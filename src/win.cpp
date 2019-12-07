@@ -47,7 +47,7 @@ void win_init(IWindowCallback* appCB) {
 	g_context = SDL_GL_CreateContext(g_window);
 
 	glewInit();
-
+	input_init();
 
 	if (g_appCB) {
 		g_appCB->init();
@@ -76,6 +76,7 @@ void win_update() {
 			std::for_each(g_eventCBs.begin(), g_eventCBs.end(), [&](std::function<void(SDL_Event&)>& func) {
 				func(e);
 			});
+
 		}
 
 		if (g_appCB) {
@@ -92,6 +93,8 @@ void win_update() {
 		if (g_fixedTime >= g_fixed_fps) {
 			g_fixedTime = 0.0f;
 		}
+
+		input_update();
 
 		SDL_GL_SwapWindow(g_window);
 	}
@@ -111,7 +114,7 @@ void win_release() {
 	SDL_Quit();
 }
 
-void win_register_event(std::function<void(SDL_Event&)>& eventCB) {
+void win_register_event(std::function<void(SDL_Event&)> eventCB) {
 	g_eventCBs.push_back(eventCB);
 }
 
