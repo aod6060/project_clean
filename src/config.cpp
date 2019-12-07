@@ -5,6 +5,8 @@ const static std::string g_version = "1.0";
 
 static std::string g_config_path = "config.json";
 
+static std::string g_caption = "";
+
 static uint32_t g_width = 0;
 static uint32_t g_height = 0;
 static bool g_isFullscreen = false;
@@ -25,6 +27,7 @@ void conf_init() {
 
 		Json::Value window = root["window"];
 
+		g_caption = window["caption"].asString();
 		g_width = window["width"].asUInt();
 		g_height = window["height"].asUInt();
 
@@ -48,4 +51,8 @@ uint32_t conf_getHeight() {
 
 bool conf_isFullscreen() {
 	return g_isFullscreen;
+}
+
+std::string conf_getCaption() {
+	return g_caption;
 }

@@ -1,13 +1,16 @@
-#include "sys.h"
+#include "game.h"
 
 
 int main(int argc, char** argv) {
+	GameWindowCallback windowCB;
+
 	conf_init();
 
-	std::cout << "Width: " << conf_getWidth() << std::endl;
-	std::cout << "Height: " << conf_getHeight() << std::endl;
-	std::cout << "IsFullscreen: " << conf_isFullscreen() << std::endl;
+	win_init(&windowCB);
 
-	std::getchar();
+	win_update();
+	
+	win_release();
+
 	return 0;
 }
