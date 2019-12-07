@@ -1,0 +1,9 @@
+{
+    "type": "config",
+    "version": "1.0",
+    "window": {
+        "width": 1280,
+        "height": 720,
+        "is-fullscreen": false
+    }
+}
