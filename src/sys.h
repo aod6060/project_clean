@@ -313,6 +313,14 @@ enum Keyboard {
 	KB_SIZE = 512
 };
 
+
+enum MouseButtons {
+	MBS_LEFT = 0,
+	MBS_MIDDLE,
+	MBS_RIGHT,
+	MBS_SIZE
+};
+
 void input_init();
 void input_update();
 
@@ -320,3 +328,16 @@ bool input_isKeyRelease(const Keyboard& key);
 bool input_isKeyDown(const Keyboard& key);
 bool input_isKeyPressed(const Keyboard& key);
 bool input_isKeyUp(const Keyboard& key);
+
+bool input_isMouseButtonRelease(const MouseButtons& mb);
+bool input_isMouseButtonDown(const MouseButtons& mb);
+bool input_isMouseButtonPress(const MouseButtons& mb);
+bool input_isMouseButtonUp(const MouseButtons& mb);
+
+void input_getMousePos(int& mx, int& my);
+
+bool input_getGrab();
+void input_setGrab(bool grab);
+void input_toggleGrab();
+
+void input_getMouseWheelCoord(int& x, int& y);
