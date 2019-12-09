@@ -225,3 +225,21 @@ bool input_isInputMappingUp(InputMapping* mapping) {
 	return b;
 }
 
+/*
+	Short Hand input mapping functions
+*/
+bool input_isIMFromConfRelease(std::string name) {
+	return input_isInputMappingRelease(conf_getInputMapping(name));
+}
+
+bool input_isIMFromConfDown(std::string name) {
+	return input_isInputMappingDown(conf_getInputMapping(name));
+}
+
+bool input_isIMFromConfPress(std::string name) {
+	return input_isInputMappingPress(conf_getInputMapping(name));
+}
+
+bool input_isIMFromConfUp(std::string name) {
+	return input_isInputMappingUp(conf_getInputMapping(name));
+}

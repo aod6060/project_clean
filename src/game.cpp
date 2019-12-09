@@ -3,12 +3,6 @@
 
 void GameWindowCallback::init() {
 	std::cout << "Init" << std::endl;
-
-	this->leftKey.isMouseButton = false;
-	this->leftKey.key = Keyboard::KB_LEFT;
-
-	this->leftMB.isMouseButton = true;
-	this->leftMB.mb = MouseButtons::MBS_LEFT;
 }
 
 void GameWindowCallback::update(float delta) {
@@ -18,44 +12,83 @@ void GameWindowCallback::update(float delta) {
 		win_exit();
 	}
 
-	// Testing Input Mapping
 	/*
-	if (input_isInputMappingRelease(&this->leftKey)) {
-		std::cout << "LEFT KEY" << std::endl;
+	if (input_isInputMappingRelease(conf_getInputMapping("left-key"))) {
+		std::cout << "left-key" << std::endl;
 	}
 
-	if (input_isInputMappingRelease(&this->leftMB)) {
-		std::cout << "LEFT MOUSE BUTTON" << std::endl;
+	if (input_isInputMappingRelease(conf_getInputMapping("left-button"))) {
+		std::cout << "left-button" << std::endl;
 	}
 	*/
 
 	/*
-	if (input_isInputMappingDown(&this->leftKey)) {
-		std::cout << "LEFT KEY" << std::endl;
+	if (input_isInputMappingDown(conf_getInputMapping("left-key"))) {
+		std::cout << "left-key" << std::endl;
 	}
-
-	if (input_isInputMappingDown(&this->leftMB)) {
-		std::cout << "LEFT MOUSE BUTTON" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isInputMappingPress(&this->leftKey)) {
-		std::cout << "LEFT KEY" << std::endl;
-	}
-
-	if (input_isInputMappingPress(&this->leftMB)) {
-		std::cout << "LEFT MOUSE BUTTON" << std::endl;
+	
+	if (input_isInputMappingDown(conf_getInputMapping("left-button"))) {
+		std::cout << "left-button" << std::endl;
 	}
 	*/
 
 	/*
-	if (input_isInputMappingUp(&this->leftKey)) {
-		std::cout << "LEFT KEY" << std::endl;
+	if (input_isInputMappingPress(conf_getInputMapping("left-key"))) {
+		std::cout << "left-key" << std::endl;
 	}
 
-	if (input_isInputMappingUp(&this->leftMB)) {
-		std::cout << "LEFT MOUSE BUTTON" << std::endl;
+	if (input_isInputMappingPress(conf_getInputMapping("left-button"))) {
+		std::cout << "left-button" << std::endl;
+	}
+	*/
+
+	/*
+	if (input_isInputMappingUp(conf_getInputMapping("left-key"))) {
+		std::cout << "left-key" << std::endl;
+	}
+
+	if (input_isInputMappingUp(conf_getInputMapping("left-button"))) {
+		std::cout << "left-button" << std::endl;
+	}
+	*/
+
+	/*
+	if (input_isIMFromConfRelease("left-key")) {
+		std::cout << "left-key" << std::endl;
+	}
+
+	if (input_isIMFromConfRelease("left-button")) {
+		std::cout << "left-button" << std::endl;
+	}
+	*/
+
+	/*
+	if (input_isIMFromConfDown("left-key")) {
+		std::cout << "left-key" << std::endl;
+	}
+
+	if (input_isIMFromConfDown("left-button")) {
+		std::cout << "left-button" << std::endl;
+	}
+	*/
+
+	/*
+	if (input_isIMFromConfPress("left-key")) {
+		std::cout << "left-key" << std::endl;
+	}
+
+	if (input_isIMFromConfPress("left-button")) {
+		std::cout << "left-button" << std::endl;
+	}
+	*/
+
+	/*
+	if (input_isIMFromConfUp("left-key")) {
+		std::cout << "left-key" << std::endl;
+	}
+
+	if (input_isIMFromConfUp("left-button")) {
+		std::cout << "left-button" << std::endl;
 	}
 	*/
 }

@@ -1,10 +1,22 @@
 {
     "type": "config",
-    "version": "1.0",
+    "version": "1.1",
     "window": {
         "caption": "Project Clean",
         "width": 1280,
         "height": 720,
         "is-fullscreen": false
-    }
+    },
+    "input-mapping": [
+        {
+            "name": "left-key", 
+            "is-mouse-button": false,
+            "input": "KB_LEFT"
+        },
+        {
+            "name": "left-button", 
+            "is-mouse-button": true, 
+            "input": "MBS_LEFT"
+        }
+    ]
 }

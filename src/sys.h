@@ -29,11 +29,15 @@
 // My Stuff
 
 // Configuration
+struct InputMapping;
+
 void conf_init();
 std::string conf_getCaption();
 uint32_t conf_getWidth();
 uint32_t conf_getHeight();
 bool conf_isFullscreen();
+
+InputMapping* conf_getInputMapping(std::string name);
 
 // Window
 class IWindowCallback {
@@ -356,3 +360,13 @@ bool input_isInputMappingRelease(InputMapping* mapping);
 bool input_isInputMappingDown(InputMapping* mapping);
 bool input_isInputMappingPress(InputMapping* mapping);
 bool input_isInputMappingUp(InputMapping* mapping);
+
+
+/*
+	Short Hand input mapping functions
+*/
+
+bool input_isIMFromConfRelease(std::string name);
+bool input_isIMFromConfDown(std::string name);
+bool input_isIMFromConfPress(std::string name);
+bool input_isIMFromConfUp(std::string name);
