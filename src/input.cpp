@@ -127,7 +127,7 @@ bool input_isKeyDown(const Keyboard& key) {
 	return keys[key] == IS_DOWN;
 }
 
-bool input_isKeyPressed(const Keyboard& key) {
+bool input_isKeyPress(const Keyboard& key) {
 	return keys[key] == IS_PRESSED;
 }
 
@@ -172,3 +172,56 @@ void input_getMouseWheelCoord(int& x, int& y) {
 	x = g_mouseWheelX;
 	y = g_mouseWheelY;
 }
+
+bool input_isInputMappingRelease(InputMapping* mapping) {
+	bool b = false;
+
+	if (mapping->isMouseButton) {
+		b = input_isMouseButtonRelease(mapping->mb);
+	}
+	else {
+		b = input_isKeyRelease(mapping->key);
+	}
+
+	return b;
+}
+
+bool input_isInputMappingDown(InputMapping* mapping) {
+	bool b = false;
+
+	if (mapping->isMouseButton) {
+		b = input_isMouseButtonDown(mapping->mb);
+	}
+	else {
+		b = input_isKeyDown(mapping->key);
+	}
+
+	return b;
+}
+
+bool input_isInputMappingPress(InputMapping* mapping) {
+	bool b = false;
+
+	if (mapping->isMouseButton) {
+		b = input_isMouseButtonPress(mapping->mb);
+	}
+	else {
+		b = input_isKeyPress(mapping->key);
+	}
+
+	return b;
+}
+
+bool input_isInputMappingUp(InputMapping* mapping) {
+	bool b = false;
+
+	if (mapping->isMouseButton) {
+		b = input_isMouseButtonUp(mapping->mb);
+	}
+	else {
+		b = input_isKeyUp(mapping->key);
+	}
+
+	return b;
+}
+

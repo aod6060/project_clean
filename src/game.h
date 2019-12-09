@@ -5,6 +5,10 @@
 
 
 class GameWindowCallback : public IWindowCallback {
+private:
+
+	InputMapping leftKey;
+	InputMapping leftMB;
 public:
 	virtual void init();
 	virtual void update(float delta);

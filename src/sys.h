@@ -326,7 +326,7 @@ void input_update();
 
 bool input_isKeyRelease(const Keyboard& key);
 bool input_isKeyDown(const Keyboard& key);
-bool input_isKeyPressed(const Keyboard& key);
+bool input_isKeyPress(const Keyboard& key);
 bool input_isKeyUp(const Keyboard& key);
 
 bool input_isMouseButtonRelease(const MouseButtons& mb);
@@ -341,3 +341,18 @@ void input_setGrab(bool grab);
 void input_toggleGrab();
 
 void input_getMouseWheelCoord(int& x, int& y);
+
+/*
+	InputMapping ~ This basically maps keys to an 
+	input mapping interface
+*/
+struct InputMapping {
+	Keyboard key;
+	MouseButtons mb;
+	bool isMouseButton;
+};
+
+bool input_isInputMappingRelease(InputMapping* mapping);
+bool input_isInputMappingDown(InputMapping* mapping);
+bool input_isInputMappingPress(InputMapping* mapping);
+bool input_isInputMappingUp(InputMapping* mapping);

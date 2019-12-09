@@ -3,6 +3,12 @@
 
 void GameWindowCallback::init() {
 	std::cout << "Init" << std::endl;
+
+	this->leftKey.isMouseButton = false;
+	this->leftKey.key = Keyboard::KB_LEFT;
+
+	this->leftMB.isMouseButton = true;
+	this->leftMB.mb = MouseButtons::MBS_LEFT;
 }
 
 void GameWindowCallback::update(float delta) {
@@ -12,76 +18,49 @@ void GameWindowCallback::update(float delta) {
 		win_exit();
 	}
 
+	// Testing Input Mapping
 	/*
-	if (input_isKeyRelease(Keyboard::KB_LEFT)) {
-		std::cout << "KEYBOARD RELEASE [LEFT]" << std::endl;
+	if (input_isInputMappingRelease(&this->leftKey)) {
+		std::cout << "LEFT KEY" << std::endl;
+	}
+
+	if (input_isInputMappingRelease(&this->leftMB)) {
+		std::cout << "LEFT MOUSE BUTTON" << std::endl;
 	}
 	*/
 
 	/*
-	if (input_isKeyDown(Keyboard::KB_LEFT)) {
-		std::cout << "KEYBOARD DOWN [LEFT]" << std::endl;
+	if (input_isInputMappingDown(&this->leftKey)) {
+		std::cout << "LEFT KEY" << std::endl;
+	}
+
+	if (input_isInputMappingDown(&this->leftMB)) {
+		std::cout << "LEFT MOUSE BUTTON" << std::endl;
 	}
 	*/
 
 	/*
-	if (input_isKeyPressed(Keyboard::KB_LEFT)) {
-		std::cout << "KEYBOARD PRESSED [LEFT]" << std::endl;
+	if (input_isInputMappingPress(&this->leftKey)) {
+		std::cout << "LEFT KEY" << std::endl;
+	}
+
+	if (input_isInputMappingPress(&this->leftMB)) {
+		std::cout << "LEFT MOUSE BUTTON" << std::endl;
 	}
 	*/
 
 	/*
-	if (input_isKeyUp(Keyboard::KB_LEFT)) {
-		std::cout << "KEYBOARD UP[LEFT]" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isMouseButtonRelease(MouseButtons::MBS_LEFT)) {
-		std::cout << "MOUSE BUTTON RELEASE[LEFT]" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isMouseButtonDown(MouseButtons::MBS_LEFT)) {
-		std::cout << "MOUSE BUTTON DOWN[LEFT]" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isMouseButtonPress(MouseButtons::MBS_LEFT)) {
-		std::cout << "MOUSE BUTTON PRESS[LEFT]" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isMouseButtonUp(MouseButtons::MBS_LEFT)) {
-		std::cout << "MOUSE BUTTON UP[LEFT]" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isKeyDown(Keyboard::KB_TAB)) {
-		input_toggleGrab();
+	if (input_isInputMappingUp(&this->leftKey)) {
+		std::cout << "LEFT KEY" << std::endl;
 	}
 
-	int x;
-	int y;
-
-	input_getMousePos(x, y);
-
-	std::cout << x << ", " << y << std::endl;
+	if (input_isInputMappingUp(&this->leftMB)) {
+		std::cout << "LEFT MOUSE BUTTON" << std::endl;
+	}
 	*/
-
-	int x, y;
-
-	input_getMouseWheelCoord(x, y);
-
-	std::cout << x << ", " << y << std::endl;
 }
 
 void GameWindowCallback::fixedUpdate() {
-	//std::cout << "Hello, from fixed update..." << std::endl;
 }
 
 void GameWindowCallback::render() {
