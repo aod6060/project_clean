@@ -1,7 +1,7 @@
 #include "sys.h"
 
 const static std::string g_type = "config";
-const static std::string g_version = "1.1";
+const static std::string g_version = "1.2";
 
 static std::string g_config_path = "config.json";
 
