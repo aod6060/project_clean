@@ -2,7 +2,6 @@
 
 
 void GameWindowCallback::init() {
-	std::cout << "Init" << std::endl;
 }
 
 void GameWindowCallback::update(float delta) {
@@ -12,85 +11,7 @@ void GameWindowCallback::update(float delta) {
 		win_exit();
 	}
 
-	/*
-	if (input_isInputMappingRelease(conf_getInputMapping("left-key"))) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isInputMappingRelease(conf_getInputMapping("left-button"))) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isInputMappingDown(conf_getInputMapping("left-key"))) {
-		std::cout << "left-key" << std::endl;
-	}
-	
-	if (input_isInputMappingDown(conf_getInputMapping("left-button"))) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isInputMappingPress(conf_getInputMapping("left-key"))) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isInputMappingPress(conf_getInputMapping("left-button"))) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isInputMappingUp(conf_getInputMapping("left-key"))) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isInputMappingUp(conf_getInputMapping("left-button"))) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isIMFromConfRelease("left-key")) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isIMFromConfRelease("left-button")) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isIMFromConfDown("left-key")) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isIMFromConfDown("left-button")) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isIMFromConfPress("left-key")) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isIMFromConfPress("left-button")) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
-
-	/*
-	if (input_isIMFromConfUp("left-key")) {
-		std::cout << "left-key" << std::endl;
-	}
-
-	if (input_isIMFromConfUp("left-button")) {
-		std::cout << "left-button" << std::endl;
-	}
-	*/
+	logger_output("delta: %f\n", delta);
 }
 
 void GameWindowCallback::fixedUpdate() {
@@ -101,6 +22,5 @@ void GameWindowCallback::render() {
 }
 
 void GameWindowCallback::release() {
-	std::cout << "Release" << std::endl;
 }
 

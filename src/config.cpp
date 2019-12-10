@@ -16,8 +16,14 @@ static std::map<std::string, InputMapping> g_inputMappings;
 static Keyboard _conf_toKeyboard(std::string key);
 static MouseButtons _conf_toMouseButtons(std::string mb);
 
+static LoggerType g_loggerType;
+
+static LoggerType _conf_toLoggerType(std::string key);
+
 void conf_init() {
 	std::ifstream in(g_config_path);
+
+	srand(time(nullptr));
 
 	Json::Value root;
 
@@ -64,6 +70,13 @@ void conf_init() {
 				g_inputMappings[name] = mapping;
 			}
 		}
+
+
+		// logger section
+		// console, file, both
+		Json::Value logger = root["logger"];
+
+		g_loggerType = _conf_toLoggerType(logger["type"].asString());
 	}
 	else {
 		throw std::exception("Error: Configuration file doesn't exist or isn't the right type of file...");
@@ -351,3 +364,16 @@ static MouseButtons _conf_toMouseButtons(std::string mb) {
 
 	return mouseButtons[mb];
 }	
+
+LoggerType conf_getLoggerType() {
+	return g_loggerType;
+}
+
+static LoggerType _conf_toLoggerType(std::string key) {
+	std::map<std::string, LoggerType> loggerType = {
+		{"console", LT_CONSOLE},
+		{"file", LT_FILE},
+		{"both", LT_BOTH}
+	};
+	return loggerType[key];
+}

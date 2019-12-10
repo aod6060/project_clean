@@ -18,5 +18,8 @@
             "is-mouse-button": true, 
             "input": "MBS_LEFT"
         }
-    ]
+    ],
+    "logger": {
+        "type": "console"
+    }
 }

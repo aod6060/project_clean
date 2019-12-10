@@ -47,6 +47,7 @@ void win_init(IWindowCallback* appCB) {
 	g_context = SDL_GL_CreateContext(g_window);
 
 	glewInit();
+	logger_init();
 	input_init();
 
 	if (g_appCB) {
@@ -108,6 +109,7 @@ void win_release() {
 	g_appCB = nullptr;
 
 	g_eventCBs.clear();
+	logger_release();
 
 	SDL_GL_DeleteContext(g_context);
 	SDL_DestroyWindow(g_window);

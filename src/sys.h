@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
+#include <cstdarg>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -27,6 +28,12 @@
 #include <btBulletDynamicsCommon.h>
 
 // My Stuff
+enum LoggerType {
+	LT_CONSOLE = 0,
+	LT_FILE,
+	LT_BOTH,
+	LT_SIZE
+};
 
 // Configuration
 struct InputMapping;
@@ -38,6 +45,8 @@ uint32_t conf_getHeight();
 bool conf_isFullscreen();
 
 InputMapping* conf_getInputMapping(std::string name);
+
+LoggerType conf_getLoggerType();
 
 // Window
 class IWindowCallback {
@@ -370,3 +379,11 @@ bool input_isIMFromConfRelease(std::string name);
 bool input_isIMFromConfDown(std::string name);
 bool input_isIMFromConfPress(std::string name);
 bool input_isIMFromConfUp(std::string name);
+
+
+// Logger Interface
+
+void logger_init();
+void logger_release();
+
+void logger_output(const char* format, ...);
