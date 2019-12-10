@@ -32,3 +32,4 @@
 #include "config.h"
 #include "win.h"
 #include "input.h"
+#include "graphics.h"

@@ -2,6 +2,7 @@
 
 
 void GameWindowCallback::init() {
+	glEnable(GL_DEPTH_TEST);
 }
 
 void GameWindowCallback::update(float delta) {
@@ -10,14 +11,15 @@ void GameWindowCallback::update(float delta) {
 	if (input_isKeyDown(Keyboard::KB_ESCAPE)) {
 		win_exit();
 	}
-
-	logger_output("delta: %f\n", delta);
 }
 
 void GameWindowCallback::fixedUpdate() {
 }
 
 void GameWindowCallback::render() {
+	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
 }
 
