@@ -1,92 +1,31 @@
 #pragma once
 
+
+
+/*
+	Wrapper Section
+*/
+// Shader
+struct Shader {
+	uint32_t id = 0;
+
+	void init(GLenum type, std::string path);
+	void release();
+};
+
 // Program
 struct Program {
 	uint32_t id = 0;
 
-	struct Shader {
-		uint32_t id = 0;
-
-		void init(GLenum type, std::string path);
-		void release();
-	};
-
-	std::vector<Shader> shaders;
+	std::vector<Shader*> shaders;
 
 	uint32_t attrID = 0;
+
 	std::map<std::string, int> attributes;
 
 	std::map<std::string, int> uniforms;
 
-
-	struct ProgramData {
-		std::string type;
-		std::string version;
-
-		struct ShaderData {
-			GLenum type;
-			std::string path;
-		};
-
-		std::vector<ShaderData> shaderDataList;
-
-		struct AttributeData {
-			std::string name;
-			int location;
-		};
-
-		std::vector<AttributeData> attributeDataList;
-
-		struct UniformData {
-			std::string name;
-			bool hasDefaultData = false;
-
-			enum MethodTokens {
-				MT_SET1I = 0,
-				MT_SET2I,
-				MT_SET3I,
-				MT_SET4I,
-				MT_SET1F,
-				MT_SET2F,
-				MT_SET3F,
-				MT_SET4F,
-				MT_SETMAT2,
-				MT_SETMAT3,
-				MT_SETMAT4,
-				MT_SIZE
-			};
-
-			struct DefaultData {
-				std::string method;
-				// Section Contains Data
-
-				// Integer
-				int data1i;
-				glm::ivec2 data2i;
-				glm::ivec3 data3i;
-				glm::ivec4 data4i;
-
-				// Float
-				float data1f;
-				glm::vec2 data2f;
-				glm::vec3 data3f;
-				glm::vec4 data4f;
-
-				// Matrices
-				glm::mat2 dataMat2;
-				glm::mat3 dataMat3;
-				glm::mat4 dataMat4;
-			};
-
-			DefaultData defData;
-		};
-
-		std::vector<UniformData> uniformDataList;
-	};
-
-	void loadData(std::string path, ProgramData& data);
-
-	void init(std::string path);
+	void init();
 
 	void bind();
 
@@ -94,6 +33,7 @@ struct Program {
 
 	void release();
 
+	void addShader(Shader* shader);
 
 	// Attributes
 	void setAttr(std::string name, int id);
@@ -128,12 +68,65 @@ struct Program {
 
 	// Matrices Uniforms
 	void setMat2(std::string name, const glm::mat2& m);
-	void setMat3(std::string name, const glm::mat2& m);
-	void setMat4(std::string name, const glm::mat2& m);
+	void setMat3(std::string name, const glm::mat3& m);
+	void setMat4(std::string name, const glm::mat4& m);
 
 };
+
 // VertexBuffer
+struct VertexBuffer {
+	uint32_t id = 0;
+	std::vector<float> list;
+	bool isDynamic = false;
+
+	void set1f(float x);
+	void set2f(float x, float y);
+	void set3f(float x, float y, float z);
+	void set4f(float x, float y, float z, float w);
+	void clear();
+
+	void init(bool isDynamic = false);
+	void release();
+	void bind();
+	void unbind();
+	void update();
+
+	int size();
+	 
+};
 
 // IndexBuffer
+struct IndexBuffer {
+	uint32_t id = 0;
+	std::vector<int> list;
+
+	void set1f(int x);
+	void set2f(int x, int y);
+	void set3f(int x, int y, int z);
+	void set4f(int x, int y, int z, int w);
+
+	void init();
+	void release();
+	void bind();
+	void unbind();
+	void update();
+
+	int size();
+};
 
 // Texture2D
+struct Texture2D {
+	uint32_t id = 0;
+	uint32_t width;
+	uint32_t height;
+
+	void loadTexture(std::string fn);
+
+	void init(uint32_t width, uint32_t height, uint32_t bytePerPixel, void* pixels);
+
+	void bind(GLenum tex = GL_TEXTURE0);
+
+	void unbind(GLenum tex = GL_TEXTURE0);
+
+	void release();
+};

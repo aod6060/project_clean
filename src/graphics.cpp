@@ -1,12 +1,7 @@
 #include "sys.h"
 
-
-const static std::string PROG_DATA_TYPE = "program";
-const static std::string PROG_DATA_VERSION = "1.0";
-// Program
-
 // Shaders
-void Program::Shader::init(GLenum type, std::string path) {
+void Shader::init(GLenum type, std::string path) {
 	id = glCreateShader(type);
 
 	std::ifstream in(path);
@@ -39,170 +34,36 @@ void Program::Shader::init(GLenum type, std::string path) {
 	}
 }
 
-void Program::Shader::release() {
+void Shader::release() {
 	glDeleteShader(this->id);
 	this->id = 0;
 }
 
 // Program functions
-void Program::loadData(
-	std::string path, 
-	ProgramData& data) {
-
-	std::ifstream in(path);
-
-	Json::Value root;
-
-	in >> root;
-
-	Json::Value type = root["type"];
-	Json::Value version = root["version"];
-
-	data.type = type.asString();
-	data.version = type.asString();
-
-	if (
-		type.asString() == PROG_DATA_TYPE && 
-		version.asString() == PROG_DATA_VERSION) {
-
-		// Shaders
-		std::map<std::string, GLenum> shaderTypes = {
-			{"vertex", GL_VERTEX_SHADER},
-			{"fragment", GL_FRAGMENT_SHADER} 
-		};
-
-		Json::Value shaders = root["shaders"];
-
-		if (shaders.isArray()) {
-			for (int i = 0; i < shaders.size(); i++) {
-				Json::Value temp = shaders[i];
-
-				ProgramData::ShaderData shaderData;
-
-				shaderData.type = shaderTypes[temp["type"].asString()];
-				shaderData.path = temp["path"].asString();
-
-				data.shaderDataList.push_back(shaderData);
-			}
-		}
-
-		// Attributes
-		Json::Value attributes = root["attributes"];
-		if (attributes.isArray()) {
-			for (int i = 0; i < attributes.size(); i++) {
-				Json::Value t1 = attributes[i];
-
-				ProgramData::AttributeData attrData;
-
-				attrData.name = t1["name"].asString();
-				attrData.location = t1["location"].asInt();
-
-				data.attributeDataList.push_back(attrData);
-			}
-		}
-
-		// Uniforms
-		Json::Value uniforms = root["uniforms"];
-		if (uniforms.isArray()) {
-			for (int i = 0; i < uniforms.size(); i++) {
-				Json::Value t1 = uniforms[i];
-
-				ProgramData::UniformData uniformData;
-
-				uniformData.name = t1["name"].asString();
-				uniformData.hasDefaultData = t1["default"].isNull();
-
-				if (uniformData.hasDefaultData) {
-					Json::Value d = t1["default"];
-
-					std::string check = uniformData.defData.method = d["method"].asString();
-
-					std::map<std::string, ProgramData::UniformData::MethodTokens> methodTokens = {
-						{"set1i", ProgramData::UniformData::MethodTokens::MT_SET1I},
-						{"set2i", ProgramData::UniformData::MethodTokens::MT_SET2I},
-						{"set3i", ProgramData::UniformData::MethodTokens::MT_SET3I},
-						{"set4i", ProgramData::UniformData::MethodTokens::MT_SET4I},
-						{"set1f", ProgramData::UniformData::MethodTokens::MT_SET1F},
-						{"set2f", ProgramData::UniformData::MethodTokens::MT_SET2F},
-						{"set3f", ProgramData::UniformData::MethodTokens::MT_SET3F},
-						{"set4f", ProgramData::UniformData::MethodTokens::MT_SET4F},
-						{"setMat2", ProgramData::UniformData::MethodTokens::MT_SETMAT2},
-						{"setMat3", ProgramData::UniformData::MethodTokens::MT_SETMAT3},
-						{"setMat4", ProgramData::UniformData::MethodTokens::MT_SETMAT4}
-					};
-
-
-						/*
-							"method": "set1i",
-							"data": 0,
-						*/
-						/*
-							"method": "set2i",
-							"data": [1, 1],
-						*/
-						/*
-							// set3i
-							"method": "set3i",
-							"data": [1, 1, 1],
-						*/
-						/*
-						// set4i
-						"method": "set4i",
-						"data" : [1, 1, 1, 1],
-						*/
-				/*
-					// set4i
-					"method": "set4i",
-					"data": [1, 1, 1, 1],
-					// set1f
-					"method": "set1f",
-					"data": 1.0,
-					// set2f
-					"method": "set2f",
-					"data": [1.0, 1.0],
-					// set3f
-					"method": "set3f",
-					"data": [1.0, 1.0, 1.0],
-					// set4f
-					"method": "set3f",
-					"data": [1.0, 1.0, 1.0, 1.0],
-					// setMat2
-					"method": "setMat2",
-					"data": [
-						1.0, 1.0,
-						1.0, 1.0
-					],
-					// setMat3
-					"method": "setMat3",
-					"data": [
-						1.0, 1.0, 1.0,
-						1.0, 1.0, 1.0,
-						1.0, 1.0, 1.0
-					],
-					// setMat4
-					"method": "setMat4",
-					"data": [
-						1.0, 1.0, 1.0, 1.0,
-						1.0, 1.0, 1.0, 1.0,
-						1.0, 1.0, 1.0, 1.0,
-						1.0, 1.0, 1.0, 1.0
-					]
-				*/
-
-
-				}
-
-				data.uniformDataList.push_back(uniformData);
-			}
-		}
-	}
-	in.close();
+void Program::addShader(Shader* shader) {
+	this->shaders.push_back(shader);
 }
 
-void Program::init(std::string path) {
-	ProgramData programData;
+void Program::init() {
+	this->id = glCreateProgram();
 
-	this->loadData(path, programData);
+	std::for_each(this->shaders.begin(), this->shaders.end(), [&](Shader* shader) {
+		glAttachShader(this->id, shader->id);
+	});
+
+	glLinkProgram(this->id);
+
+	char log[1024];
+	int len;
+
+	glGetProgramiv(id, GL_INFO_LOG_LENGTH, &len);
+
+	if (len > 0) {
+		glGetProgramInfoLog(id, len, 0, log);
+		logger_output("%s\n", log);
+	}
+
+	glGenVertexArrays(1, &this->attrID);
 }
 
 void Program::bind() {
@@ -216,9 +77,8 @@ void Program::unbind() {
 void Program::release() {
 	glDeleteVertexArrays(1, &this->attrID);
 
-	std::for_each(shaders.begin(), shaders.end(), [&](Shader& shader) {
-		glDetachShader(this->id, shader.id);
-		shader.release();
+	std::for_each(shaders.begin(), shaders.end(), [&](Shader* shader) {
+		glDetachShader(this->id, shader->id);
 	});
 
 	shaders.clear();
@@ -308,11 +168,190 @@ void Program::setMat2(std::string name, const glm::mat2& m) {
 	glUniformMatrix2fv(this->uniforms[name], 1, GL_FALSE, &m[0][0]);
 }
 
-void Program::setMat3(std::string name, const glm::mat2& m) {
+void Program::setMat3(std::string name, const glm::mat3& m) {
 	glUniformMatrix3fv(this->uniforms[name], 1, GL_FALSE, &m[0][0]);
 }
 
-void Program::setMat4(std::string name, const glm::mat2& m) {
+void Program::setMat4(std::string name, const glm::mat4& m) {
 	glUniformMatrix4fv(this->uniforms[name], 1, GL_FALSE, &m[0][0]);
 }
 
+
+
+// VertexBuffer
+void VertexBuffer::set1f(float x) {
+	this->list.push_back(x);
+}
+
+void VertexBuffer::set2f(float x, float y) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+}
+
+void VertexBuffer::set3f(float x, float y, float z) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+	this->list.push_back(z);
+}
+
+void VertexBuffer::set4f(float x, float y, float z, float w) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+	this->list.push_back(z);
+	this->list.push_back(w);
+}
+
+void VertexBuffer::clear() {
+	this->list.clear();
+}
+
+void VertexBuffer::init(bool isDynamic) {
+	this->isDynamic = isDynamic;
+	glGenBuffers(1, &this->id);
+}
+
+void VertexBuffer::release() {
+	glDeleteBuffers(1, &this->id);
+	this->clear();
+}
+
+void VertexBuffer::bind() {
+	glBindBuffer(GL_ARRAY_BUFFER, this->id);
+}
+
+void VertexBuffer::unbind() {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void VertexBuffer::update() {
+	this->bind();
+	glBufferData(GL_ARRAY_BUFFER, this->size() * sizeof(float), list.data(), (this->isDynamic) ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+	this->unbind();
+}
+
+int VertexBuffer::size() {
+	return this->list.size();
+}
+
+
+
+// Index Buffer
+void IndexBuffer::set1f(int x) {
+	this->list.push_back(x);
+}
+
+void IndexBuffer::set2f(int x, int y) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+}
+
+void IndexBuffer::set3f(int x, int y, int z) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+	this->list.push_back(z);
+}
+
+void IndexBuffer::set4f(int x, int y, int z, int w) {
+	this->list.push_back(x);
+	this->list.push_back(y);
+	this->list.push_back(z);
+	this->list.push_back(w);
+}
+
+void IndexBuffer::init() {
+	glGenBuffers(1, &this->id);
+}
+
+void IndexBuffer::release() {
+	glDeleteBuffers(1, &this->id);
+}
+
+void IndexBuffer::bind() {
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+}
+
+void IndexBuffer::unbind() {
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void IndexBuffer::update() {
+	bind();
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->size() * sizeof(int), this->list.data(), GL_DYNAMIC_DRAW);
+	unbind();
+}
+
+int IndexBuffer::size() {
+	return this->list.size();
+}
+
+
+
+// Texture2D
+
+void Texture2D::loadTexture(std::string fn) {
+	SDL_Surface* surf = IMG_Load(fn.c_str());
+
+	if (surf == nullptr) {
+		return;
+	}
+
+	this->init(
+		surf->w,
+		surf->h,
+		surf->format->BytesPerPixel,
+		surf->pixels);
+
+	SDL_FreeSurface(surf);
+}
+
+void Texture2D::init(
+	uint32_t width,
+	uint32_t height,
+	uint32_t bytePerPixel,
+	void* pixels) {
+
+	this->width = width;
+	this->height = height;
+
+	GLenum format = GL_RGB;
+
+	if (bytePerPixel == 4) {
+		format = GL_RGBA;
+	}
+
+	if (this->id == 0) {
+		glGenTextures(1, &this->id);
+	}
+
+	this->bind();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		format,
+		this->width,
+		this->height,
+		0,
+		format,
+		GL_UNSIGNED_BYTE,
+		pixels);
+
+	this->unbind();
+}
+
+void Texture2D::bind(GLenum tex) {
+	glActiveTexture(tex);
+	glBindTexture(GL_TEXTURE_2D, this->id);
+}
+
+void Texture2D::unbind(GLenum tex) {
+	glActiveTexture(tex);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Texture2D::release() {
+	glDeleteTextures(1, &this->id);
+}
