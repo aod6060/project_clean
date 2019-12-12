@@ -6,13 +6,10 @@
 
 class GameWindowCallback : public IWindowCallback {
 private:
-	TestShader testShader;
-
-	VertexBuffer quad;
-	VertexBuffer quadTexCoords;
-	IndexBuffer quadIndencies;
-
+	RenderPassManager renderPassManager;
+	MainRenderPass mainRenderPass;
 	Texture2D angry;
+	QuadTestShaderGeomentry quad;
 
 	float yrot = 0.0f;
 

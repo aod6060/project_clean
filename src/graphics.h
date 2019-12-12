@@ -138,16 +138,7 @@ struct Texture2D {
 	HIGHLEVEL ~ Graphics
 */
 
-struct IShader;
-
-struct IGeometry {
-	virtual void init() = 0;
-	virtual void render(IShader* shader) = 0;
-	virtual void release() = 0;
-
-	virtual void getVertices(std::vector<glm::vec3>& vertices) = 0;
-};
-
+// Shader Section
 struct IShader {
 
 	virtual void init() = 0;
@@ -196,4 +187,94 @@ struct TestShader : public AbstractShader {
 	void setProjection(const glm::mat4& proj);
 	void setView(const glm::mat4& view);
 	void setModel(const glm::mat4& model);
+};
+
+// Geometry Section
+template<typename T>
+struct IGeometry {
+	virtual void init() = 0;
+	virtual void render(T* shader) = 0;
+	virtual void release() = 0;
+
+	virtual void getVertices(std::vector<glm::vec3>& vertices) = 0;
+};
+
+
+struct AbstractTestShaderGeometry : public IGeometry<TestShader> {
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	IndexBuffer indencies;
+
+	virtual void init() = 0;
+	virtual void render(TestShader* shader);
+	virtual void release();
+
+	virtual void getVertices(std::vector<glm::vec3>& vertices);
+};
+
+struct QuadTestShaderGeomentry : public AbstractTestShaderGeometry {
+	virtual void init();
+};
+
+
+// IRenderPass Section
+struct IRenderPass;
+
+struct RenderContext {
+	IRenderPass* pass = nullptr;
+
+	RenderContext(IRenderPass* pass);
+	void enable(GLenum e);
+	void disable(GLenum e);
+	void clearColor(float r, float g, float b, float a);
+	void clear(int clear);
+	// I'll add in more functions later for the render context
+
+	template<typename T>
+	T* getPass() {
+		return (T*)pass;
+	}
+};
+
+struct IRenderPass {
+	virtual void init() = 0;
+	virtual void render() = 0;
+	virtual void release() = 0;
+
+	virtual void setCallback(std::function<void(RenderContext* renderContext)> callback) = 0;
+};
+
+struct AbstractRenderPass : public IRenderPass {
+
+	std::function<void(RenderContext*)> callback;
+
+	virtual void init() = 0;
+	virtual void render() = 0;
+	virtual void release() = 0;
+
+	virtual void setCallback(std::function<void(RenderContext*)> callback);
+};
+
+
+struct MainRenderPass : public AbstractRenderPass {
+
+	TestShader testShader;
+
+	virtual void init();
+	virtual void render();
+	virtual void release();
+};
+
+
+// RenderPass Manager
+struct RenderPassManager {
+	std::vector<IRenderPass*> passes;
+
+	void addRenderPass(IRenderPass* pass);
+
+	void init();
+
+	void render();
+
+	void release();
 };
