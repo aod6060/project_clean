@@ -4,35 +4,7 @@
 void GameWindowCallback::init() {
 	glEnable(GL_DEPTH_TEST);
 
-	// Shader
-	testVertex.init(GL_VERTEX_SHADER, "data/shaders/test.vert");
-	testFragment.init(GL_FRAGMENT_SHADER, "data/shaders/test.frag");
-
-	// Program
-	testProgram.addShader(&testVertex);
-	testProgram.addShader(&testFragment);
-
-	testProgram.init();
-
-	testProgram.bind();
-	testProgram.createUniform("proj");
-	testProgram.createUniform("view");
-	testProgram.createUniform("model");
-	testProgram.createUniform("tex0");
-	testProgram.set1i("tex0", 0);
-
-	testProgram.setAttr("vertices", 0);
-	testProgram.setAttr("texCoords", 1);
-
-	testProgram.bindAttr();
-	testProgram.enableAttr("vertices");
-	testProgram.enableAttr("texCoords");
-	testProgram.unbindAttr();
-	testProgram.disableAttr("vertices");
-	testProgram.disableAttr("texCoords");
-	
-	testProgram.unbind();
-
+	this->testShader.init();
 
 	quad.init();
 	// 0
@@ -89,31 +61,41 @@ void GameWindowCallback::render() {
 	glClearColor(0.0f, 0.0f, 1.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	testProgram.bind();
+	testShader.bind();
 
+	/*
 	testProgram.setMat4("proj", proj);
 	testProgram.setMat4("view", view);
 	testProgram.setMat4("model", model);
+	*/
+
+	testShader.setProjection(proj);
+	testShader.setView(view);
+	testShader.setModel(model);
 
 	angry.bind();
-	testProgram.bindAttr();
+	//testProgram.bindAttr();
+	testShader.bindAttr();
 
 	quad.bind();
-	testProgram.pointerAttr("vertices", 3, GL_FLOAT);
+	//testProgram.pointerAttr("vertices", 3, GL_FLOAT);
+	testShader.verticesPointer();
 	quad.unbind();
 
 	quadTexCoords.bind();
-	testProgram.pointerAttr("texCoords", 2, GL_FLOAT);
+	//testProgram.pointerAttr("texCoords", 2, GL_FLOAT);
+	testShader.texCoordPointer();
 	quadTexCoords.unbind();
 
 	quadIndencies.bind();
 	glDrawElements(GL_TRIANGLES, quadIndencies.size(), GL_UNSIGNED_INT, 0);
 	quadIndencies.unbind();
 
-	testProgram.unbindAttr();
+	testShader.unbindAttr();
+
 	angry.unbind();
 
-	testProgram.unbind();
+	testShader.unbind();
 
 }
 
@@ -124,9 +106,6 @@ void GameWindowCallback::release() {
 	quadTexCoords.release();
 	quad.release();
 
-	testProgram.release();
-
-	testFragment.release();
-	testVertex.release();
+	testShader.release();
 }
 

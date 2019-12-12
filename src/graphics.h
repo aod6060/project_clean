@@ -130,3 +130,70 @@ struct Texture2D {
 
 	void release();
 };
+
+
+
+
+/*
+	HIGHLEVEL ~ Graphics
+*/
+
+struct IShader;
+
+struct IGeometry {
+	virtual void init() = 0;
+	virtual void render(IShader* shader) = 0;
+	virtual void release() = 0;
+
+	virtual void getVertices(std::vector<glm::vec3>& vertices) = 0;
+};
+
+struct IShader {
+
+	virtual void init() = 0;
+	virtual void bind() = 0;
+	virtual void unbind() = 0;
+	virtual void release() = 0;
+
+	virtual void bindAttr() = 0;
+	virtual void unbindAttr() = 0;
+	virtual void pointerAttr(
+		std::string name,
+		uint32_t size,
+		GLenum type) = 0;
+};
+
+struct AbstractShader : public IShader {
+	Shader vertex;
+	Shader fragment;
+
+	Program program;
+
+	virtual void init() = 0;
+	virtual void bind();
+	virtual void unbind();
+	virtual void release();
+
+	virtual void bindAttr();
+	virtual void unbindAttr();
+	virtual void pointerAttr(
+		std::string name,
+		uint32_t size,
+		GLenum type);
+};
+
+struct TestShader : public AbstractShader {
+
+
+	virtual void init();
+
+	// Set Attributes
+	void verticesPointer();
+
+	void texCoordPointer();
+
+	// Set Uniforms
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+};

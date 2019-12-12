@@ -6,10 +6,7 @@
 
 class GameWindowCallback : public IWindowCallback {
 private:
-	Shader testVertex;
-	Shader testFragment;
-
-	Program testProgram;
+	TestShader testShader;
 
 	VertexBuffer quad;
 	VertexBuffer quadTexCoords;
