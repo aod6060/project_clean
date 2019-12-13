@@ -1,0 +1,27 @@
+//----------------------------------------------------------//
+Format: Mesh
+Version: 1.0
+//----------------------------------------------------------//
+
+This document describes the mesh format for "Project Clean." 
+The format will use for all complex objects and will eventually
+support Animations as well. The format will use JSON file format.
+
+{
+    "type": "scene",
+    "version": "1.0"
+    "meshes": [
+        {
+            "matrix": [float16],
+            "vertices": [
+                {"x": 0, "y": 0, "z": 0, "tx": 0, "ty": 0, "nx": 0, "ny": 0, "nz": 0},
+                ...
+            ],
+            "faces": [
+                {"p1": 0, "p2": 0, "p3": 0},
+                ...
+            ]
+        },
+        ...
+    ]
+}
