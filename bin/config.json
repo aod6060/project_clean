@@ -9,17 +9,70 @@
     },
     "input-mapping": [
         {
-            "name": "left-key", 
+            "name": "_left-key-test_remove-later", 
             "is-mouse-button": false,
             "input": "KB_LEFT"
         },
         {
-            "name": "left-button", 
+            "name": "_left-button_remove-later", 
             "is-mouse-button": true, 
             "input": "MBS_LEFT"
+        },
+        {
+            "name": "escape",
+            "is-mouse-button": false,
+            "input": "KB_ESCAPE"
+        },
+        {
+            "name": "toggle-input-mode",
+            "is-mouse-button": false,
+            "input": "KB_TAB"
+        },
+        {
+            "name": "move-run",
+            "is-mouse-button": false,
+            "input": "KB_E"
+        },
+        {
+            "name": "move-forward",
+            "is-mouse-button": false,
+            "input": "KB_W"
+        },
+        {
+            "name": "move-backward",
+            "is-mouse-button": false,
+            "input": "KB_S"
+        },
+        {
+            "name": "strafe-left",
+            "is-mouse-button": false,
+            "input": "KB_A"
+        },
+        {
+            "name": "strafe-right",
+            "is-mouse-button": false,
+            "input": "KB_D"
+        },
+        {
+            "name": "move-up",
+            "is-mouse-button": false,
+            "input": "KB_SPACE"
+        },
+        {
+            "name": "move-down",
+            "is-mouse-button": false,
+            "input": "KB_LSHIFT"
+        },
+        {
+            "name": "wire-frame-toggle",
+            "is-mouse-button": false,
+            "input": "KB_F1"
         }
     ],
     "logger": {
         "type": "file"
+    },
+    "graphics": {
+        "fov": 60.0
     }
 }

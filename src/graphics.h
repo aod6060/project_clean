@@ -1,6 +1,7 @@
 #pragma once
 
 
+#define GRAPHICS_FPS_60 1.0f / 60.0f
 
 /*
 	Wrapper Section
@@ -142,6 +143,7 @@ struct Texture2D {
 */
 
 // Shader Section
+
 struct IShader {
 
 	virtual void init() = 0;
@@ -176,6 +178,8 @@ struct AbstractShader : public IShader {
 		GLenum type);
 };
 
+struct Camera;
+
 struct SceneShader : public AbstractShader {
 
 	virtual void init();
@@ -189,9 +193,12 @@ struct SceneShader : public AbstractShader {
 	void setProjective(const glm::mat4& proj);
 	void setView(const glm::mat4& view);
 	void setModel(const glm::mat4& model);
+
+	void setCamera(Camera* camera);
 };
 
 // Geometry Section
+
 template<typename T>
 struct IGeometry {
 	virtual void init() = 0;
@@ -323,4 +330,35 @@ struct RenderPassManager {
 	void render();
 
 	void release();
+};
+
+
+struct Camera {
+	glm::vec3 pos;
+	glm::vec2 rot;
+
+	float fov;
+	float apsect;
+	float znear;
+	float zfar;
+
+	float rotSpeed = 64.0f;
+	float walkingSpeed = 32.0f;
+
+	void init(
+		glm::vec3 pos,
+		glm::vec2 rot,
+		float fov,
+		float aspect,
+		float znear,
+		float zfar,
+		float rotSpeed = 64.0f,
+		float walkingSpeed = 32.0f);
+
+	void update(float delta);
+
+	glm::mat4 getProjection();
+
+	glm::mat4 getView();
+
 };

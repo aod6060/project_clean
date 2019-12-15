@@ -92,3 +92,8 @@ void SceneShader::setView(const glm::mat4& view) {
 void SceneShader::setModel(const glm::mat4& model) {
 	this->program.setMat4("model", model);
 }
+
+void SceneShader::setCamera(Camera* camera) {
+	this->setProjective(camera->getProjection());
+	this->setView(camera->getView());
+}

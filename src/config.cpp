@@ -20,6 +20,8 @@ static LoggerType g_loggerType;
 
 static LoggerType _conf_toLoggerType(std::string key);
 
+static float g_fov;
+
 void conf_init() {
 	std::ifstream in(g_config_path);
 
@@ -77,6 +79,11 @@ void conf_init() {
 		Json::Value logger = root["logger"];
 
 		g_loggerType = _conf_toLoggerType(logger["type"].asString());
+
+		// Graphics
+		Json::Value graphics = root["graphics"];
+
+		g_fov = graphics["fov"].asFloat();
 	}
 	else {
 		throw std::exception("Error: Configuration file doesn't exist or isn't the right type of file...");
@@ -376,4 +383,8 @@ static LoggerType _conf_toLoggerType(std::string key) {
 		{"both", LT_BOTH}
 	};
 	return loggerType[key];
+}
+
+float conf_getFOV() {
+	return g_fov;
 }

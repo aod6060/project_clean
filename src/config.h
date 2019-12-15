@@ -13,3 +13,6 @@ bool conf_isFullscreen();
 InputMapping* conf_getInputMapping(std::string name);
 
 LoggerType conf_getLoggerType();
+
+// Graphics Section
+float conf_getFOV();
