@@ -188,10 +188,18 @@ void VertexBuffer::set2f(float x, float y) {
 	this->list.push_back(y);
 }
 
+void VertexBuffer::set2f(const glm::vec2& v) {
+	this->set2f(v.x, v.y);
+}
+
 void VertexBuffer::set3f(float x, float y, float z) {
 	this->list.push_back(x);
 	this->list.push_back(y);
 	this->list.push_back(z);
+}
+
+void VertexBuffer::set3f(const glm::vec3& v) {
+	this->set3f(v.x, v.y, v.z);
 }
 
 void VertexBuffer::set4f(float x, float y, float z, float w) {
@@ -199,6 +207,10 @@ void VertexBuffer::set4f(float x, float y, float z, float w) {
 	this->list.push_back(y);
 	this->list.push_back(z);
 	this->list.push_back(w);
+}
+
+void VertexBuffer::set4f(const glm::vec4& v) {
+	this->set4f(v.x, v.y, v.z, v.w);
 }
 
 void VertexBuffer::clear() {
@@ -236,22 +248,22 @@ int VertexBuffer::size() {
 
 
 // Index Buffer
-void IndexBuffer::set1f(int x) {
+void IndexBuffer::set1f(uint32_t x) {
 	this->list.push_back(x);
 }
 
-void IndexBuffer::set2f(int x, int y) {
+void IndexBuffer::set2f(uint32_t x, uint32_t y) {
 	this->list.push_back(x);
 	this->list.push_back(y);
 }
 
-void IndexBuffer::set3f(int x, int y, int z) {
+void IndexBuffer::set3f(uint32_t x, uint32_t y, uint32_t z) {
 	this->list.push_back(x);
 	this->list.push_back(y);
 	this->list.push_back(z);
 }
 
-void IndexBuffer::set4f(int x, int y, int z, int w) {
+void IndexBuffer::set4f(uint32_t x, uint32_t y, uint32_t z, uint32_t w) {
 	this->list.push_back(x);
 	this->list.push_back(y);
 	this->list.push_back(z);
@@ -276,7 +288,7 @@ void IndexBuffer::unbind() {
 
 void IndexBuffer::update() {
 	bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->size() * sizeof(int), this->list.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->size() * sizeof(uint32_t), this->list.data(), GL_STATIC_DRAW);
 	unbind();
 }
 
@@ -325,7 +337,7 @@ void Texture2D::init(
 
 	this->bind();
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 	glTexImage2D(
@@ -338,6 +350,8 @@ void Texture2D::init(
 		format,
 		GL_UNSIGNED_BYTE,
 		pixels);
+
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	this->unbind();
 }

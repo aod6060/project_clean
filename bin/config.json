@@ -20,6 +20,6 @@
         }
     ],
     "logger": {
-        "type": "console"
+        "type": "file"
     }
 }

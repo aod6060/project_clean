@@ -30,7 +30,7 @@ void AbstractRenderPass::setCallback(std::function<void(RenderContext*)> callbac
 
 // MainRenderPass
 void MainRenderPass::init() {
-	this->testShader.init();
+	sceneShader.init();
 }
 
 void MainRenderPass::render() {
@@ -40,7 +40,7 @@ void MainRenderPass::render() {
 }
 
 void MainRenderPass::release() {
-	this->testShader.release();
+	sceneShader.release();
 }
 
 void RenderPassManager::addRenderPass(IRenderPass* pass) {

@@ -81,8 +81,11 @@ struct VertexBuffer {
 
 	void set1f(float x);
 	void set2f(float x, float y);
+	void set2f(const glm::vec2& v);
 	void set3f(float x, float y, float z);
+	void set3f(const glm::vec3& v);
 	void set4f(float x, float y, float z, float w);
+	void set4f(const glm::vec4& v);
 	void clear();
 
 	void init(bool isDynamic = false);
@@ -98,12 +101,12 @@ struct VertexBuffer {
 // IndexBuffer
 struct IndexBuffer {
 	uint32_t id = 0;
-	std::vector<int> list;
+	std::vector<uint32_t> list;
 
-	void set1f(int x);
-	void set2f(int x, int y);
-	void set3f(int x, int y, int z);
-	void set4f(int x, int y, int z, int w);
+	void set1f(uint32_t x);
+	void set2f(uint32_t x, uint32_t y);
+	void set3f(uint32_t x, uint32_t y, uint32_t z);
+	void set4f(uint32_t x, uint32_t y, uint32_t z, uint32_t w);
 
 	void init();
 	void release();
@@ -173,18 +176,17 @@ struct AbstractShader : public IShader {
 		GLenum type);
 };
 
-struct TestShader : public AbstractShader {
-
+struct SceneShader : public AbstractShader {
 
 	virtual void init();
 
-	// Set Attributes
+	// Attributes
 	void verticesPointer();
-
 	void texCoordPointer();
+	void normalPointer();
 
-	// Set Uniforms
-	void setProjection(const glm::mat4& proj);
+	// Uniforms
+	void setProjective(const glm::mat4& proj);
 	void setView(const glm::mat4& view);
 	void setModel(const glm::mat4& model);
 };
@@ -195,27 +197,72 @@ struct IGeometry {
 	virtual void init() = 0;
 	virtual void render(T* shader) = 0;
 	virtual void release() = 0;
-
-	virtual void getVertices(std::vector<glm::vec3>& vertices) = 0;
 };
 
+struct SceneGeometry : public IGeometry<SceneShader> {
 
-struct AbstractTestShaderGeometry : public IGeometry<TestShader> {
-	VertexBuffer vertices;
-	VertexBuffer texCoords;
-	IndexBuffer indencies;
+	const std::string TYPE = "scene";
+	const std::string VERSION = "1.0";
 
-	virtual void init() = 0;
-	virtual void render(TestShader* shader);
-	virtual void release();
+	struct Vertex {
+		glm::vec3 position;
+		glm::vec2 texCoord;
+		glm::vec3 normal;
+	};
 
-	virtual void getVertices(std::vector<glm::vec3>& vertices);
-};
+	struct Face {
+		uint32_t p1;
+		uint32_t p2;
+		uint32_t p3;
+	};
 
-struct QuadTestShaderGeomentry : public AbstractTestShaderGeometry {
+	struct Mesh {
+		glm::mat4 matrix;
+		std::vector<Vertex> vertices;
+		std::vector<Face> faces;
+	};
+
+	struct Scene {
+		std::string type;
+		std::string version;
+		std::vector<Mesh> meshes;
+	};
+
+	struct MeshGeometry : public IGeometry<SceneShader> {
+		SceneGeometry* parent = nullptr;
+
+		std::vector<Vertex> v;
+		std::vector<Face> f;
+
+		glm::mat4 matrix;
+
+		VertexBuffer vertices;
+		VertexBuffer texCoords;
+		VertexBuffer normals;
+		IndexBuffer indencies;
+
+		void setParent(SceneGeometry* parent);
+
+		virtual void init();
+		virtual void render(SceneShader* shader);
+		virtual void release();
+	};
+
+
+	std::string path;
+	glm::mat4 model;
+	Scene scene;
+	std::vector<MeshGeometry> geometry;
+
+	void setFilePath(std::string path);
+	void setModel(const glm::mat4& model);
+
+	void loadScene(std::string path, Scene& scene);
+
 	virtual void init();
+	virtual void render(SceneShader* shader);
+	virtual void release();
 };
-
 
 // IRenderPass Section
 struct IRenderPass;
@@ -257,8 +304,7 @@ struct AbstractRenderPass : public IRenderPass {
 
 
 struct MainRenderPass : public AbstractRenderPass {
-
-	TestShader testShader;
+	SceneShader sceneShader;
 
 	virtual void init();
 	virtual void render();

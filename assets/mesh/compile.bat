@@ -8,3 +8,4 @@ echo %comp%
 %comp% torus.blend ../../bin/data/meshes/torus
 %comp% monkey.blend ../../bin/data/meshes/monkey
 %comp% temp_floor.blend ../../bin/data/meshes/temp_floor
+%comp% multi_mesh_test.blend ../../bin/data/meshes/multi_mesh_test
