@@ -115,10 +115,19 @@ void TerrainShader::init() {
 	program.createUniform("proj");
 	program.createUniform("view");
 	program.createUniform("model");
-	program.createUniform("tex0");
-	program.set1i("tex0", 0);
 	program.createUniform("texScale");
 	program.set1f("texScale", 1.0f);
+
+	program.createUniform("blendMap");
+	program.set1i("blendMap", 0);
+	program.createUniform("channelBlack");
+	program.set1i("channelBlack", 1);
+	program.createUniform("channelRed");
+	program.set1i("channelRed", 2);
+	program.createUniform("channelGreen");
+	program.set1i("channelGreen", 3);
+	program.createUniform("channelBlue");
+	program.set1i("channelBlue", 4);
 
 	program.setAttr("vertices", 0);
 	program.setAttr("texCoords", 1);

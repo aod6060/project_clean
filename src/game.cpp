@@ -23,24 +23,22 @@ void GameWindowCallback::init() {
 
 		pass->terrainShader.bind();
 		pass->terrainShader.setCamera(&camera);
-		pass->terrainShader.setTexScale(256.0f);
+		pass->terrainShader.setTexScale(32.0f);
 
-
-
-		sand1.bind();
 		pass->terrainShader.setModel(model);
 		terrain.render(&pass->terrainShader);
-		sand1.unbind();
 
 		pass->terrainShader.unbind();
 
 
 		pass->sceneShader.bind();
 		pass->sceneShader.setCamera(&camera);
-		angry.bind();
+		sand1.bind();
+		//angry.bind();
 		multiMeshTest.setModel(model);
 		multiMeshTest.render(&pass->sceneShader);
-		angry.unbind();
+		sand1.unbind();
+		//angry.unbind();
 		pass->sceneShader.unbind();
 
 		context->disable(GL_DEPTH_TEST);
@@ -61,7 +59,14 @@ void GameWindowCallback::init() {
 		1024.0f);
 
 	terrain.setHeightMapFilePath("data/terrain/static_terrain_height_map.png");
+	terrain.setBlendMap("data/terrain/static_terrain_rgb_map.png");
 	terrain.init();
+
+	terrain.setBlackChannel(&this->dirt2);
+	terrain.setRedChannel(&this->sand1);
+	terrain.setGreenChannel(&this->grass1);
+	terrain.setBlueChannel(&this->dirt1);
+
 }
 
 void GameWindowCallback::update(float delta) {

@@ -306,7 +306,24 @@ struct StaticTerrainGeometry : public IGeometry<TerrainShader> {
 	VertexBuffer normals;
 	IndexBuffer indinces;
 
+	std::string blendMapPath;
+
+	Texture2D blendMap;
+
+	Texture2D* blackChannel;
+	Texture2D* redChannel;
+	Texture2D* greenChannel;
+	Texture2D* blueChannel;
+
 	void setHeightMapFilePath(std::string path);
+
+	void setBlendMap(std::string path);
+
+	void setBlackChannel(Texture2D* channel);
+	void setRedChannel(Texture2D* channel);
+	void setGreenChannel(Texture2D* channel);
+	void setBlueChannel(Texture2D* channel);
+
 	void setHeightScale(float scale);
 
 	virtual void init();

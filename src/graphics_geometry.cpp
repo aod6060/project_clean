@@ -214,6 +214,26 @@ void StaticTerrainGeometry::setHeightScale(float scale) {
 	this->heightScale = scale;
 }
 
+void StaticTerrainGeometry::setBlendMap(std::string path) {
+	this->blendMapPath = path;
+}
+
+void StaticTerrainGeometry::setBlackChannel(Texture2D* channel) {
+	this->blackChannel = channel;
+}
+
+void StaticTerrainGeometry::setRedChannel(Texture2D* channel) {
+	this->redChannel = channel;
+}
+
+void StaticTerrainGeometry::setGreenChannel(Texture2D* channel) {
+	this->greenChannel = channel;
+}
+
+void StaticTerrainGeometry::setBlueChannel(Texture2D* channel) {
+	this->blueChannel = channel;
+}
+
 void StaticTerrainGeometry::init() {
 	SDL_Surface* surf = IMG_Load(this->heightMapFilePath.c_str());
 
@@ -341,9 +361,20 @@ void StaticTerrainGeometry::init() {
 	SDL_UnlockSurface(surf);
 
 	SDL_FreeSurface(surf);
+
+
+	this->blendMap.loadTexture(this->blendMapPath);
+
 }
 
 void StaticTerrainGeometry::render(TerrainShader* shader) {
+
+	blendMap.bind();
+	blackChannel->bind(GL_TEXTURE1);
+	redChannel->bind(GL_TEXTURE2);
+	greenChannel->bind(GL_TEXTURE3);
+	blueChannel->bind(GL_TEXTURE4);
+
 	shader->bindAttr();
 	vertices.bind();
 	shader->verticesPointer();
@@ -362,9 +393,22 @@ void StaticTerrainGeometry::render(TerrainShader* shader) {
 	indinces.unbind();
 
 	shader->unbindAttr();
+
+	blendMap.unbind();
+	blackChannel->unbind(GL_TEXTURE1);
+	redChannel->unbind(GL_TEXTURE2);
+	greenChannel->unbind(GL_TEXTURE3);
+	blueChannel->unbind(GL_TEXTURE4);
+
 }
 
 void StaticTerrainGeometry::release() {
+	blackChannel = nullptr;
+	redChannel = nullptr;
+	greenChannel = nullptr;
+	blueChannel = nullptr;
+
+	this->blendMap.release();
 	this->indinces.release();
 	this->normals.release();
 	this->texCoords.release();
