@@ -202,3 +202,171 @@ void SceneGeometry::release() {
 	});
 
 }
+
+
+
+// TerrainGeometry
+void StaticTerrainGeometry::setHeightMapFilePath(std::string path) {
+	this->heightMapFilePath = path;
+}
+
+void StaticTerrainGeometry::setHeightScale(float scale) {
+	this->heightScale = scale;
+}
+
+void StaticTerrainGeometry::init() {
+	SDL_Surface* surf = IMG_Load(this->heightMapFilePath.c_str());
+
+
+	if (surf == nullptr) {
+		logger_output("%: doesn't exist...", this->heightMapFilePath.c_str());
+		return;
+	}
+
+
+	this->width = surf->w;
+	this->height = surf->h;
+
+	this->heights.resize(this->width * this->height);
+
+	SDL_LockSurface(surf);
+
+	SDL_Color* colors = (SDL_Color*)surf->pixels;
+
+	// Create Heights
+	for (int y = 0; y < this->height; y++) {
+		for (int x = 0; x < this->width; x++) {
+			SDL_Color color = colors[y * this->width + x];
+
+			float height = ((float)color.r / 256.0f) * this->heightScale;
+
+			this->heights[y * this->width + x] = height;
+		}
+	}
+
+	v.resize(this->width * this->height);
+
+	struct Triangle {
+		uint32_t p1;
+		uint32_t p2;
+		uint32_t p3;
+	};
+
+	std::vector<Triangle> triangles;
+
+	for (int y = 0; y < this->height - 1; y++) {
+		for (int x = 0; x < this->width - 1; x++) {
+			Triangle t1;
+			Triangle t2;
+
+			t1.p1 = y * this->width + x;
+			t1.p2 = y * this->width + (x + 1);
+			t1.p3 = (y + 1) * this->width + x;
+
+			t2.p1 = (y + 1) * this->width + x;
+			t2.p2 = y * this->width + (x + 1);
+			t2.p3 = (y + 1) * this->width + (x + 1);
+
+			triangles.push_back(t1);
+			triangles.push_back(t2);
+		}
+	}
+
+	std::vector<glm::vec3> normals(this->width * this->height);
+
+	// Create Indexes and Face Normals
+	this->indinces.init();
+	for (int i = 0; i < triangles.size(); i++) {
+		glm::vec3 U;
+		glm::vec3 V;
+
+		glm::vec3 N;
+
+		U = v[triangles[i].p2] - v[triangles[i].p1];
+		V = v[triangles[i].p3] - v[triangles[i].p1];
+
+		N = glm::cross(U, V);
+
+		N = glm::normalize(N);
+
+		normals[triangles[i].p1] += N;
+		normals[triangles[i].p2] += N;
+		normals[triangles[i].p3] += N;
+
+
+		// Faces
+		this->indinces.set3f(
+			triangles[i].p1,
+			triangles[i].p2,
+			triangles[i].p3
+		);
+
+	}
+	this->indinces.update();
+
+	// Create Vertices
+
+	float halfWidth = this->width * 0.5f;
+	float halfHeight = this->height * 0.5f;
+
+	vertices.init();
+	texCoords.init();
+	this->normals.init();
+	for (int y = 0; y < this->height; y++) {
+		for (int x = 0; x < this->width; x++) {
+
+			float height = this->heights[y * this->width + x];
+
+			// Vertices
+			v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
+
+			vertices.set3f(v[y * this->width + x]);
+
+			float tx = ((float)x / (float)this->width);
+			float ty = ((float)y / (float)this->height);
+
+			texCoords.set2f(tx, ty);
+
+			glm::vec3 n = glm::normalize(normals[y * this->width + x]);
+
+			this->normals.set3f(n);
+		}
+	}
+	vertices.update();
+	texCoords.update();
+	this->normals.update();
+
+	// Create Indencies
+
+	SDL_UnlockSurface(surf);
+
+	SDL_FreeSurface(surf);
+}
+
+void StaticTerrainGeometry::render(TerrainShader* shader) {
+	shader->bindAttr();
+	vertices.bind();
+	shader->verticesPointer();
+	vertices.unbind();
+
+	texCoords.bind();
+	shader->texCoordPointer();
+	texCoords.unbind();
+
+	normals.bind();
+	shader->normalPointer();
+	normals.unbind();
+
+	indinces.bind();
+	glDrawElements(GL_TRIANGLES, indinces.size(), GL_UNSIGNED_INT, 0);
+	indinces.unbind();
+
+	shader->unbindAttr();
+}
+
+void StaticTerrainGeometry::release() {
+	this->indinces.release();
+	this->normals.release();
+	this->texCoords.release();
+	this->vertices.release();
+}

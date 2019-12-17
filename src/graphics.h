@@ -197,6 +197,26 @@ struct SceneShader : public AbstractShader {
 	void setCamera(Camera* camera);
 };
 
+struct TerrainShader : public AbstractShader {
+
+	virtual void init();
+
+	// Attributes
+	void verticesPointer();
+	void texCoordPointer();
+	void normalPointer();
+
+	// Uniforms
+	void setProjective(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+	void setCamera(Camera* camera);
+
+	void setTexScale(float scale);
+
+};
+
 // Geometry Section
 
 template<typename T>
@@ -271,6 +291,32 @@ struct SceneGeometry : public IGeometry<SceneShader> {
 	virtual void release();
 };
 
+struct StaticTerrainGeometry : public IGeometry<TerrainShader> {
+	std::string heightMapFilePath;
+	float heightScale = 64.0f;
+	int width = 0;
+	int height = 0;
+
+	std::vector<float> heights;
+
+	std::vector<glm::vec3> v;
+
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	VertexBuffer normals;
+	IndexBuffer indinces;
+
+	void setHeightMapFilePath(std::string path);
+	void setHeightScale(float scale);
+
+	virtual void init();
+
+	virtual void render(TerrainShader* shader);
+
+	virtual void release();
+
+};
+
 // IRenderPass Section
 struct IRenderPass;
 
@@ -312,6 +358,7 @@ struct AbstractRenderPass : public IRenderPass {
 
 struct MainRenderPass : public AbstractRenderPass {
 	SceneShader sceneShader;
+	TerrainShader terrainShader;
 
 	virtual void init();
 	virtual void render();

@@ -24,8 +24,8 @@ void Camera::update(float delta) {
 
 		input_getMousePos(x, y);
 
-		rot.x += this->rotSpeed * y * ((GRAPHICS_FPS_60 - delta > 0) ? delta : GRAPHICS_FPS_60);
-		rot.y += this->rotSpeed * x * ((GRAPHICS_FPS_60 - delta > 0) ? delta : GRAPHICS_FPS_60);
+		rot.x += this->rotSpeed * y * ((delta - 0.001f < 0) ? 0.001f : delta);
+		rot.y += this->rotSpeed * x * ((delta - 0.001f < 0) ? 0.001f : delta);
 
 		if (rot.y <= -360.0f) {
 			rot.y += 360.0f;

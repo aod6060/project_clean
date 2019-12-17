@@ -1,8 +1,15 @@
 #include "game.h"
 
 
+
 void GameWindowCallback::init() {
 	angry.loadTexture("data/textures/angry.png");
+
+	grass1.loadTexture("data/textures/terrain/grass1.png");
+	grass2.loadTexture("data/textures/terrain/grass2.png");
+	dirt1.loadTexture("data/textures/terrain/dirt1.png");
+	dirt2.loadTexture("data/textures/terrain/dirt2.png");
+	sand1.loadTexture("data/textures/terrain/sand1.png");
 
 	this->mainRenderPass.setCallback([&](RenderContext* context) {
 		glm::mat4 model =
@@ -14,22 +21,26 @@ void GameWindowCallback::init() {
 
 		MainRenderPass* pass = context->getPass<MainRenderPass>();
 
+		pass->terrainShader.bind();
+		pass->terrainShader.setCamera(&camera);
+		pass->terrainShader.setTexScale(256.0f);
+
+
+
+		sand1.bind();
+		pass->terrainShader.setModel(model);
+		terrain.render(&pass->terrainShader);
+		sand1.unbind();
+
+		pass->terrainShader.unbind();
+
+
 		pass->sceneShader.bind();
-
-		/*
-		pass->sceneShader.setProjective(camera.getProjection());
-		pass->sceneShader.setView(camera.getView());
-		*/
-
 		pass->sceneShader.setCamera(&camera);
-
 		angry.bind();
-
 		multiMeshTest.setModel(model);
 		multiMeshTest.render(&pass->sceneShader);
-
 		angry.unbind();
-
 		pass->sceneShader.unbind();
 
 		context->disable(GL_DEPTH_TEST);
@@ -48,6 +59,9 @@ void GameWindowCallback::init() {
 		(float)conf_getWidth() / (float)conf_getHeight(),
 		1.0f,
 		1024.0f);
+
+	terrain.setHeightMapFilePath("data/terrain/static_terrain_height_map.png");
+	terrain.init();
 }
 
 void GameWindowCallback::update(float delta) {
@@ -87,8 +101,17 @@ void GameWindowCallback::render() {
 }
 
 void GameWindowCallback::release() {
+	terrain.release();
 	multiMeshTest.release();
 	//testShader.release();
 	renderPassManager.release();
+
+	sand1.release();
+	dirt2.release();
+	dirt1.release();
+	grass2.release();
+	grass1.release();
+
+	angry.release();
 }
 

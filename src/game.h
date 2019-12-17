@@ -13,8 +13,15 @@ private:
 	bool isWire = false;
 
 	SceneGeometry multiMeshTest;
+	StaticTerrainGeometry terrain;
 
 	Texture2D angry;
+	// Terrain Stuff
+	Texture2D grass1;
+	Texture2D grass2;
+	Texture2D dirt1;
+	Texture2D dirt2;
+	Texture2D sand1;
 
 	float yrot = 0.0f;
 
