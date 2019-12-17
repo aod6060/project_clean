@@ -19,6 +19,7 @@ in vec3 v_Normals;
 out vec4 out_Color;
 
 void main() {
+
     vec3 bm = texture(blendMap, v_TexCoords).rgb;
 
     vec3 colorBlack = texture(channelBlack, v_TexCoords * texScale).rgb * (1.0 - (bm.r + bm.g + bm.b));

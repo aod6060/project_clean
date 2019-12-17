@@ -1,0 +1,17 @@
+{
+    "type": "config",
+    "version": "1.2",
+    "window": {
+        "caption": "Procedural Terrain Test",
+        "width": 1024,
+        "height": 1024,
+        "is-fullscreen": false
+    },
+    "input-mapping": [],
+    "logger": {
+        "type": "file"
+    },
+    "graphics": {
+        "fov": 60.0
+    }
+}

@@ -4,7 +4,7 @@
 // Configuration
 struct InputMapping;
 
-void conf_init();
+void conf_init(std::string path);
 std::string conf_getCaption();
 uint32_t conf_getWidth();
 uint32_t conf_getHeight();

@@ -1,16 +1,33 @@
 #include "game.h"
-
+#include "proc_terrain_test.h"
 
 int main(int argc, char** argv) {
-	GameWindowCallback windowCB;
 
-	conf_init();
+	if (argc > 1) {
 
-	win_init(&windowCB);
+		if (std::string(argv[1]) == "-terrain") {
+			ProcTerrainTestWindowCallback cb;
 
-	win_update();
-	
-	win_release();
+			conf_init("config/proc_terrain_test.json");
+
+			win_init(&cb);
+
+			win_update();
+
+			win_release();
+		}
+	}
+	else {
+		GameWindowCallback windowCB;
+
+		conf_init("config/config.json");
+
+		win_init(&windowCB);
+
+		win_update();
+
+		win_release();
+	}
 
 	return 0;
 }

@@ -3,7 +3,7 @@
 const static std::string g_type = "config";
 const static std::string g_version = "1.2";
 
-static std::string g_config_path = "config.json";
+//static std::string g_config_path = "config.json";
 
 static std::string g_caption = "";
 
@@ -22,8 +22,8 @@ static LoggerType _conf_toLoggerType(std::string key);
 
 static float g_fov;
 
-void conf_init() {
-	std::ifstream in(g_config_path);
+void conf_init(std::string path) {
+	std::ifstream in(path);
 
 	srand(time(nullptr));
 

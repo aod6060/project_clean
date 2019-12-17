@@ -33,3 +33,4 @@
 #include "win.h"
 #include "input.h"
 #include "graphics.h"
+#include "proc_terrain.h"
