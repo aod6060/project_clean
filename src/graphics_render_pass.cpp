@@ -45,6 +45,21 @@ void MainRenderPass::release() {
 	sceneShader.release();
 }
 
+// HUBRenderPass
+void HUBRenderPass::init() {
+	hubShader.init();
+}
+
+void HUBRenderPass::release() {
+	hubShader.release();
+}
+
+void HUBRenderPass::render() {
+	RenderContext context(this);
+
+	this->callback(&context);
+}
+
 void RenderPassManager::addRenderPass(IRenderPass* pass) {
 	this->passes.push_back(pass);
 }
@@ -67,3 +82,4 @@ void RenderPassManager::release() {
 	});
 	this->passes.clear();
 }
+

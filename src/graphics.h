@@ -217,8 +217,20 @@ struct TerrainShader : public AbstractShader {
 
 };
 
-// Geometry Section
+struct HUBShader : public AbstractShader {
+	virtual void init();
 
+	// Attributes
+	void verticesPointer();
+	void texCoordPointer();
+
+	// Uniforms
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+};
+
+// Geometry Section
 template<typename T>
 struct IGeometry {
 	virtual void init() = 0;
@@ -334,6 +346,17 @@ struct StaticTerrainGeometry : public IGeometry<TerrainShader> {
 
 };
 
+struct QuadHUBGeometry : public IGeometry<HUBShader> {
+
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	IndexBuffer indencies;
+
+	virtual void init();
+	virtual void render(HUBShader* shader);
+	virtual void release();
+};
+
 // IRenderPass Section
 struct IRenderPass;
 
@@ -382,6 +405,13 @@ struct MainRenderPass : public AbstractRenderPass {
 	virtual void release();
 };
 
+struct HUBRenderPass : public AbstractRenderPass {
+	HUBShader hubShader;
+
+	virtual void init();
+	virtual void release();
+	virtual void render();
+};
 
 // RenderPass Manager
 struct RenderPassManager {

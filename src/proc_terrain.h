@@ -4,7 +4,7 @@ enum ProcTerrainType {
 	PTT_OCEAN = 0,
 	PTT_BEACH,
 	PTT_GRASS,
-	PTT_TREE
+	PTT_FOREST
 };
 
 enum ProcTerrainMaskType {
@@ -44,6 +44,27 @@ struct ProcTerrain {
 		0.15f
 	};
 
+
+	// Moister Map Parameters
+	ProcTerrainHeightmapWave mainMoisterWave = {
+		32.0f,
+		0.5f
+	};
+
+	ProcTerrainHeightmapWave secondaryMoisterWave = {
+		16.0f,
+		0.35f
+	};
+
+	ProcTerrainHeightmapWave trinaryMoisterWave = {
+		8.0f,
+		0.15f
+	};
+
+	float beachLevel = 0.25f;
+	float grassLevel = 0.35f;
+	float forestLevel = 0.5f;
+
 	std::vector<float> elevation;
 	std::vector<float> mask;
 	std::vector<float> maskedElevation;
@@ -56,8 +77,8 @@ struct ProcTerrain {
 	Texture2D maskTex;
 	Texture2D maskedElevationTex;
 	Texture2D moisterTex;
-	Texture2D blendMap;
-	Texture2D biomesMap;
+	Texture2D blendMapTex;
+	Texture2D biomesMapTex;
 
 	void init();
 	void release();

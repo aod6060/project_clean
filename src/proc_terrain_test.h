@@ -7,6 +7,12 @@
 
 class ProcTerrainTestWindowCallback : public IWindowCallback {
 private:
+	ProcTerrain procTerrain;
+	RenderPassManager renderPassManager;
+	HUBRenderPass hubRenderPass;
+	QuadHUBGeometry quad;
+
+	Texture2D* current;
 
 public:
 	virtual void init();

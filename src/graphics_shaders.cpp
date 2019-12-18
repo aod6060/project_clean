@@ -180,3 +180,56 @@ void TerrainShader::setCamera(Camera* camera) {
 void TerrainShader::setTexScale(float scale) {
 	program.set1f("texScale", scale);
 }
+
+// HUBShader
+void HUBShader::init() {
+	vertex.init(GL_VERTEX_SHADER, "data/shaders/hub.vert");
+	fragment.init(GL_FRAGMENT_SHADER, "data/shaders/hub.frag");
+
+	program.addShader(&vertex);
+	program.addShader(&fragment);
+
+	program.init();
+
+	program.bind();
+
+	program.createUniform("proj");
+	program.createUniform("view");
+	program.createUniform("model");
+	program.createUniform("tex0");
+	program.set1i("tex0", 0);
+
+	program.setAttr("vertices", 0);
+	program.setAttr("texCoords", 1);
+
+	program.bindAttr();
+	program.enableAttr("vertices");
+	program.enableAttr("texCoords");
+	program.unbindAttr();
+	program.disableAttr("vertices");
+	program.disableAttr("texCoords");
+
+	program.unbind();
+}
+
+// Attributes
+void HUBShader::verticesPointer() {
+	this->pointerAttr("vertices", 3, GL_FLOAT);
+}
+
+void HUBShader::texCoordPointer() {
+	program.pointerAttr("texCoords", 2, GL_FLOAT);
+}
+
+// Uniforms
+void HUBShader::setProjection(const glm::mat4& proj) {
+	program.setMat4("proj", proj);
+}
+
+void HUBShader::setView(const glm::mat4& view) {
+	program.setMat4("view", view);
+}
+
+void HUBShader::setModel(const glm::mat4& model) {
+	program.setMat4("model", model);
+}
