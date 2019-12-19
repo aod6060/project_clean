@@ -58,14 +58,14 @@ void GameWindowCallback::init() {
 		1.0f,
 		1024.0f);
 
-	terrain.setHeightMapFilePath("data/terrain/static_terrain_height_map.png");
-	terrain.setBlendMap("data/terrain/static_terrain_rgb_map.png");
+	//terrain.setHeightMapFilePath("data/terrain/static_terrain_height_map.png");
+	//terrain.setBlendMap("data/terrain/static_terrain_rgb_map.png");
 	terrain.init();
 
-	terrain.setBlackChannel(&this->dirt2);
+	terrain.setBlackChannel(&this->dirt1);
 	terrain.setRedChannel(&this->sand1);
 	terrain.setGreenChannel(&this->grass1);
-	terrain.setBlueChannel(&this->dirt1);
+	terrain.setBlueChannel(&this->dirt2);
 
 }
 

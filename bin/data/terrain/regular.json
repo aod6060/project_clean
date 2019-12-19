@@ -1,0 +1,61 @@
+{
+    "type": "terrain",
+    "version": "1.0",
+    "elevation-waves": [
+        {
+            "wave": 512.0,
+            "weight": 0.3,
+            "seed": 0,
+            "noise": "perlin"
+        },
+        {
+            "wave": 256.0,
+            "weight": 0.3,
+            "seed": 1,
+            "noise":"perlin"
+        },
+        {
+            "wave": 128.0,
+            "weight": 0.1,
+            "seed": 2,
+            "noise":"perlin"
+        },
+        {
+            "wave": 64.0,
+            "weight": 0.1,
+            "seed":3,
+            "noise":"perlin"
+        },
+        {
+            "wave":32.0,
+            "weight": 0.1,
+            "seed":4,
+            "noise":"perlin"
+        },
+        {
+            "wave":32.0,
+            "weight": 0.1,
+            "seed":5,
+            "noise":"perlin"
+        }
+    ],
+    "moister-waves": [
+        {
+            "wave": 128.0,
+            "weight": 0.9,
+            "seed": 0,
+            "noise": "perlin"
+        },
+        {
+            "wave": 16.0,
+            "weight":0.1,
+            "seed": 1,
+            "noise":"perlin"
+        }
+    ],
+    "levels": {
+        "beach": 0.25,
+        "grass": 0.35,
+        "forest": 0.55
+    }
+}

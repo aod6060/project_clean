@@ -3,7 +3,64 @@
 
 #define RGB_COLOR(r, g, b) (r | g << 8 | b << 16 | 255 << 24)
 
-void ProcTerrain::init() {
+#define PROC_TERRAIN_TYPE "terrain"
+#define PROC_TERRAIN_VERSION "1.0"
+
+void ProcTerrain::loadConfig(std::string path) {
+	std::ifstream in(path);
+
+	Json::Value root;
+
+	in >> root;
+
+	Json::Value type = root["type"];
+	Json::Value version = root["version"];
+
+	if (type.asString() == PROC_TERRAIN_TYPE && version.asString() == PROC_TERRAIN_VERSION) {
+		// Elevation Waves
+		Json::Value elevationWaves = root["elevation-waves"];
+		for (int i = 0; i < elevationWaves.size(); i++) {
+			Json::Value temp = elevationWaves[i];
+
+			ProcTerrainHeightmapWave wave;
+
+			wave.wave = temp["wave"].asFloat();
+			wave.weight = temp["weight"].asFloat();
+			wave.seed = temp["seed"].asFloat();
+			wave.noise = (temp["noise"].asString() == "perlin") ? PTWT_PERLIN : PTWT_SIMPLEX;
+
+			this->elevationWaves.push_back(wave);
+		}
+
+		// Moister Waves
+		Json::Value moisterWaves = root["moister-waves"];
+		for (int i = 0; i < moisterWaves.size(); i++) {
+			Json::Value temp = moisterWaves[i];
+
+			ProcTerrainHeightmapWave wave;
+
+			wave.wave = temp["wave"].asFloat();
+			wave.weight = temp["weight"].asFloat();
+			wave.seed = temp["seed"].asFloat();
+			wave.noise = (temp["noise"].asString() == "perlin") ? PTWT_PERLIN : PTWT_SIMPLEX;
+
+			this->moisterWaves.push_back(wave);
+		}
+
+		// Levels
+		Json::Value levels = root["levels"];
+
+		this->beachLevel = levels["beach"].asFloat();
+		this->grassLevel = levels["grass"].asFloat();
+		this->forestLevel = levels["forest"].asFloat();
+	}
+
+	in.close();
+}
+
+void ProcTerrain::init(std::string path) {
+	this->loadConfig(path);
+
 	this->seed = rand() % UINT_MAX;
 	uint32_t r = rand() % 2;
 
@@ -19,9 +76,6 @@ void ProcTerrain::init() {
 	this->biomes.resize(size2);
 	this->terrainType.resize(size2);
 
-	std::cout << this->mainWave.wave << std::endl;
-	std::cout << this->mainWave.weight << std::endl;
-
 	float seedf = seed;
 
 	// Generate Map
@@ -29,6 +83,7 @@ void ProcTerrain::init() {
 		for (int x = 0; x < this->size; x++) {
 			int i = y * this->size + x;
 
+			/*
 			// Elevation
 			float n1 = (glm::perlin(glm::vec3(x / this->mainWave.wave, y / this->mainWave.wave, seedf)) + 1.0f) * 0.5f;
 			float n2 = (glm::perlin(glm::vec3(x / this->secondaryWave.wave, y / this->secondaryWave.wave, seedf + 1)) + 1.0f) * 0.5f;
@@ -39,6 +94,21 @@ void ProcTerrain::init() {
 				n2 * secondaryWave.weight +
 				n3 * trinaryWave.weight;
 
+			*/
+
+			// Elevation
+			float n = 0;
+
+			std::for_each(this->elevationWaves.begin(), this->elevationWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
+				if (wave.noise == PTWT_PERLIN) {
+					float nt = (glm::perlin(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f;
+					n += nt * wave.weight;
+				}
+				else if (wave.noise == PTWT_SIMPLEX) {
+					float nt = (glm::simplex(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f;
+					n += nt * wave.weight;
+				}
+			});
 
 			elevation[i] = glm::clamp(
 				n,
@@ -58,6 +128,7 @@ void ProcTerrain::init() {
 			glm::vec2 mo;
 			mo.x = (me > 0.25f) ? me : 0.0f;
 
+			/*
 			float t1 = ((glm::perlin(glm::vec3(x / mainMoisterWave.wave, y / mainMoisterWave.wave, seed + 3)) + 1.0f) * 0.5f) * me;
 			float t2 = ((glm::perlin(glm::vec3(x / secondaryMoisterWave.wave, y / secondaryMoisterWave.wave, seed + 4)) + 1.0f) * 0.5f) * me;
 			float t3 = ((glm::perlin(glm::vec3(x / trinaryMoisterWave.wave, y / trinaryMoisterWave.wave, seed + 5)) + 1.0f) * 0.5f) * me;
@@ -65,7 +136,29 @@ void ProcTerrain::init() {
 				t1 * mainMoisterWave.weight + 
 				t2 * secondaryMoisterWave.weight + 
 				t3 * trinaryMoisterWave.weight;
-			
+			*/
+
+			float temp = 0;
+
+			std::for_each(this->moisterWaves.begin(), this->moisterWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
+				if (wave.noise == PTWT_PERLIN) {
+					float tt = ((glm::perlin(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f) * me;
+					temp += tt * wave.weight;
+				}
+				else if (wave.noise == PTWT_SIMPLEX) {
+					float tt = ((glm::simplex(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f) * me;
+					temp += tt * wave.weight;
+				}
+			});
+
+			/*
+			temp = glm::clamp(
+				temp,
+				0.0f,
+				1.0f
+			);
+			*/
+
 			mo.y = (me > 0.3f) ? temp : 0.0f;
 
 			moister[i] = mo;
@@ -241,4 +334,180 @@ float ProcTerrain::toMask(float x, float y, float radius, ProcTerrainMaskType ty
 		return fmax(0.0f, 1.0f - gradient);
 	}
 	return 1.0f;
+}
+
+
+void ProcTerrainGeometry::init() {
+	//this->data.loadConfig("data/terrain/regular.json");
+	this->data.init("data/terrain/regular.json");
+
+	this->width = this->data.size;
+	this->height = this->data.size;
+
+	this->heights.resize(this->width * this->height);
+
+	// Create Heights
+	float halfWidth = this->width * 0.5f;
+	float halfHeight = this->height * 0.5f;
+
+	v.resize(this->width * this->height);
+
+	for (int y = 0; y < this->height; y++) {
+		for (int x = 0; x < this->width; x++) {
+			float height = this->data.maskedElevation[y * this->width + x] * this->heightScale;
+			this->heights[y * this->width + x] = height;
+			v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
+		}
+	}
+
+	struct Triangle {
+		uint32_t p1;
+		uint32_t p2;
+		uint32_t p3;
+	};
+
+	std::vector<Triangle> triangles;
+
+	// Create Triangles
+	for (int y = 0; y < this->height - 1; y++) {
+		for (int x = 0; x < this->width - 1; x++) {
+			Triangle t1;
+			Triangle t2;
+
+			t1.p1 = y * this->width + x;
+			t1.p2 = y * this->width + (x + 1);
+			t1.p3 = (y + 1) * this->width + x;
+
+			t2.p1 = (y + 1) * this->width + x;
+			t2.p2 = y * this->width + (x + 1);
+			t2.p3 = (y + 1) * this->width + (x + 1);
+
+			triangles.push_back(t1);
+			triangles.push_back(t2);
+		}
+	}
+
+
+	std::vector<glm::vec3> normals(this->width * this->height);
+
+	// Create Indencies and Face Normals
+	this->indinces.init();
+	for (int i = 0; i < triangles.size(); i++) {
+		glm::vec3 U;
+		glm::vec3 V;
+
+		glm::vec3 N;
+
+		U = v[triangles[i].p2] - v[triangles[i].p1];
+		V = v[triangles[i].p3] - v[triangles[i].p1];
+
+		N = glm::cross(U, V);
+
+		N = glm::normalize(N);
+
+		normals[triangles[i].p1] += N;
+		normals[triangles[i].p2] += N;
+		normals[triangles[i].p3] += N;
+
+		// Faces
+		this->indinces.set3f(
+			triangles[i].p1,
+			triangles[i].p2,
+			triangles[i].p3
+		);
+	}
+	this->indinces.update();
+
+	// Create Vertices
+
+	vertices.init();
+	texCoords.init();
+	this->normals.init();
+
+	for (int y = 0; y < this->height; y++) {
+		for (int x = 0; x < this->width; x++) {
+			vertices.set3f(v[y*this->width + x]);
+
+			float tx = ((float)x / (float)this->width);
+			float ty = ((float)y / (float)this->height);
+
+			texCoords.set2f(tx, ty);
+
+			glm::vec3 n = glm::normalize(normals[y * this->width + x]);
+
+			this->normals.set3f(n);
+		}
+	}
+
+	vertices.update();
+	texCoords.update();
+	this->normals.update();
+}
+
+void ProcTerrainGeometry::render(TerrainShader* shader) {
+	data.blendMapTex.bind();
+	blackChannel->bind(GL_TEXTURE1);
+	redChannel->bind(GL_TEXTURE2);
+	greenChannel->bind(GL_TEXTURE3);
+	blueChannel->bind(GL_TEXTURE4);
+
+	shader->bindAttr();
+
+	vertices.bind();
+	shader->verticesPointer();
+	vertices.unbind();
+
+	texCoords.bind();
+	shader->texCoordPointer();
+	texCoords.unbind();
+
+	normals.bind();
+	shader->normalPointer();
+	normals.unbind();
+
+	indinces.bind();
+	glDrawElements(GL_TRIANGLES, indinces.size(), GL_UNSIGNED_INT, 0);
+	indinces.unbind();
+
+	shader->unbindAttr();
+
+	data.blendMapTex.unbind();
+	blackChannel->unbind(GL_TEXTURE1);
+	redChannel->unbind(GL_TEXTURE2);
+	greenChannel->unbind(GL_TEXTURE3);
+	blueChannel->unbind(GL_TEXTURE4);
+}
+
+void ProcTerrainGeometry::release() {
+	blackChannel = nullptr;
+	redChannel = nullptr;
+	greenChannel = nullptr;
+	blueChannel = nullptr;
+
+	this->indinces.release();
+	this->normals.release();
+	this->texCoords.release();
+	this->vertices.release();
+
+	this->data.release();
+}
+
+void ProcTerrainGeometry::setBlackChannel(Texture2D* channel) {
+	this->blackChannel = channel;
+}
+
+void ProcTerrainGeometry::setRedChannel(Texture2D* channel) {
+	this->redChannel = channel;
+}
+
+void ProcTerrainGeometry::setGreenChannel(Texture2D* channel) {
+	this->greenChannel = channel;
+}
+
+void ProcTerrainGeometry::setBlueChannel(Texture2D* channel) {
+	this->blueChannel = channel;
+}
+
+void ProcTerrainGeometry::setHeightScale(float scale) {
+	this->heightScale = scale;
 }

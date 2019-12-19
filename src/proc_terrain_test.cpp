@@ -34,7 +34,7 @@ void ProcTerrainTestWindowCallback::init() {
 
 	this->quad.init();
 
-	this->procTerrain.init();
+	this->procTerrain.init("data/terrain/regular.json");
 
 	this->current = &procTerrain.elevationTex;
 

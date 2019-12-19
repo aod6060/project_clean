@@ -12,9 +12,16 @@ enum ProcTerrainMaskType {
 	PTMT_QUAD_GRADIENT
 };
 
+enum ProcTerrainWaveType {
+	PTWT_PERLIN = 0,
+	PTWT_SIMPLEX
+};
+
 struct ProcTerrainHeightmapWave {
 	float wave;
 	float weight;
+	float seed;
+	ProcTerrainWaveType noise;
 };
 
 struct ProcTerrain {
@@ -26,40 +33,9 @@ struct ProcTerrain {
 
 	// Proc Terrain Heightmap Waves
 
-	// Main Wave
-	ProcTerrainHeightmapWave mainWave = {
-		128.0f,
-		0.5f
-	};
-
-	// Secondary Wave
-	ProcTerrainHeightmapWave secondaryWave = {
-		64.0f,
-		0.35f
-	};
-
-	// Trinary Wave
-	ProcTerrainHeightmapWave trinaryWave = {
-		16.0f,
-		0.15f
-	};
-
-
-	// Moister Map Parameters
-	ProcTerrainHeightmapWave mainMoisterWave = {
-		32.0f,
-		0.5f
-	};
-
-	ProcTerrainHeightmapWave secondaryMoisterWave = {
-		16.0f,
-		0.35f
-	};
-
-	ProcTerrainHeightmapWave trinaryMoisterWave = {
-		8.0f,
-		0.15f
-	};
+	std::vector<ProcTerrainHeightmapWave> elevationWaves;
+	
+	std::vector<ProcTerrainHeightmapWave> moisterWaves;
 
 	float beachLevel = 0.25f;
 	float grassLevel = 0.35f;
@@ -80,8 +56,45 @@ struct ProcTerrain {
 	Texture2D blendMapTex;
 	Texture2D biomesMapTex;
 
-	void init();
+	void loadConfig(std::string path);
+
+	void init(std::string path);
+
 	void release();
 
 	float toMask(float x, float y, float radius, ProcTerrainMaskType type);
+};
+
+struct ProcTerrainGeometry : public IGeometry<TerrainShader> {
+	ProcTerrain data;
+	float heightScale = 64.0f;
+	int width = 0;
+	int height = 0;
+
+	std::vector<float> heights;
+	std::vector<glm::vec3> v;
+
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	VertexBuffer normals;
+	IndexBuffer indinces;
+
+	Texture2D* blackChannel;
+	Texture2D* redChannel;
+	Texture2D* greenChannel;
+	Texture2D* blueChannel;
+
+	virtual void init();
+
+	virtual void render(TerrainShader* shader);
+
+	virtual void release();
+
+	void setBlackChannel(Texture2D* channel);
+	void setRedChannel(Texture2D* channel);
+	void setGreenChannel(Texture2D* channel);
+	void setBlueChannel(Texture2D* channel);
+
+	void setHeightScale(float scale);
+
 };

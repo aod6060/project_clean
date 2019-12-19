@@ -13,7 +13,8 @@ private:
 	bool isWire = false;
 
 	SceneGeometry multiMeshTest;
-	StaticTerrainGeometry terrain;
+	//StaticTerrainGeometry terrain;
+	ProcTerrainGeometry terrain;
 
 	Texture2D angry;
 	// Terrain Stuff

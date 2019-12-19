@@ -247,7 +247,12 @@ void StaticTerrainGeometry::init() {
 	this->width = surf->w;
 	this->height = surf->h;
 
+	float halfWidth = this->width * 0.5f;
+	float halfHeight = this->height * 0.5f;
+
 	this->heights.resize(this->width * this->height);
+
+	v.resize(this->width * this->height);
 
 	SDL_LockSurface(surf);
 
@@ -261,10 +266,11 @@ void StaticTerrainGeometry::init() {
 			float height = ((float)color.r / 256.0f) * this->heightScale;
 
 			this->heights[y * this->width + x] = height;
+
+			v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
+
 		}
 	}
-
-	v.resize(this->width * this->height);
 
 	struct Triangle {
 		uint32_t p1;
@@ -326,9 +332,6 @@ void StaticTerrainGeometry::init() {
 
 	// Create Vertices
 
-	float halfWidth = this->width * 0.5f;
-	float halfHeight = this->height * 0.5f;
-
 	vertices.init();
 	texCoords.init();
 	this->normals.init();
@@ -338,7 +341,7 @@ void StaticTerrainGeometry::init() {
 			float height = this->heights[y * this->width + x];
 
 			// Vertices
-			v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
+			//v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
 
 			vertices.set3f(v[y * this->width + x]);
 
