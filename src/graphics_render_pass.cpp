@@ -32,6 +32,7 @@ void AbstractRenderPass::setCallback(std::function<void(RenderContext*)> callbac
 void MainRenderPass::init() {
 	sceneShader.init();
 	terrainShader.init();
+	waterShader.init();
 }
 
 void MainRenderPass::render() {
@@ -41,6 +42,7 @@ void MainRenderPass::render() {
 }
 
 void MainRenderPass::release() {
+	waterShader.release();
 	terrainShader.release();
 	sceneShader.release();
 }

@@ -230,6 +230,26 @@ struct HUBShader : public AbstractShader {
 	void setModel(const glm::mat4& model);
 };
 
+struct WaterShader : public AbstractShader {
+	virtual void init();
+
+	// Attributes
+	void verticePointer();
+	void texCoordPointer();
+	void normalPointer();
+
+	// Uniforms
+	void setProjection(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+	void setCamera(Camera* camera);
+
+	void setTexScale(float scale);
+
+	void setTimeDelta(float timeDelta);
+};
+
 // Geometry Section
 template<typename T>
 struct IGeometry {
@@ -357,6 +377,17 @@ struct QuadHUBGeometry : public IGeometry<HUBShader> {
 	virtual void release();
 };
 
+struct WaterGeometry : public IGeometry<WaterShader> {
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	VertexBuffer normals;
+	IndexBuffer indencies;
+
+	virtual void init();
+	virtual void render(WaterShader* shader);
+	virtual void release();
+};
+
 // IRenderPass Section
 struct IRenderPass;
 
@@ -399,6 +430,7 @@ struct AbstractRenderPass : public IRenderPass {
 struct MainRenderPass : public AbstractRenderPass {
 	SceneShader sceneShader;
 	TerrainShader terrainShader;
+	WaterShader waterShader;
 
 	virtual void init();
 	virtual void render();

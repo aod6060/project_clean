@@ -11,6 +11,8 @@ void GameWindowCallback::init() {
 	dirt2.loadTexture("data/textures/terrain/dirt2.png");
 	sand1.loadTexture("data/textures/terrain/sand1.png");
 
+	water.loadTexture("data/textures/water/temp_water1.png");
+
 	this->mainRenderPass.setCallback([&](RenderContext* context) {
 		glm::mat4 model =
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
@@ -21,6 +23,7 @@ void GameWindowCallback::init() {
 
 		MainRenderPass* pass = context->getPass<MainRenderPass>();
 
+		// Terrain Rendering
 		pass->terrainShader.bind();
 		pass->terrainShader.setCamera(&camera);
 		pass->terrainShader.setTexScale(32.0f);
@@ -30,7 +33,7 @@ void GameWindowCallback::init() {
 
 		pass->terrainShader.unbind();
 
-
+		// Render Meshes
 		pass->sceneShader.bind();
 		pass->sceneShader.setCamera(&camera);
 		sand1.bind();
@@ -40,6 +43,27 @@ void GameWindowCallback::init() {
 		sand1.unbind();
 		//angry.unbind();
 		pass->sceneShader.unbind();
+
+
+		// Render Water
+		pass->waterShader.bind();
+		pass->waterShader.setCamera(&camera);
+		
+		float y = this->terrain.data.beachLevel * this->terrain.heightScale;
+		pass->waterShader.setModel(
+			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, y, 0.0f)) *
+			glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))
+		);
+
+		pass->waterShader.setTexScale(32.0f);
+
+		pass->waterShader.setTimeDelta(this->waterAnim);
+
+		water.bind();
+		waterGeom.render(&pass->waterShader);
+		water.unbind();
+
+		pass->waterShader.unbind();
 
 		context->disable(GL_DEPTH_TEST);
 	});
@@ -67,6 +91,7 @@ void GameWindowCallback::init() {
 	terrain.setGreenChannel(&this->grass1);
 	terrain.setBlueChannel(&this->dirt2);
 
+	waterGeom.init();
 }
 
 void GameWindowCallback::update(float delta) {
@@ -96,6 +121,13 @@ void GameWindowCallback::update(float delta) {
 	}
 
 	camera.update(delta);
+
+	// Water animation
+	this->waterAnim += delta * 0.001f;
+
+	if (this->waterAnim >= 1.0f) {
+		this->waterAnim -= 1.0f;
+	}
 }
 
 void GameWindowCallback::fixedUpdate() {
@@ -106,10 +138,13 @@ void GameWindowCallback::render() {
 }
 
 void GameWindowCallback::release() {
+	waterGeom.release();
 	terrain.release();
 	multiMeshTest.release();
 	//testShader.release();
 	renderPassManager.release();
+
+	water.release();
 
 	sand1.release();
 	dirt2.release();

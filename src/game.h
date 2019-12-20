@@ -16,6 +16,9 @@ private:
 	//StaticTerrainGeometry terrain;
 	ProcTerrainGeometry terrain;
 
+	float waterAnim = 0.0f;
+	WaterGeometry waterGeom;
+
 	Texture2D angry;
 	// Terrain Stuff
 	Texture2D grass1;
@@ -23,6 +26,8 @@ private:
 	Texture2D dirt1;
 	Texture2D dirt2;
 	Texture2D sand1;
+
+	Texture2D water;
 
 	float yrot = 0.0f;
 

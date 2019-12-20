@@ -233,3 +233,81 @@ void HUBShader::setView(const glm::mat4& view) {
 void HUBShader::setModel(const glm::mat4& model) {
 	program.setMat4("model", model);
 }
+
+
+// WaterShader
+void WaterShader::init() {
+	vertex.init(GL_VERTEX_SHADER, "data/shaders/water.vert");
+	fragment.init(GL_FRAGMENT_SHADER, "data/shaders/water.frag");
+
+	program.addShader(&vertex);
+	program.addShader(&fragment);
+
+	program.init();
+
+	program.bind();
+
+	program.createUniform("proj");
+	program.createUniform("view");
+	program.createUniform("model");
+	program.createUniform("tex0");
+	program.set1i("tex0", 0);
+	program.createUniform("texScale");
+	this->setTexScale(1.0f);
+	program.createUniform("timeDelta");
+	program.set1f("timeDelta", 0.0f);
+
+	program.setAttr("vertices", 0);
+	program.setAttr("texCoords", 1);
+	program.setAttr("normals", 2);
+
+	program.bindAttr();
+	program.enableAttr("vertices");
+	program.enableAttr("texCoords");
+	program.enableAttr("normals");
+	program.unbindAttr();
+	program.disableAttr("vertices");
+	program.disableAttr("texCoords");
+	program.disableAttr("normals");
+
+	program.unbind();
+}
+
+// Attributes
+void WaterShader::verticePointer() {
+	program.pointerAttr("vertices", 3, GL_FLOAT);
+}
+
+void WaterShader::texCoordPointer() {
+	program.pointerAttr("texCoords", 2, GL_FLOAT);
+}
+
+void WaterShader::normalPointer() {
+	program.pointerAttr("normals", 3, GL_FLOAT);
+}
+
+// Uniforms
+void WaterShader::setProjection(const glm::mat4& proj) {
+	program.setMat4("proj", proj);
+}
+
+void WaterShader::setView(const glm::mat4& view) {
+	program.setMat4("view", view);
+}
+
+void WaterShader::setModel(const glm::mat4& model) {
+	program.setMat4("model", model);
+}
+
+void WaterShader::setCamera(Camera* camera) {
+	this->setProjection(camera->getProjection());
+	this->setView(camera->getView());
+}
+
+void WaterShader::setTexScale(float scale) {
+	program.set1f("texScale", scale);
+}
+
+void WaterShader::setTimeDelta(float timeDelta) {
+	program.set1f("timeDelta", timeDelta);
+}

@@ -450,6 +450,8 @@ void QuadHUBGeometry::render(HUBShader* shader) {
 	texCoords.bind();
 	shader->texCoordPointer();
 	texCoords.unbind();
+
+	
 	indencies.bind();
 	glDrawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT, 0);
 	indencies.unbind();
@@ -460,4 +462,67 @@ void QuadHUBGeometry::release() {
 	this->indencies.release();
 	this->texCoords.release();
 	this->vertices.release();
+}
+
+
+// WaterGeometry
+void WaterGeometry::init() {
+	// Vertices
+	vertices.init();
+	vertices.set3f(-1.0f, 0.0f, 1.0f);
+	vertices.set3f(1.0f, 0.0f, 1.0f);
+	vertices.set3f(-1.0f, 0.0f, -1.0f);
+	vertices.set3f(1.0f, 0.0f, -1.0f);
+	vertices.update();
+
+	// TexCoords
+	texCoords.init();
+	texCoords.set2f(0.0f, 0.0f);
+	texCoords.set2f(1.0f, 0.0f);
+	texCoords.set2f(0.0f, 1.0f);
+	texCoords.set2f(1.0f, 1.0f);
+	texCoords.update();
+	
+	// Normals
+	normals.init();
+	normals.set3f(0.0f, 1.0f, 0.0f);
+	normals.set3f(0.0f, 1.0f, 0.0f);
+	normals.set3f(0.0f, 1.0f, 0.0f);
+	normals.set3f(0.0f, 1.0f, 0.0f);
+	normals.update();
+
+	// Indencies
+	indencies.init();
+	indencies.set3f(0, 1, 2);
+	indencies.set3f(2, 1, 3);
+	indencies.update();
+}
+
+void WaterGeometry::render(WaterShader* shader) {
+	shader->bindAttr();
+
+	vertices.bind();
+	shader->verticePointer();
+	vertices.unbind();
+
+	texCoords.bind();
+	shader->texCoordPointer();
+	texCoords.unbind();
+
+	normals.bind();
+	shader->normalPointer();
+	normals.unbind();
+
+	indencies.bind();
+	glDrawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT, 0);
+	indencies.unbind();
+
+	shader->unbindAttr();
+}
+
+void WaterGeometry::release() {
+	indencies.release();
+	normals.release();
+	texCoords.release();
+	vertices.release();
 }
