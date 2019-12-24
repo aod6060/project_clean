@@ -24,9 +24,26 @@ struct ProcTerrainHeightmapWave {
 	ProcTerrainWaveType noise;
 };
 
+struct ProcTerrain;
+
+struct ProcTerrainThreadData {
+	int id;
+	int x;
+	int y;
+	int width;
+	int height;
+	ProcTerrain* gen;
+};
+
+struct ProcTerrainThreadHolder {
+	SDL_Thread* thread;
+	ProcTerrainThreadData data;
+};
+
 struct ProcTerrain {
 	// Proc Terrain
 	uint32_t size = 1024.0f;
+	uint32_t isMaskQuad = 0;
 
 	// Height Map Generation
 	uint32_t seed = 0;
@@ -41,6 +58,7 @@ struct ProcTerrain {
 	float grassLevel = 0.35f;
 	float forestLevel = 0.5f;
 
+	// Actual Values
 	std::vector<float> elevation;
 	std::vector<float> mask;
 	std::vector<float> maskedElevation;
@@ -49,6 +67,15 @@ struct ProcTerrain {
 	std::vector<glm::vec3> biomes;
 	std::vector<ProcTerrainType> terrainType;
 
+	// Pixels
+	std::vector<uint32_t> elevation_pixels;
+	std::vector<uint32_t> mask_pixels;
+	std::vector<uint32_t> mask_elevation_pixels;
+	std::vector<uint32_t> moister_pixels;
+	std::vector<uint32_t> blend_map_pixels;
+	std::vector<uint32_t> biome_pixels;
+
+	// Textures
 	Texture2D elevationTex;
 	Texture2D maskTex;
 	Texture2D maskedElevationTex;
@@ -63,6 +90,10 @@ struct ProcTerrain {
 	void release();
 
 	float toMask(float x, float y, float radius, ProcTerrainMaskType type);
+
+	void generate();
+	void generateTextures();
+
 };
 
 struct ProcTerrainGeometry : public IGeometry<TerrainShader> {

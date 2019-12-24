@@ -62,12 +62,22 @@ void ProcTerrain::init(std::string path) {
 	this->loadConfig(path);
 
 	this->seed = rand() % UINT_MAX;
-	uint32_t r = rand() % 2;
-
+	//uint32_t r = rand() % 2;
+	this->isMaskQuad = rand() % 2;
 
 	// Resize Maps
 	uint32_t size2 = this->size * this->size;
 
+	// Clear Maps
+	this->elevation.clear();
+	this->mask.clear();
+	this->maskedElevation.clear();
+	this->moister.clear();
+	this->blend.clear();
+	this->biomes.clear();
+	this->terrainType.clear();
+
+	// Create Maps
 	this->elevation.resize(size2);
 	this->mask.resize(size2);
 	this->maskedElevation.resize(size2);
@@ -76,30 +86,73 @@ void ProcTerrain::init(std::string path) {
 	this->biomes.resize(size2);
 	this->terrainType.resize(size2);
 
-	float seedf = seed;
+	// Create Pixels
+	this->elevation_pixels.resize(size2);
+	this->mask_pixels.resize(size2);
+	this->mask_elevation_pixels.resize(size2);
+	this->moister_pixels.resize(size2);
+	this->blend_map_pixels.resize(size2);
+	this->biome_pixels.resize(size2);
+
+	this->generate();
+
+	// Textures
+	// Elevation
+	this->generateTextures();
+}
+
+void ProcTerrain::release() {
+	elevationTex.release();
+	maskTex.release();
+	maskedElevationTex.release();
+	moisterTex.release();
+	blendMapTex.release();
+	biomesMapTex.release();
+}
+
+float ProcTerrain::toMask(float x, float y, float radius, ProcTerrainMaskType type) {
+
+	if (type == ProcTerrainMaskType::PTMT_SPHERE_GRADIENT) {
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = sqrt(distX * distX + distY * distY);
+
+		float max_width = size * 0.5f - radius;
+		float delta = dist / max_width;
+		float gradient = delta * delta;
+
+		return fmax(0.0f, 1.0f - gradient);
+	}
+	else if(type == ProcTerrainMaskType::PTMT_QUAD_GRADIENT) {
+		float distX = fabs(x - size * 0.5f);
+		float distY = fabs(y - size * 0.5f);
+		float dist = fmax(distX, distY);
+
+		float max_width = size * 0.5f - radius;
+		float delta = dist / max_width;
+		float gradient = delta * delta;
+
+		return fmax(0.0f, 1.0f - gradient);
+	}
+	return 1.0f;
+}
+
+static int proc_thread_callback(void* ptr) {
+
+	//ProcTerrain* terrain = (ProcTerrain*)data;
+	ProcTerrainThreadData* data = (ProcTerrainThreadData*)ptr;
+
+	float seedf = (float)data->gen->seed;
 
 	// Generate Map
-	for (int y = 0; y < this->size; y++) {
-		for (int x = 0; x < this->size; x++) {
-			int i = y * this->size + x;
-
-			/*
-			// Elevation
-			float n1 = (glm::perlin(glm::vec3(x / this->mainWave.wave, y / this->mainWave.wave, seedf)) + 1.0f) * 0.5f;
-			float n2 = (glm::perlin(glm::vec3(x / this->secondaryWave.wave, y / this->secondaryWave.wave, seedf + 1)) + 1.0f) * 0.5f;
-			float n3 = (glm::perlin(glm::vec3(x / this->trinaryWave.wave, y / this->trinaryWave.wave, seedf + 2)) + 1.0f) * 0.5f;
-
-			float n =
-				n1 * mainWave.weight +
-				n2 * secondaryWave.weight +
-				n3 * trinaryWave.weight;
-
-			*/
+	for (int y = data->y; y < data->height; y++) {
+		for (int x = data->x; x < data->width; x++) {
+			int i = y * data->gen->size + x;
 
 			// Elevation
 			float n = 0;
 
-			std::for_each(this->elevationWaves.begin(), this->elevationWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
+			std::for_each(data->gen->elevationWaves.begin(), data->gen->elevationWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
 				if (wave.noise == PTWT_PERLIN) {
 					float nt = (glm::perlin(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f;
 					n += nt * wave.weight;
@@ -110,37 +163,27 @@ void ProcTerrain::init(std::string path) {
 				}
 			});
 
-			elevation[i] = glm::clamp(
+			data->gen->elevation[i] = glm::clamp(
 				n,
 				0.0f,
 				1.0f
 			);
 
 			// Island Mask
-			mask[i] = this->toMask(x, y, 10.0f, (ProcTerrainMaskType)r);
+			data->gen->mask[i] = data->gen->toMask(x, y, 10.0f, (ProcTerrainMaskType)data->gen->isMaskQuad);
 
 			// Masked Elevation
-			float me = elevation[i] * mask[i];
+			float me = data->gen->elevation[i] * data->gen->mask[i];
 
-			maskedElevation[i] = me;
+			data->gen->maskedElevation[i] = me;
 
 			// Moister Map
 			glm::vec2 mo;
 			mo.x = (me > 0.25f) ? me : 0.0f;
 
-			/*
-			float t1 = ((glm::perlin(glm::vec3(x / mainMoisterWave.wave, y / mainMoisterWave.wave, seed + 3)) + 1.0f) * 0.5f) * me;
-			float t2 = ((glm::perlin(glm::vec3(x / secondaryMoisterWave.wave, y / secondaryMoisterWave.wave, seed + 4)) + 1.0f) * 0.5f) * me;
-			float t3 = ((glm::perlin(glm::vec3(x / trinaryMoisterWave.wave, y / trinaryMoisterWave.wave, seed + 5)) + 1.0f) * 0.5f) * me;
-			float temp = 
-				t1 * mainMoisterWave.weight + 
-				t2 * secondaryMoisterWave.weight + 
-				t3 * trinaryMoisterWave.weight;
-			*/
-
 			float temp = 0;
 
-			std::for_each(this->moisterWaves.begin(), this->moisterWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
+			std::for_each(data->gen->moisterWaves.begin(), data->gen->moisterWaves.end(), [&](ProcTerrainHeightmapWave& wave) {
 				if (wave.noise == PTWT_PERLIN) {
 					float tt = ((glm::perlin(glm::vec3(x / wave.wave, y / wave.wave, seedf + wave.seed)) + 1.0f) * 0.5f) * me;
 					temp += tt * wave.weight;
@@ -151,104 +194,122 @@ void ProcTerrain::init(std::string path) {
 				}
 			});
 
-			/*
-			temp = glm::clamp(
-				temp,
-				0.0f,
-				1.0f
-			);
-			*/
-
 			mo.y = (me > 0.3f) ? temp : 0.0f;
 
-			moister[i] = mo;
+			data->gen->moister[i] = mo;
 
 			// Blend Map
-			if (me <= this->beachLevel) {
-				this->blend[i] = glm::vec3(0.0f, 0.0f, 0.0f);
+			if (me <= data->gen->beachLevel) {
+				data->gen->blend[i] = glm::vec3(0.0f, 0.0f, 0.0f);
 			}
-			else if (me > this->beachLevel) {
-				float t = glm::length(moister[i]);
+			else if (me > data->gen->beachLevel) {
+				float t = glm::length(data->gen->moister[i]);
 
-				if (t >= this->beachLevel && t < this->grassLevel) {
-					this->blend[i] = glm::vec3(1.0f, 0.0f, 0.0f);
+				if (t >= data->gen->beachLevel && t < data->gen->grassLevel) {
+					data->gen->blend[i] = glm::vec3(1.0f, 0.0f, 0.0f);
 				}
-				else if (t >= this->grassLevel && t < this->forestLevel) {
-					this->blend[i] = glm::vec3(0.0f, 1.0f, 0.0f);
+				else if (t >= data->gen->grassLevel && t < data->gen->forestLevel) {
+					data->gen->blend[i] = glm::vec3(0.0f, 1.0f, 0.0f);
 				}
-				else if (t >= this->forestLevel) {
-					this->blend[i] = glm::vec3(0.0f, 0.0f, 1.0f);
+				else if (t >= data->gen->forestLevel) {
+					data->gen->blend[i] = glm::vec3(0.0f, 0.0f, 1.0f);
 				}
 			}
 
 			// Biome Map
-			if (me <= this->beachLevel) {
-				this->biomes[i] = glm::vec3(0.0f, 0.0f, 1.0f);
-				this->terrainType[i] = PTT_OCEAN;
+			if (me <= data->gen->beachLevel) {
+				data->gen->biomes[i] = glm::vec3(0.0f, 0.0f, 1.0f);
+				data->gen->terrainType[i] = PTT_OCEAN;
 			}
-			else if (me > this->beachLevel) {
-				float t = glm::length(moister[i]);
-				if (t >= this->beachLevel && t < this->grassLevel) {
-					this->biomes[i] = glm::vec3(194.0f, 256.0f, 128.0f) / 256.0f;
-					this->terrainType[i] = PTT_BEACH;
+			else if (me > data->gen->beachLevel) {
+				float t = glm::length(data->gen->moister[i]);
+				if (t >= data->gen->beachLevel && t < data->gen->grassLevel) {
+					data->gen->biomes[i] = glm::vec3(194.0f, 256.0f, 128.0f) / 256.0f;
+					data->gen->terrainType[i] = PTT_BEACH;
 				}
-				else if (t >= this->grassLevel && t < this->forestLevel) {
-					this->biomes[i] = glm::vec3(0.3f, 1.0f, 0.3f);
-					this->terrainType[i] = PTT_GRASS;
+				else if (t >= data->gen->grassLevel && t < data->gen->forestLevel) {
+					data->gen->biomes[i] = glm::vec3(0.3f, 1.0f, 0.3f);
+					data->gen->terrainType[i] = PTT_GRASS;
 				}
 				else if (t >= 0.5f) {
-					this->biomes[i] = glm::vec3(139.0f, 69.0f, 19.0f) / 256.0f;
-					this->terrainType[i] = PTT_FOREST;
+					data->gen->biomes[i] = glm::vec3(139.0f, 69.0f, 19.0f) / 256.0f;
+					data->gen->terrainType[i] = PTT_FOREST;
 				}
 			}
-		}
-	}
 
-
-	std::vector<uint32_t> elevation_pixels(size2);
-	std::vector<uint32_t> mask_pixels(size2);
-	std::vector<uint32_t> mask_elevation_pixels(size2);
-	std::vector<uint32_t> moister_pixels(size2);
-	std::vector<uint32_t> blend_map_pixels(size2);
-	std::vector<uint32_t> biome_pixels(size2);
-
-
-	for (int y = 0; y < this->size; y++) {
-		for (int x = 0; x < this->size; x++) {
-			int i = y * this->size + x;
-
+			// Pixel Section
 			// Elevation
-			uint8_t e = this->elevation[i] * 255;
-			elevation_pixels[i] = RGB_COLOR(e, e, e);
+			uint8_t e = data->gen->elevation[i] * 255;
+			data->gen->elevation_pixels[i] = RGB_COLOR(e, e, e);
 
 			// Mask
-			uint8_t m = this->mask[i] * 255;
-			mask_pixels[i] = RGB_COLOR(m, m, m);
+			uint8_t m = data->gen->mask[i] * 255;
+			data->gen->mask_pixels[i] = RGB_COLOR(m, m, m);
 
 			// Masked Elevation
-			uint8_t me = this->maskedElevation[i] * 255;
-			mask_elevation_pixels[i] = RGB_COLOR(me, me, me);
+			uint8_t men = data->gen->maskedElevation[i] * 255;
+			data->gen->mask_elevation_pixels[i] = RGB_COLOR(men, men, men);
 
 			// Moister
-			uint8_t mor = this->moister[i].r * 255;
-			uint8_t mog = this->moister[i].g * 255;
-			moister_pixels[i] = RGB_COLOR(mor, 0, mog);
+			uint8_t mor = data->gen->moister[i].r * 255;
+			uint8_t mog = data->gen->moister[i].g * 255;
+			data->gen->moister_pixels[i] = RGB_COLOR(mor, 0, mog);
 
 			// Blend Map
-			uint8_t br = this->blend[i].r * 255;
-			uint8_t bg = this->blend[i].g * 255;
-			uint8_t bb = this->blend[i].b * 255;
-			blend_map_pixels[i] = RGB_COLOR(br, bg, bb);
+			uint8_t br = data->gen->blend[i].r * 255;
+			uint8_t bg = data->gen->blend[i].g * 255;
+			uint8_t bb = data->gen->blend[i].b * 255;
+			data->gen->blend_map_pixels[i] = RGB_COLOR(br, bg, bb);
 
 			// Biome
-			uint8_t bmr = this->biomes[i].r * 255;
-			uint8_t bmg = this->biomes[i].g * 255;
-			uint8_t bmb = this->biomes[i].b * 255;
-			biome_pixels[i] = RGB_COLOR(bmr, bmg, bmb);
-
+			uint8_t bmr = data->gen->biomes[i].r * 255;
+			uint8_t bmg = data->gen->biomes[i].g * 255;
+			uint8_t bmb = data->gen->biomes[i].b * 255;
+			data->gen->biome_pixels[i] = RGB_COLOR(bmr, bmg, bmb);
 		}
 	}
 
+	return 0;
+}
+
+void ProcTerrain::generate() {
+	// Handle Map Size
+	int tsize = 16;
+	int osize = size / tsize;
+
+	//std::cout << "tsize=" << tsize << " osize=" << osize << std::endl;
+	logger_output("tsize=%d, osize=%d\n", tsize, osize);
+
+	std::vector<ProcTerrainThreadHolder> threads(tsize * tsize);
+
+	int i = 0;
+
+	for (int y = 0; y < tsize; y++) {
+		for (int x = 0; x < tsize; x++) {
+			std::stringstream ss;
+			ss << "Thread: " << i;
+			int o = y * tsize + x;
+
+			threads[o].data.id = i;
+			threads[o].data.x = x * osize;
+			threads[o].data.y = y * osize;
+			threads[o].data.width = x * osize + osize;
+			threads[o].data.height = y * osize + osize;
+			threads[o].data.gen = this;
+			threads[o].thread = SDL_CreateThread(proc_thread_callback, ss.str().c_str(), &threads[o].data);
+		}
+	}
+
+
+	std::vector<ProcTerrainThreadHolder>::iterator it;
+
+	for (it = threads.begin(); it != threads.end(); it++) {
+		int ret;
+		SDL_WaitThread(it->thread, &ret);
+	}
+}
+
+void ProcTerrain::generateTextures() {
 	// Textures
 	// Elevation
 	this->elevationTex.init(
@@ -297,46 +358,9 @@ void ProcTerrain::init(std::string path) {
 		4,
 		biome_pixels.data()
 	);
-
 }
 
-void ProcTerrain::release() {
-	elevationTex.release();
-	maskTex.release();
-	maskedElevationTex.release();
-	moisterTex.release();
-	blendMapTex.release();
-	biomesMapTex.release();
-}
-
-float ProcTerrain::toMask(float x, float y, float radius, ProcTerrainMaskType type) {
-
-	if (type == ProcTerrainMaskType::PTMT_SPHERE_GRADIENT) {
-		float distX = fabs(x - size * 0.5f);
-		float distY = fabs(y - size * 0.5f);
-		float dist = sqrt(distX * distX + distY * distY);
-
-		float max_width = size * 0.5f - radius;
-		float delta = dist / max_width;
-		float gradient = delta * delta;
-
-		return fmax(0.0f, 1.0f - gradient);
-	}
-	else if(type == ProcTerrainMaskType::PTMT_QUAD_GRADIENT) {
-		float distX = fabs(x - size * 0.5f);
-		float distY = fabs(y - size * 0.5f);
-		float dist = fmax(distX, distY);
-
-		float max_width = size * 0.5f - radius;
-		float delta = dist / max_width;
-		float gradient = delta * delta;
-
-		return fmax(0.0f, 1.0f - gradient);
-	}
-	return 1.0f;
-}
-
-
+// Geometry
 void ProcTerrainGeometry::init() {
 	//this->data.loadConfig("data/terrain/regular.json");
 	this->data.init("data/terrain/regular.json");

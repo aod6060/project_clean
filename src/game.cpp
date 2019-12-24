@@ -18,7 +18,7 @@ void GameWindowCallback::init() {
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 		context->enable(GL_DEPTH_TEST);
-		context->clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 256.0f, 1.0f);
+		context->clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
 		context->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		MainRenderPass* pass = context->getPass<MainRenderPass>();

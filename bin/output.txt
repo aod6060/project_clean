@@ -141,3 +141,4 @@ void main() {
     //out_Color = vec4(v_TexCoords, 0.0, 1.0);
 }
 
+tsize=16, osize=64
