@@ -33,4 +33,8 @@
 #include "win.h"
 #include "input.h"
 #include "graphics.h"
+#include "shader.h"
+#include "geometry.h"
+#include "render_pass.h"
+#include "camera.h"
 #include "proc_terrain.h"
