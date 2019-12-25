@@ -49,6 +49,7 @@ void win_init(IWindowCallback* appCB) {
 	glewInit();
 	logger_init();
 	input_init();
+	ShaderManager::init();
 
 	if (g_appCB) {
 		g_appCB->init();
@@ -109,6 +110,9 @@ void win_release() {
 	g_appCB = nullptr;
 
 	g_eventCBs.clear();
+
+	ShaderManager::release();
+
 	logger_release();
 
 	SDL_GL_DeleteContext(g_context);

@@ -369,3 +369,104 @@ void Texture2D::unbind(GLenum tex) {
 void Texture2D::release() {
 	glDeleteTextures(1, &this->id);
 }
+
+
+// RenderBuffer
+void RenderBuffer::init() {
+	glGenRenderbuffers(1, &this->id);
+}
+
+void RenderBuffer::load(GLenum storage, uint32_t width, uint32_t height) {
+	this->width = width;
+	this->height = height;
+
+	bind();
+	glRenderbufferStorage(GL_RENDERBUFFER, storage, this->width, this->height);
+	unbind();
+}
+
+void RenderBuffer::bind() {
+	glBindRenderbuffer(GL_RENDERBUFFER, id);
+}
+
+void RenderBuffer::unbind() {
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+}
+
+void RenderBuffer::release() {
+	glDeleteRenderbuffers(1, &this->id);
+}
+
+// Framebuffer
+void FrameBuffer::init() {
+	glGenFramebuffers(1, &this->id);
+}
+
+void FrameBuffer::release() {
+	glDeleteFramebuffers(1, &this->id);
+}
+
+void FrameBuffer::bind() {
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
+}
+
+void FrameBuffer::unbind() {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::setTexture2D(Texture2D& tex, GLenum attachment) {
+	glFramebufferTexture2D(
+		GL_FRAMEBUFFER,
+		attachment,
+		GL_TEXTURE_2D,
+		tex.id,
+		0);
+}
+
+void FrameBuffer::setRenderBuffer(RenderBuffer& buffer, GLenum attachment) {
+	glFramebufferRenderbuffer(
+		GL_FRAMEBUFFER,
+		attachment,
+		GL_RENDERBUFFER,
+		buffer.id
+	);
+}
+
+void FrameBuffer::checkForErrors() {
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		logger_output("Error: Framebuffer wasn't created!\n");
+	}
+	else {
+		logger_output("Success: Framebuffer created\n");
+	}
+}
+
+
+// RenderSystem
+void RenderSystem::enable(GLenum e) {
+	glEnable(e);
+}
+
+void RenderSystem::disable(GLenum e) {
+	glDisable(e);
+}
+
+void RenderSystem::clearColor(float r, float g, float b, float a) {
+	glClearColor(r, g, b, a);
+}
+
+void RenderSystem::clearColor(const glm::vec4& v) {
+	clearColor(v.r, v.g, v.b, v.a);
+}
+
+void RenderSystem::clear(int clear) {
+	glClear(clear);
+}
+
+void RenderSystem::drawArrays(GLenum type, GLint first, GLint count) {
+	glDrawArrays(type, first, count);
+}
+
+void RenderSystem::drawElements(GLenum mode, GLsizei size, GLenum type) {
+	glDrawElements(mode, size, type, 0);
+}

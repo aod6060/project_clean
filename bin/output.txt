@@ -106,6 +106,36 @@ void main() {
 
 layout(location=0) in vec3 vertices;
 layout(location=1) in vec2 texCoords;
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+
+out vec2 v_TexCoords;
+
+void main() {
+    gl_Position = proj * view * model * vec4(vertices, 1.0);
+    v_TexCoords = texCoords;
+}
+
+#version 400
+
+
+uniform sampler2D tex0;
+
+in vec2 v_TexCoords;
+out vec4 out_Color;
+
+void main() {
+    out_Color = texture(tex0, v_TexCoords);    
+    //out_Color = vec4(v_TexCoords, 0.0f, 1.0f);
+}
+
+#version 400
+
+
+layout(location=0) in vec3 vertices;
+layout(location=1) in vec2 texCoords;
 layout(location=2) in vec3 normals;
 
 

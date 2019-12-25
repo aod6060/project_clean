@@ -36,5 +36,6 @@
 #include "shader.h"
 #include "geometry.h"
 #include "render_pass.h"
+#include "pre_process.h"
 #include "camera.h"
 #include "proc_terrain.h"

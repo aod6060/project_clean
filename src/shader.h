@@ -107,4 +107,33 @@ struct WaterShader : public AbstractShader {
 	void setTimeDelta(float timeDelta);
 };
 
+struct BlurPreProcessShader : public AbstractShader {
+	virtual void init();
 
+	// Attributes
+	void verticesPointer();
+	void texCoordPointer();
+
+	// Uniforms
+	void setProj(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+	void setSize(float size);
+
+};
+
+
+struct ShaderManager {
+	// Regular Shaders
+	static SceneShader sceneShader;
+	static TerrainShader terrainShader;
+	static HUBShader hubShader;
+	static WaterShader waterShader;
+
+	// Pre Process Shaders
+	static BlurPreProcessShader blurPreProcessShader;
+
+	static void init();
+
+	static void release();
+};

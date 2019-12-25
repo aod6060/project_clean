@@ -8,7 +8,7 @@ class GameWindowCallback : public IWindowCallback {
 private:
 	Camera camera;
 	RenderPassManager renderPassManager;
-	MainRenderPass mainRenderPass;
+	RenderPass mainRenderPass;
 
 	bool isWire = false;
 

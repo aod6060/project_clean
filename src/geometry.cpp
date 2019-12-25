@@ -47,7 +47,7 @@ void SceneGeometry::MeshGeometry::render(SceneShader* shader) {
 	normals.unbind();
 
 	indencies.bind();
-	glDrawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT, 0);
+	RenderSystem::drawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT);
 	indencies.unbind();
 
 	shader->unbindAttr();
@@ -392,7 +392,7 @@ void StaticTerrainGeometry::render(TerrainShader* shader) {
 	normals.unbind();
 
 	indinces.bind();
-	glDrawElements(GL_TRIANGLES, indinces.size(), GL_UNSIGNED_INT, 0);
+	RenderSystem::drawElements(GL_TRIANGLES, indinces.size(), GL_UNSIGNED_INT);
 	indinces.unbind();
 
 	shader->unbindAttr();
@@ -453,7 +453,7 @@ void QuadHUBGeometry::render(HUBShader* shader) {
 
 	
 	indencies.bind();
-	glDrawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT, 0);
+	RenderSystem::drawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT);
 	indencies.unbind();
 	shader->unbindAttr();
 }
@@ -514,7 +514,7 @@ void WaterGeometry::render(WaterShader* shader) {
 	normals.unbind();
 
 	indencies.bind();
-	glDrawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT, 0);
+	RenderSystem::drawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT);
 	indencies.unbind();
 
 	shader->unbindAttr();

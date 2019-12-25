@@ -311,3 +311,60 @@ void WaterShader::setTexScale(float scale) {
 void WaterShader::setTimeDelta(float timeDelta) {
 	program.set1f("timeDelta", timeDelta);
 }
+
+// Blur Shader
+void BlurPreProcessShader::init() {
+
+}
+
+// Attributes
+void BlurPreProcessShader::verticesPointer() {
+	this->pointerAttr("vertices", 3, GL_FLOAT);
+}
+
+void BlurPreProcessShader::texCoordPointer() {
+
+}
+
+// Uniforms
+void BlurPreProcessShader::setProj(const glm::mat4& proj) {
+
+}
+
+void BlurPreProcessShader::setView(const glm::mat4& view) {
+
+}
+
+void BlurPreProcessShader::setModel(const glm::mat4& model) {
+
+}
+
+void BlurPreProcessShader::setSize(float size) {
+
+}
+
+// ShaderManager
+// Regular Shaders
+SceneShader ShaderManager::sceneShader;
+TerrainShader ShaderManager::terrainShader;
+HUBShader ShaderManager::hubShader;
+WaterShader ShaderManager::waterShader;
+
+// Pre Process Shaders
+BlurPreProcessShader ShaderManager::blurPreProcessShader;
+
+void ShaderManager::init() {
+	sceneShader.init();
+	terrainShader.init();
+	hubShader.init();
+	waterShader.init();
+	blurPreProcessShader.init();
+}
+
+void ShaderManager::release() {
+	blurPreProcessShader.release();
+	waterShader.release();
+	hubShader.release();
+	terrainShader.release();
+	sceneShader.release();
+}

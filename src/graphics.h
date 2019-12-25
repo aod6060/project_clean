@@ -6,6 +6,7 @@
 /*
 	Wrapper Section
 */
+
 // Shader
 struct Shader {
 	uint32_t id = 0;
@@ -135,15 +136,20 @@ struct Texture2D {
 	void release();
 };
 
+// RenderBuffer
 struct RenderBuffer {
 	uint32_t id = 0;
 	uint32_t width = 0;
 	uint32_t height = 0;
 
 	void init();
+	void load(GLenum storage, uint32_t width, uint32_t height);
+	void bind();
+	void unbind();
 	void release();
 };
 
+// FrameBuffer
 struct FrameBuffer {
 	uint32_t id = 0;
 
@@ -156,4 +162,19 @@ struct FrameBuffer {
 	void setTexture2D(Texture2D& tex, GLenum attachment);
 
 	void setRenderBuffer(RenderBuffer& buffer, GLenum attachment);
+
+	void checkForErrors();
+};
+
+
+// RenderSystem
+struct RenderSystem {
+
+	static void enable(GLenum e);
+	static void disable(GLenum e);
+	static void clearColor(float r, float g, float b, float a);
+	static void clearColor(const glm::vec4& v);
+	static void clear(int clear);
+	static void drawArrays(GLenum type, GLint first, GLint count);
+	static void drawElements(GLenum mode, GLsizei size, GLenum type);
 };

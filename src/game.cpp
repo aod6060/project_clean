@@ -13,63 +13,62 @@ void GameWindowCallback::init() {
 
 	water.loadTexture("data/textures/water/temp_water1.png");
 
-	this->mainRenderPass.setCallback([&](RenderContext* context) {
+	this->mainRenderPass.setCallback([&]() {
 		glm::mat4 model =
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
-		context->enable(GL_DEPTH_TEST);
-		context->clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
-		context->clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		RenderSystem::enable(GL_DEPTH_TEST);
+		RenderSystem::clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
+		RenderSystem::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		MainRenderPass* pass = context->getPass<MainRenderPass>();
+		//MainRenderPass* pass = context->getPass<MainRenderPass>();
 
 		// Terrain Rendering
-		pass->terrainShader.bind();
-		pass->terrainShader.setCamera(&camera);
-		pass->terrainShader.setTexScale(32.0f);
+		ShaderManager::terrainShader.bind();
+		ShaderManager::terrainShader.setCamera(&camera);
+		ShaderManager::terrainShader.setTexScale(32.0f);
 
-		pass->terrainShader.setModel(model);
-		terrain.render(&pass->terrainShader);
+		ShaderManager::terrainShader.setModel(model);
+		terrain.render(&ShaderManager::terrainShader);
 
-		pass->terrainShader.unbind();
+		ShaderManager::terrainShader.unbind();
 
 		// Render Meshes
-		pass->sceneShader.bind();
-		pass->sceneShader.setCamera(&camera);
+		ShaderManager::sceneShader.bind();
+		ShaderManager::sceneShader.setCamera(&camera);
 		sand1.bind();
 		//angry.bind();
 		multiMeshTest.setModel(model);
-		multiMeshTest.render(&pass->sceneShader);
+		multiMeshTest.render(&ShaderManager::sceneShader);
 		sand1.unbind();
 		//angry.unbind();
-		pass->sceneShader.unbind();
+		ShaderManager::sceneShader.unbind();
 
 
 		// Render Water
-		pass->waterShader.bind();
-		pass->waterShader.setCamera(&camera);
+		ShaderManager::waterShader.bind();
+		ShaderManager::waterShader.setCamera(&camera);
 		
 		float y = this->terrain.data.beachLevel * this->terrain.heightScale;
-		pass->waterShader.setModel(
+		ShaderManager::waterShader.setModel(
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, y, 0.0f)) *
 			glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))
 		);
 
-		pass->waterShader.setTexScale(32.0f);
+		ShaderManager::waterShader.setTexScale(32.0f);
 
-		pass->waterShader.setTimeDelta(this->waterAnim);
+		ShaderManager::waterShader.setTimeDelta(this->waterAnim);
 
 		water.bind();
-		waterGeom.render(&pass->waterShader);
+		waterGeom.render(&ShaderManager::waterShader);
 		water.unbind();
 
-		pass->waterShader.unbind();
+		ShaderManager::waterShader.unbind();
 
-		context->disable(GL_DEPTH_TEST);
+		RenderSystem::disable(GL_DEPTH_TEST);
 	});
 
 	renderPassManager.addRenderPass(&this->mainRenderPass);
-	renderPassManager.init();
 
 	multiMeshTest.setFilePath("data/meshes/multi_mesh_test.json");
 	multiMeshTest.init();
@@ -142,7 +141,6 @@ void GameWindowCallback::release() {
 	terrain.release();
 	multiMeshTest.release();
 	//testShader.release();
-	renderPassManager.release();
 
 	water.release();
 

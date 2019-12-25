@@ -2,35 +2,41 @@
 
 
 void ProcTerrainTestWindowCallback::init() {
-	this->hubRenderPass.setCallback([&](RenderContext* context) {
+	this->hubRenderPass.setCallback([&]() {
 
 		glm::mat4 proj =
 			glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f);
 		glm::mat4 view = glm::mat4(1.0f);
 		glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(this->procTerrain.size, this->procTerrain.size, 0.0f));
 
-		context->disable(GL_DEPTH_TEST);
-		context->clearColor(1.0f, 0.0f, 0.0f, 1.0f);
-		context->clear(GL_COLOR_BUFFER_BIT);
+		RenderSystem::disable(GL_DEPTH_TEST);
+		RenderSystem::clearColor(1.0f, 0.0f, 0.0f, 1.0f);
+		RenderSystem::clear(GL_COLOR_BUFFER_BIT);
 
-		HUBRenderPass* pass = context->getPass<HUBRenderPass>();
+		//HUBRenderPass* pass = context->getPass<HUBRenderPass>();
 
-		pass->hubShader.bind();
-
-		pass->hubShader.setProjection(proj);
-		pass->hubShader.setView(view);
-		pass->hubShader.setModel(model);
+		//pass->hubShader.bind();
+		ShaderManager::hubShader.bind();
+		
+		//pass->hubShader.setProjection(proj);
+		ShaderManager::hubShader.setProjection(proj);
+		//pass->hubShader.setView(view);
+		ShaderManager::hubShader.setView(view);
+		//pass->hubShader.setModel(model);
+		ShaderManager::hubShader.setModel(model);
 
 		this->current->bind();
-		quad.render(&pass->hubShader);
+		quad.render(&ShaderManager::hubShader);
 		//procTerrain.maskTex.unbind();
 		this->current->unbind();
 
-		pass->hubShader.unbind();
+		//pass->hubShader.unbind();
+		ShaderManager::hubShader.unbind();
+
+		RenderSystem::enable(GL_DEPTH_TEST);
 	});
 
 	this->renderPassManager.addRenderPass(&this->hubRenderPass);
-	this->renderPassManager.init();
 
 	this->quad.init();
 
@@ -77,5 +83,4 @@ void ProcTerrainTestWindowCallback::render() {
 void ProcTerrainTestWindowCallback::release() {
 	procTerrain.release();
 	this->quad.release();
-	this->renderPassManager.release();
 }
