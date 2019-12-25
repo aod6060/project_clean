@@ -110,6 +110,8 @@ struct ProcTerrainGeometry : public IGeometry<TerrainShader> {
 	VertexBuffer normals;
 	IndexBuffer indinces;
 
+	Texture2D blendMap;
+
 	Texture2D* blackChannel;
 	Texture2D* redChannel;
 	Texture2D* greenChannel;

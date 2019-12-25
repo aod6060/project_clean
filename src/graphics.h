@@ -129,6 +129,8 @@ struct Texture2D {
 
 	void init(uint32_t width, uint32_t height, uint32_t bytePerPixel, void* pixels);
 
+	void initEmpty(uint32_t width, uint32_t height);
+
 	void bind(GLenum tex = GL_TEXTURE0);
 
 	void unbind(GLenum tex = GL_TEXTURE0);
@@ -159,9 +161,9 @@ struct FrameBuffer {
 	void bind();
 	void unbind();
 
-	void setTexture2D(Texture2D& tex, GLenum attachment);
+	void setTexture2D(Texture2D* tex, GLenum attachment);
 
-	void setRenderBuffer(RenderBuffer& buffer, GLenum attachment);
+	void setRenderBuffer(RenderBuffer* buffer, GLenum attachment);
 
 	void checkForErrors();
 };
@@ -170,6 +172,7 @@ struct FrameBuffer {
 // RenderSystem
 struct RenderSystem {
 
+	static void viewport(int x, int y, uint32_t width, uint32_t height);
 	static void enable(GLenum e);
 	static void disable(GLenum e);
 	static void clearColor(float r, float g, float b, float a);

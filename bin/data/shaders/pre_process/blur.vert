@@ -10,7 +10,7 @@ uniform mat4 view;
 uniform mat4 model;
 
 // Varying
-out vec4 v_TexCoords;
+out vec2 v_TexCoords;
 
 void main() {
     gl_Position = proj * view * model * vec4(vertices, 1.0);

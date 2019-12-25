@@ -356,6 +356,36 @@ void Texture2D::init(
 	this->unbind();
 }
 
+void Texture2D::initEmpty(uint32_t width, uint32_t height) {
+	this->width = width;
+	this->height = height;
+
+	if (this->id == 0) {
+		glGenTextures(1, &this->id);
+	}
+
+	this->bind();
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		GL_RGBA,
+		this->width,
+		this->height,
+		0,
+		GL_RGBA,
+		GL_UNSIGNED_BYTE,
+		nullptr);
+
+	//glGenerateMipmap(GL_TEXTURE_2D);
+
+	this->unbind();
+
+}
+
 void Texture2D::bind(GLenum tex) {
 	glActiveTexture(tex);
 	glBindTexture(GL_TEXTURE_2D, this->id);
@@ -414,22 +444,26 @@ void FrameBuffer::unbind() {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::setTexture2D(Texture2D& tex, GLenum attachment) {
+void FrameBuffer::setTexture2D(Texture2D* tex, GLenum attachment) {
 	glFramebufferTexture2D(
 		GL_FRAMEBUFFER,
 		attachment,
 		GL_TEXTURE_2D,
-		tex.id,
+		tex->id,
 		0);
+
+	logger_output("tex: %d\n", tex->id);
 }
 
-void FrameBuffer::setRenderBuffer(RenderBuffer& buffer, GLenum attachment) {
+void FrameBuffer::setRenderBuffer(RenderBuffer* buffer, GLenum attachment) {
 	glFramebufferRenderbuffer(
 		GL_FRAMEBUFFER,
 		attachment,
 		GL_RENDERBUFFER,
-		buffer.id
+		buffer->id
 	);
+
+	logger_output("renderbuf: %d\n", buffer->id);
 }
 
 void FrameBuffer::checkForErrors() {
@@ -469,4 +503,8 @@ void RenderSystem::drawArrays(GLenum type, GLint first, GLint count) {
 
 void RenderSystem::drawElements(GLenum mode, GLsizei size, GLenum type) {
 	glDrawElements(mode, size, type, 0);
+}
+
+void RenderSystem::viewport(int x, int y, uint32_t width, uint32_t height) {
+	glViewport(x, y, width, height);
 }

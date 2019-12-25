@@ -139,3 +139,12 @@ struct WaterGeometry : public IGeometry<WaterShader> {
 	virtual void release();
 };
 
+struct QuadBlurPreProcessGeometry : public IGeometry<BlurPreProcessShader> {
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	IndexBuffer indencies;
+
+	virtual void init();
+	virtual void render(BlurPreProcessShader* shader);
+	virtual void release();
+};

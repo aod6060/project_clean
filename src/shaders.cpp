@@ -314,6 +314,37 @@ void WaterShader::setTimeDelta(float timeDelta) {
 
 // Blur Shader
 void BlurPreProcessShader::init() {
+	vertex.init(GL_VERTEX_SHADER, "data/shaders/pre_process/blur.vert");
+	fragment.init(GL_FRAGMENT_SHADER, "data/shaders/pre_process/blur.frag");
+
+	program.addShader(&vertex);
+	program.addShader(&fragment);
+
+	program.init();
+
+	program.bind();
+
+	// Attributes
+	program.setAttr("vertices", 0);
+	program.setAttr("texCoords", 1);
+
+	program.bindAttr();
+	program.enableAttr("vertices");
+	program.enableAttr("texCoords");
+	program.unbindAttr();
+	program.disableAttr("vertices");
+	program.disableAttr("texCoords");
+
+	// Uniforms
+	program.createUniform("proj");
+	program.createUniform("view");
+	program.createUniform("model");
+	program.createUniform("inputTex0");
+	program.set1i("inputTex0", 0);
+	program.createUniform("size");
+	program.set1f("size", 1024.0f);
+
+	program.unbind();
 
 }
 
@@ -323,24 +354,24 @@ void BlurPreProcessShader::verticesPointer() {
 }
 
 void BlurPreProcessShader::texCoordPointer() {
-
+	this->pointerAttr("texCoords", 2, GL_FLOAT);
 }
 
 // Uniforms
 void BlurPreProcessShader::setProj(const glm::mat4& proj) {
-
+	program.setMat4("proj", proj);
 }
 
 void BlurPreProcessShader::setView(const glm::mat4& view) {
-
+	program.setMat4("view", view);
 }
 
 void BlurPreProcessShader::setModel(const glm::mat4& model) {
-
+	program.setMat4("model", model);
 }
 
 void BlurPreProcessShader::setSize(float size) {
-
+	program.set1f("size", size);
 }
 
 // ShaderManager

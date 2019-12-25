@@ -13,11 +13,14 @@ void GameWindowCallback::init() {
 
 	water.loadTexture("data/textures/water/temp_water1.png");
 
+	hubGeom.init();
+
 	this->mainRenderPass.setCallback([&]() {
 		glm::mat4 model =
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 		RenderSystem::enable(GL_DEPTH_TEST);
+		RenderSystem::viewport(0, 0, conf_getWidth(), conf_getHeight());
 		RenderSystem::clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
 		RenderSystem::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -36,11 +39,11 @@ void GameWindowCallback::init() {
 		// Render Meshes
 		ShaderManager::sceneShader.bind();
 		ShaderManager::sceneShader.setCamera(&camera);
-		sand1.bind();
+		angry.bind();
 		//angry.bind();
 		multiMeshTest.setModel(model);
 		multiMeshTest.render(&ShaderManager::sceneShader);
-		sand1.unbind();
+		angry.unbind();
 		//angry.unbind();
 		ShaderManager::sceneShader.unbind();
 
@@ -68,7 +71,32 @@ void GameWindowCallback::init() {
 		RenderSystem::disable(GL_DEPTH_TEST);
 	});
 
+	
+	this->hubRenderPass.setCallback([&]() {
+		// Do nothing for the moment
+
+		ShaderManager::hubShader.bind();
+
+		ShaderManager::hubShader.setProjection(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
+		ShaderManager::hubShader.setView(glm::mat4(1.0f));
+		
+		ShaderManager::hubShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(128.0f, 128.0f, 0.0f)));
+
+		terrain.data.blendMapTex.bind();
+		hubGeom.render(&ShaderManager::hubShader);
+		terrain.data.blendMapTex.unbind();
+
+		ShaderManager::hubShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(129.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(128.0f, 128.0f, 0.0f)));
+
+		terrain.blendMap.bind();
+		hubGeom.render(&ShaderManager::hubShader);
+		terrain.blendMap.unbind();
+
+		ShaderManager::hubShader.unbind();
+	});
+
 	renderPassManager.addRenderPass(&this->mainRenderPass);
+	renderPassManager.addRenderPass(&this->hubRenderPass);
 
 	multiMeshTest.setFilePath("data/meshes/multi_mesh_test.json");
 	multiMeshTest.init();
@@ -88,7 +116,7 @@ void GameWindowCallback::init() {
 	terrain.setBlackChannel(&this->dirt1);
 	terrain.setRedChannel(&this->sand1);
 	terrain.setGreenChannel(&this->grass1);
-	terrain.setBlueChannel(&this->dirt2);
+	terrain.setBlueChannel(&this->angry);
 
 	waterGeom.init();
 }
@@ -151,5 +179,7 @@ void GameWindowCallback::release() {
 	grass1.release();
 
 	angry.release();
+
+	hubGeom.release();
 }
 

@@ -526,3 +526,48 @@ void WaterGeometry::release() {
 	texCoords.release();
 	vertices.release();
 }
+
+void QuadBlurPreProcessGeometry::init() {
+	vertices.init();
+	vertices.set3f(0.0f, 0.0f, 0.0f);
+	vertices.set3f(1.0f, 0.0f, 0.0f);
+	vertices.set3f(0.0f, 1.0f, 0.0f);
+	vertices.set3f(1.0f, 1.0f, 0.0f);
+	vertices.update();
+
+	texCoords.init();
+	texCoords.set2f(0.0f, 0.0f);
+	texCoords.set2f(1.0f, 0.0f);
+	texCoords.set2f(0.0f, 1.0f);
+	texCoords.set2f(1.0f, 1.0f);
+	texCoords.update();
+
+	indencies.init();
+	indencies.set3f(0, 1, 2);
+	indencies.set3f(2, 1, 3);
+	indencies.update();
+}
+
+void QuadBlurPreProcessGeometry::render(BlurPreProcessShader* shader) {
+	shader->bindAttr();
+
+	vertices.bind();
+	shader->verticesPointer();
+	vertices.unbind();
+
+	texCoords.bind();
+	shader->texCoordPointer();
+	texCoords.unbind();
+
+	indencies.bind();
+	RenderSystem::drawElements(GL_TRIANGLES, indencies.size(), GL_UNSIGNED_INT);
+	indencies.unbind();
+
+	shader->unbindAttr();
+}
+
+void QuadBlurPreProcessGeometry::release() {
+	indencies.release();
+	texCoords.release();
+	vertices.release();
+}

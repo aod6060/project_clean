@@ -47,7 +47,7 @@ void main() {
     vec3 vb = vblur(inputTex0, v_TexCoords, size);
     vec3 i = texture(inputTex0, v_TexCoords).rgb;
 
-    vec3 output = (hb + vb + i) / 3;
+    vec3 o = (hb + vb + i) / 3.0;
 
-    out_Color = vec4(output, 1.0);
+    out_Color = vec4(1.0, 0.0, 0.0, 1.0);
 }

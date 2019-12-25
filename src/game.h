@@ -10,6 +10,9 @@ private:
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
 
+	QuadHUBGeometry hubGeom;
+	RenderPass hubRenderPass;
+
 	bool isWire = false;
 
 	SceneGeometry multiMeshTest;
