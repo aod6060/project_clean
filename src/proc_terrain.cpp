@@ -365,25 +365,8 @@ void ProcTerrainGeometry::init() {
 	//this->data.loadConfig("data/terrain/regular.json");
 	this->data.init("data/terrain/regular.json");
 
-	//this->blendMap.initEmpty(this->data.size, this->data.size);
-
-	/*
-	BlurStandardPreProcess blur;
-
-	blur.setSize(this->data.size, this->data.size);
-
-	blur.setInputTexture(&this->data.blendMapTex);
-	blur.setOutputTexture(&this->blendMap);
-
-
-	blur.init();
-	blur.build();
-	blur.process();
-	blur.release();
-
 	this->width = this->data.size;
 	this->height = this->data.size;
-	*/
 
 	this->heights.resize(this->width * this->height);
 
@@ -484,58 +467,19 @@ void ProcTerrainGeometry::init() {
 	texCoords.update();
 	this->normals.update();
 
-
-
-
-	RenderBuffer depth;
-	FrameBuffer frameBuffer;
-
-	QuadBlurPreProcessGeometry quad;
-
-
-	quad.init();
-
-
-	uint32_t width = data.blendMapTex.width;
-	uint32_t height = data.blendMapTex.height;
-
-	logger_output("%d, %d\n", width, height);
-
-	depth.init();
-	depth.load(GL_DEPTH_COMPONENT, width, height);
-
 	blendMap.initEmpty(width, height);
 
-	
-	frameBuffer.init();
-
-	logger_output("TextureID: %d, RenderBufferID: %d, FrameBufferID: %d\n", blendMap.id, depth.id, frameBuffer.id);
-
-	frameBuffer.bind();
-	frameBuffer.setRenderBuffer(&depth, GL_DEPTH_ATTACHMENT);
-	frameBuffer.setTexture2D(&this->blendMap, GL_COLOR_ATTACHMENT0);
-	frameBuffer.unbind();
-	frameBuffer.checkForErrors();
-
-
-
-
-	frameBuffer.bind();
-	RenderSystem::viewport(0, 0, width, height);
-	RenderSystem::clearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	RenderSystem::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-	frameBuffer.unbind();
-
-	frameBuffer.release();
-	depth.release();
-	quad.release();
+	PreProcessorManager::Blur(
+		&data.blendMapTex,
+		&blendMap,
+		1024.0f,
+		width,
+		height);
 }
 
 void ProcTerrainGeometry::render(TerrainShader* shader) {
-	//data.blendMapTex.bind();
-	blendMap.bind();
+	data.blendMapTex.bind();
+	//blendMap.bind();
 	blackChannel->bind(GL_TEXTURE1);
 	redChannel->bind(GL_TEXTURE2);
 	greenChannel->bind(GL_TEXTURE3);
@@ -561,8 +505,8 @@ void ProcTerrainGeometry::render(TerrainShader* shader) {
 
 	shader->unbindAttr();
 
-	//data.blendMapTex.unbind();
-	blendMap.release();
+	data.blendMapTex.unbind();
+	//blendMap.unbind();
 	blackChannel->unbind(GL_TEXTURE1);
 	redChannel->unbind(GL_TEXTURE2);
 	greenChannel->unbind(GL_TEXTURE3);

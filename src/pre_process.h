@@ -63,3 +63,16 @@ struct BlurStandardPreProcess : public IStandardPreProcess {
 	virtual void setOutputTexture(Texture2D* out);
 
 };
+
+
+
+struct PreProcessorManager {
+	static BlurStandardPreProcess blur;
+
+	static void init();
+
+	static void release();
+
+	static void Blur(Texture2D* input, Texture2D* output, float size, int width, int height);
+
+};

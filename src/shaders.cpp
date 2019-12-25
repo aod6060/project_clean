@@ -339,10 +339,11 @@ void BlurPreProcessShader::init() {
 	program.createUniform("proj");
 	program.createUniform("view");
 	program.createUniform("model");
+
 	program.createUniform("inputTex0");
 	program.set1i("inputTex0", 0);
+
 	program.createUniform("size");
-	program.set1f("size", 1024.0f);
 
 	program.unbind();
 

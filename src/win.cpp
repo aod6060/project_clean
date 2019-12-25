@@ -50,6 +50,7 @@ void win_init(IWindowCallback* appCB) {
 	logger_init();
 	input_init();
 	ShaderManager::init();
+	PreProcessorManager::init();
 
 	if (g_appCB) {
 		g_appCB->init();
@@ -111,6 +112,7 @@ void win_release() {
 
 	g_eventCBs.clear();
 
+	PreProcessorManager::release();
 	ShaderManager::release();
 
 	logger_release();
