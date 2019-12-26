@@ -107,6 +107,8 @@ struct WaterShader : public AbstractShader {
 	void setTimeDelta(float timeDelta);
 };
 
+
+// PreProcessor Shaders
 struct BlurPreProcessShader : public AbstractShader {
 	virtual void init();
 
@@ -122,6 +124,23 @@ struct BlurPreProcessShader : public AbstractShader {
 
 };
 
+// FontRender Shader
+struct FontRenderShader : public AbstractShader {
+	virtual void init();
+
+	// Attributes
+	void verticesPointer();
+	void texCoordsPointer();
+
+	// Uniforms
+	void setProj(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+
+
+};
+
+// UI Shaders
 
 struct ShaderManager {
 	// Regular Shaders
@@ -132,6 +151,8 @@ struct ShaderManager {
 
 	// Pre Process Shaders
 	static BlurPreProcessShader blurPreProcessShader;
+
+	// FontRender
 
 	static void init();
 

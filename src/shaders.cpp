@@ -375,6 +375,62 @@ void BlurPreProcessShader::setSize(float size) {
 	program.set1f("size", size);
 }
 
+
+// Font Render
+void FontRenderShader::init() {
+	vertex.init(GL_VERTEX_SHADER, "data/shaders/ui/font.vert");
+	fragment.init(GL_FRAGMENT_SHADER, "data/shaders/ui/font.frag");
+
+	program.addShader(&vertex);
+	program.addShader(&fragment);
+
+	program.init();
+
+	program.bind();
+
+	// Attributes
+	program.setAttr("vertices", 0);
+	program.setAttr("texCoords", 1);
+
+	program.bindAttr();
+	program.enableAttr("vertices");
+	program.enableAttr("texCoords");
+	program.unbindAttr();
+	program.disableAttr("vertices");
+	program.disableAttr("texCoords");
+
+
+
+	// Uniforms
+
+
+	program.unbind();
+}
+
+// Attributes
+void FontRenderShader::verticesPointer() {
+
+}
+
+void FontRenderShader::texCoordsPointer() {
+
+}
+
+// Uniforms
+void FontRenderShader::setProj(const glm::mat4& proj) {
+
+}
+
+void FontRenderShader::setView(const glm::mat4& view) {
+
+}
+
+void FontRenderShader::setModel(const glm::mat4& model) {
+
+}
+
+
+
 // ShaderManager
 // Regular Shaders
 SceneShader ShaderManager::sceneShader;

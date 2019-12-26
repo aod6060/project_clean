@@ -9,16 +9,6 @@
     },
     "input-mapping": [
         {
-            "name": "_left-key-test_remove-later", 
-            "is-mouse-button": false,
-            "input": "KB_LEFT"
-        },
-        {
-            "name": "_left-button_remove-later", 
-            "is-mouse-button": true, 
-            "input": "MBS_LEFT"
-        },
-        {
             "name": "escape",
             "is-mouse-button": false,
             "input": "KB_ESCAPE"
