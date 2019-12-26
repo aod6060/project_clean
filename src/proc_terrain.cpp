@@ -478,8 +478,8 @@ void ProcTerrainGeometry::init() {
 }
 
 void ProcTerrainGeometry::render(TerrainShader* shader) {
-	data.blendMapTex.bind();
-	//blendMap.bind();
+	//data.blendMapTex.bind();
+	blendMap.bind();
 	blackChannel->bind(GL_TEXTURE1);
 	redChannel->bind(GL_TEXTURE2);
 	greenChannel->bind(GL_TEXTURE3);
@@ -505,8 +505,8 @@ void ProcTerrainGeometry::render(TerrainShader* shader) {
 
 	shader->unbindAttr();
 
-	data.blendMapTex.unbind();
-	//blendMap.unbind();
+	//data.blendMapTex.unbind();
+	blendMap.unbind();
 	blackChannel->unbind(GL_TEXTURE1);
 	redChannel->unbind(GL_TEXTURE2);
 	greenChannel->unbind(GL_TEXTURE3);
