@@ -46,11 +46,14 @@ void win_init(IWindowCallback* appCB) {
 
 	g_context = SDL_GL_CreateContext(g_window);
 
+	TTF_Init();
+
 	glewInit();
 	logger_init();
 	input_init();
 	ShaderManager::init();
 	PreProcessorManager::init();
+	FontRender::init();
 
 	if (g_appCB) {
 		g_appCB->init();
@@ -112,10 +115,13 @@ void win_release() {
 
 	g_eventCBs.clear();
 
+	FontRender::release();
 	PreProcessorManager::release();
 	ShaderManager::release();
 
 	logger_release();
+
+	TTF_Quit();
 
 	SDL_GL_DeleteContext(g_context);
 	SDL_DestroyWindow(g_window);

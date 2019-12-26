@@ -1,4 +1,4 @@
-set comp=..\\..\\bin\\mesh_compiler_d
+set comp=..\\..\\bin\\mesh_compiler
 
 echo %comp%
 
