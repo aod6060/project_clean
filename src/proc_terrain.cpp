@@ -179,7 +179,7 @@ static int proc_thread_callback(void* ptr) {
 
 			// Moister Map
 			glm::vec2 mo;
-			mo.x = (me > 0.25f) ? me : 0.0f;
+			mo.x = (me > data->gen->beachLevel) ? me : 0.0f;
 
 			float temp = 0;
 
@@ -194,7 +194,7 @@ static int proc_thread_callback(void* ptr) {
 				}
 			});
 
-			mo.y = (me > 0.3f) ? temp : 0.0f;
+			mo.y = (me > data->gen->grassLevel) ? temp : 0.0f;
 
 			data->gen->moister[i] = mo;
 

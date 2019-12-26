@@ -136,7 +136,7 @@ struct FontRenderShader : public AbstractShader {
 	void setProj(const glm::mat4& proj);
 	void setView(const glm::mat4& view);
 	void setModel(const glm::mat4& model);
-
+	void setColor(const glm::vec3& color);
 
 };
 
@@ -148,11 +148,12 @@ struct ShaderManager {
 	static TerrainShader terrainShader;
 	static HUBShader hubShader;
 	static WaterShader waterShader;
-
+	
 	// Pre Process Shaders
 	static BlurPreProcessShader blurPreProcessShader;
 
 	// FontRender
+	static FontRenderShader fontRenderShader;
 
 	static void init();
 

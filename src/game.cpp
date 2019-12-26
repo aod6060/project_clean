@@ -52,6 +52,7 @@ void GameWindowCallback::init() {
 		ShaderManager::waterShader.bind();
 		ShaderManager::waterShader.setCamera(&camera);
 		
+		
 		float y = this->terrain.data.beachLevel * this->terrain.heightScale;
 		ShaderManager::waterShader.setModel(
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, y, 0.0f)) *
@@ -75,11 +76,13 @@ void GameWindowCallback::init() {
 	this->hubRenderPass.setCallback([&]() {
 		// Do nothing for the moment
 
+		RenderSystem::disable(GL_DEPTH_TEST);
+
 		ShaderManager::hubShader.bind();
 
 		ShaderManager::hubShader.setProjection(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
 		ShaderManager::hubShader.setView(glm::mat4(1.0f));
-		
+		/*
 		ShaderManager::hubShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(128.0f, 128.0f, 0.0f)));
 
 		terrain.data.blendMapTex.bind();
@@ -91,9 +94,19 @@ void GameWindowCallback::init() {
 		terrain.blendMap.bind();
 		hubGeom.render(&ShaderManager::hubShader);
 		terrain.blendMap.unbind();
+		*/
 
 		ShaderManager::hubShader.unbind();
+
+		FontRender::setColor(glm::vec3(1.0f, 0.0f, 0.0f));
+		FontRender::print(1.0f, 1.0f, "player position: [%f, %f, %f]", camera.pos.x, camera.pos.y, camera.pos.z);
+		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
+		FontRender::print(1.0f, 22.0f, "player rotation: [%f, %f]", camera.rot.x, camera.rot.y);
+
+		RenderSystem::enable(GL_DEPTH_TEST);
+
 	});
+
 
 	renderPassManager.addRenderPass(&this->mainRenderPass);
 	renderPassManager.addRenderPass(&this->hubRenderPass);
@@ -116,7 +129,7 @@ void GameWindowCallback::init() {
 	terrain.setBlackChannel(&this->dirt1);
 	terrain.setRedChannel(&this->sand1);
 	terrain.setGreenChannel(&this->grass1);
-	terrain.setBlueChannel(&this->angry);
+	terrain.setBlueChannel(&this->dirt2);
 
 	waterGeom.init();
 }

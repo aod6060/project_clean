@@ -402,34 +402,42 @@ void FontRenderShader::init() {
 
 
 	// Uniforms
-
+	program.createUniform("proj");
+	program.createUniform("view");
+	program.createUniform("model");
+	program.createUniform("font0");
+	program.set1i("font0", 0);
+	program.createUniform("color");
+	program.set3f("color", glm::vec3(1.0f, 1.0f, 1.0f));
 
 	program.unbind();
 }
 
 // Attributes
 void FontRenderShader::verticesPointer() {
-
+	this->pointerAttr("vertices", 3, GL_FLOAT);
 }
 
 void FontRenderShader::texCoordsPointer() {
-
+	this->pointerAttr("texCoords", 2, GL_FLOAT);
 }
 
 // Uniforms
 void FontRenderShader::setProj(const glm::mat4& proj) {
-
+	program.setMat4("proj", proj);
 }
 
 void FontRenderShader::setView(const glm::mat4& view) {
-
+	program.setMat4("view", view);
 }
 
 void FontRenderShader::setModel(const glm::mat4& model) {
-
+	program.setMat4("model", model);
 }
 
-
+void FontRenderShader::setColor(const glm::vec3& color) {
+	program.set3f("color", color);
+}
 
 // ShaderManager
 // Regular Shaders
@@ -441,15 +449,20 @@ WaterShader ShaderManager::waterShader;
 // Pre Process Shaders
 BlurPreProcessShader ShaderManager::blurPreProcessShader;
 
+// FontRender
+FontRenderShader ShaderManager::fontRenderShader;
+
 void ShaderManager::init() {
 	sceneShader.init();
 	terrainShader.init();
 	hubShader.init();
 	waterShader.init();
 	blurPreProcessShader.init();
+	fontRenderShader.init();
 }
 
 void ShaderManager::release() {
+	fontRenderShader.release();
 	blurPreProcessShader.release();
 	waterShader.release();
 	hubShader.release();

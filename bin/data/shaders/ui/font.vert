@@ -2,7 +2,7 @@
 
 // Attributes
 layout(location=0) in vec3 vertices;
-layout(location=1) in vec3 texCoords;
+layout(location=1) in vec2 texCoords;
 
 // Uniforms
 uniform mat4 proj;

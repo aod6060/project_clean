@@ -54,8 +54,8 @@
         }
     ],
     "levels": {
-        "beach": 0.25,
-        "grass": 0.35,
-        "forest": 0.55
+        "beach": 0.20,
+        "grass": 0.30,
+        "forest": 0.50
     }
 }

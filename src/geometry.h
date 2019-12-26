@@ -148,3 +148,13 @@ struct QuadBlurPreProcessGeometry : public IGeometry<BlurPreProcessShader> {
 	virtual void render(BlurPreProcessShader* shader);
 	virtual void release();
 };
+
+struct QuadFontRenderGeometry : public IGeometry<FontRenderShader> {
+	VertexBuffer vertices;
+	VertexBuffer texCoords;
+	IndexBuffer indencies;
+
+	virtual void init();
+	virtual void render(FontRenderShader* shader);
+	virtual void release();
+};
