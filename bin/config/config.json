@@ -57,6 +57,11 @@
             "name": "wire-frame-toggle",
             "is-mouse-button": false,
             "input": "KB_F1"
+        },
+        {
+            "name": "ui-action",
+            "is-mouse-button": true,
+            "input": "MBS_LEFT"
         }
     ],
     "logger": {

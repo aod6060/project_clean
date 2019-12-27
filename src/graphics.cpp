@@ -1,5 +1,21 @@
 #include "sys.h"
 
+
+// Global Inits
+void graphics_init() {
+	ShaderManager::init();
+	PreProcessorManager::init();
+	FontRender::init();
+	UISystem::init();
+}
+
+void graphics_release() {
+	UISystem::release();
+	FontRender::release();
+	PreProcessorManager::release();
+	ShaderManager::release();
+}
+
 // Shaders
 void Shader::init(GLenum type, std::string path) {
 	id = glCreateShader(type);

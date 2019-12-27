@@ -158,3 +158,13 @@ struct QuadFontRenderGeometry : public IGeometry<FontRenderShader> {
 	virtual void render(FontRenderShader* shader);
 	virtual void release();
 };
+
+
+struct QuadUIGeometry : public IGeometry<UIShader> {
+	VertexBuffer vertices;
+	IndexBuffer indencies;
+
+	virtual void init();
+	virtual void render(UIShader* shader);
+	virtual void release();
+};

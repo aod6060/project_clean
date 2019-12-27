@@ -11,5 +11,5 @@ uniform mat4 model;
 // Varying
 
 void main() {
-    gl_Position = proj * view * model * vec4(vertices);
+    gl_Position = proj * view * model * vec4(vertices, 1.0);
 }

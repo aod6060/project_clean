@@ -61,6 +61,7 @@ void FontRender::print(float x, float y, const char* format, ...) {
 	}
 
 
+
 	glBindTexture(GL_TEXTURE_2D, texID);
 
 	glTexImage2D(
@@ -111,4 +112,24 @@ void FontRender::print(float x, float y, const char* format, ...) {
 
 	ShaderManager::fontRenderShader.unbind();
 
+}
+
+glm::vec2 FontRender::getSize(const char* format, ...) {
+	char buf[1024];
+
+	va_list args;
+	va_start(args, format);
+
+	vsprintf(buf, format, args);
+
+	va_end(args);
+
+	std::string str(buf);
+
+	int width;
+	int height;
+
+	TTF_SizeText(font, str.c_str(), &width, &height);
+
+	return glm::vec2(width, height);
 }

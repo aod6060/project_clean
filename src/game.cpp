@@ -71,7 +71,6 @@ void GameWindowCallback::init() {
 
 		RenderSystem::disable(GL_DEPTH_TEST);
 	});
-
 	
 	this->hubRenderPass.setCallback([&]() {
 		// Do nothing for the moment
@@ -106,7 +105,6 @@ void GameWindowCallback::init() {
 		RenderSystem::enable(GL_DEPTH_TEST);
 
 	});
-
 
 	renderPassManager.addRenderPass(&this->mainRenderPass);
 	renderPassManager.addRenderPass(&this->hubRenderPass);

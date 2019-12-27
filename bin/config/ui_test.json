@@ -1,0 +1,28 @@
+{
+    "type": "config",
+    "version": "1.2",
+    "window": {
+        "caption": "Project Clean: UI Test",
+        "width": 1280,
+        "height": 720,
+        "is-fullscreen": false
+    },
+    "input-mapping": [
+        {
+            "name": "toggle-ui",
+            "is-mouse-button": false,
+            "input": "KB_TAB"
+        },
+        {
+            "name": "ui-action",
+            "is-mouse-button": true,
+            "input": "MBS_LEFT"
+        }
+    ],
+    "logger": {
+        "type": "file"
+    },
+    "graphics": {
+        "fov": 60.0
+    }
+}

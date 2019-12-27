@@ -7,6 +7,9 @@
 	Wrapper Section
 */
 
+void graphics_init();
+void graphics_release();
+
 // Shader
 struct Shader {
 	uint32_t id = 0;

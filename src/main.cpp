@@ -1,5 +1,6 @@
 #include "game.h"
 #include "proc_terrain_test.h"
+#include "ui_test.h"
 
 int main(int argc, char** argv) {
 
@@ -9,6 +10,17 @@ int main(int argc, char** argv) {
 			ProcTerrainTestWindowCallback cb;
 
 			conf_init("config/proc_terrain_test.json");
+
+			win_init(&cb);
+
+			win_update();
+
+			win_release();
+		}
+		else if (std::string(argv[1]) == "-ui_test") {
+			UITestWindowCallback cb;
+
+			conf_init("config/ui_test.json");
 
 			win_init(&cb);
 

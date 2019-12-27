@@ -141,6 +141,19 @@ struct FontRenderShader : public AbstractShader {
 };
 
 // UI Shaders
+struct UIShader : public AbstractShader {
+	virtual void init();
+
+	// Attributes
+	void verticesPointer();
+
+	// Uniforms
+	void setProj(const glm::mat4& proj);
+	void setView(const glm::mat4& view);
+	void setModel(const glm::mat4& model);
+	void setColor(const glm::vec3& color);
+
+};
 
 struct ShaderManager {
 	// Regular Shaders
@@ -154,6 +167,9 @@ struct ShaderManager {
 
 	// FontRender
 	static FontRenderShader fontRenderShader;
+
+	// UIShaders
+	static UIShader uiShader;
 
 	static void init();
 

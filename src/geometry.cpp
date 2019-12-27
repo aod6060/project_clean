@@ -617,3 +617,40 @@ void QuadFontRenderGeometry::release() {
 	texCoords.release();
 	vertices.release();
 }
+
+
+
+// QuadUIGeometry
+void QuadUIGeometry::init() {
+	vertices.init();
+	vertices.set3f(0.0f, 0.0f, 0.0f);
+	vertices.set3f(1.0f, 0.0f, 0.0f);
+	vertices.set3f(0.0f, 1.0f, 0.0f);
+	vertices.set3f(1.0f, 1.0f, 0.0f);
+	vertices.update();
+
+	indencies.init();
+	indencies.set3f(0, 1, 2);
+	indencies.set3f(2, 1, 3);
+	indencies.update();
+}
+
+void QuadUIGeometry::render(UIShader* shader) {
+	shader->bindAttr();
+
+	vertices.bind();
+	shader->verticesPointer();
+	vertices.unbind();
+
+	indencies.bind();
+	RenderSystem::drawElements(GL_TRIANGLES, vertices.size(), GL_UNSIGNED_INT);
+	indencies.unbind();
+
+	shader->unbindAttr();
+}
+
+void QuadUIGeometry::release() {
+	indencies.release();
+	vertices.release();
+}
+

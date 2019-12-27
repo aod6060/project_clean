@@ -439,6 +439,64 @@ void FontRenderShader::setColor(const glm::vec3& color) {
 	program.set3f("color", color);
 }
 
+// UIShader
+void UIShader::init() {
+	vertex.init(GL_VERTEX_SHADER, "data/shaders/ui/ui.vert");
+	fragment.init(GL_FRAGMENT_SHADER, "data/shaders/ui/ui.frag");
+
+	program.addShader(&vertex);
+	program.addShader(&fragment);
+
+	program.init();
+
+	program.bind();
+
+	// Attributes
+	
+	program.setAttr("vertices", 0);
+
+	program.bindAttr();
+	program.enableAttr("vertices");
+	program.unbindAttr();
+	program.disableAttr("vertices");
+
+	// Uniforms
+	program.createUniform("proj");
+	program.createUniform("view");
+	program.createUniform("model");
+	program.createUniform("color");
+	program.set3f("color", glm::vec3(1.0f));
+
+
+	program.unbind();
+}
+
+// Attributes
+void UIShader::verticesPointer() {
+	this->pointerAttr(
+		"vertices",
+		3,
+		GL_FLOAT);
+}
+
+// Uniforms
+void UIShader::setProj(const glm::mat4& proj) {
+	program.setMat4("proj", proj);
+}
+
+void UIShader::setView(const glm::mat4& view) {
+	program.setMat4("view", view);
+}
+
+void UIShader::setModel(const glm::mat4& model) {
+	program.setMat4("model", model);
+}
+
+void UIShader::setColor(const glm::vec3& color) {
+	program.set3f("color", color);
+}
+
+
 // ShaderManager
 // Regular Shaders
 SceneShader ShaderManager::sceneShader;
@@ -452,6 +510,9 @@ BlurPreProcessShader ShaderManager::blurPreProcessShader;
 // FontRender
 FontRenderShader ShaderManager::fontRenderShader;
 
+// UIShaders
+UIShader ShaderManager::uiShader;
+
 void ShaderManager::init() {
 	sceneShader.init();
 	terrainShader.init();
@@ -459,9 +520,11 @@ void ShaderManager::init() {
 	waterShader.init();
 	blurPreProcessShader.init();
 	fontRenderShader.init();
+	uiShader.init();
 }
 
 void ShaderManager::release() {
+	uiShader.release();
 	fontRenderShader.release();
 	blurPreProcessShader.release();
 	waterShader.release();
