@@ -11,6 +11,7 @@ void GameWindowCallback::init() {
 	dirt2.loadTexture("data/textures/terrain/dirt2.png");
 	sand1.loadTexture("data/textures/terrain/sand1.png");
 
+
 	water.loadTexture("data/textures/water/temp_water1.png");
 
 	hubGeom.init();

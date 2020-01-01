@@ -4,6 +4,7 @@
 #include <sys.h>
 
 
+
 class GameWindowCallback : public IWindowCallback {
 private:
 	Camera camera;
