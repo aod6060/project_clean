@@ -113,6 +113,22 @@ struct UIButtonComponent : public IUIComponent {
 };
 
 struct UICheckBoxComponent : public IUIComponent {
+
+	glm::vec2 position;
+	glm::vec2 size;
+
+	std::string title;
+
+	glm::vec3 foregroundColor;
+	glm::vec3 backgroundColor;
+	glm::vec3 inactiveColor;
+	glm::vec3 activeColor;
+
+	std::function<void(UICheckBoxComponent*)> callback;
+
+	bool checked = false;
+	bool isHover = false;
+
 	virtual void init();
 	virtual void handleEvents(SDL_Event& e);
 	virtual void render(UIShader* shader);
@@ -122,10 +138,218 @@ struct UICheckBoxComponent : public IUIComponent {
 	virtual glm::vec2 getPosition();
 	virtual void setPosition(const glm::vec2& pos);
 
+	glm::vec2 getSize();
+	void setSize(const glm::vec2& size);
+
+	//std::string title;
+	std::string getTitle();
+	void setTitle(std::string title);
+
+	//glm::vec3 foregroundColor;
+	glm::vec3 getForegroundColor();
+	void setForegroundColor(const glm::vec3& foregroundColor);
+
+	//glm::vec3 backgroundColor;
+	glm::vec3 getBackgroundColor();
+	void setBackgroundColor(const glm::vec3& backgroundColor);
+
+	//glm::vec3 inactiveColor;
+	glm::vec3 getInactiveColor();
+	void setInactiveColor(const glm::vec3& inactiveColor);
+
+	//glm::vec3 activeColor;
+	glm::vec3 getActiveColor();
+	void setActiveColor(const glm::vec3& activeColor);
+
+	//std::function<void(UICheckBoxComponent*)> callback;
+	void setCallback(std::function<void(UICheckBoxComponent*)> callback);
+
+	//bool checked = false;
+	bool isChecked();
+	void setChecked(bool checked);
+
+	virtual UIRect toRect();
+
+
+};
+
+#define TEXT_BOX_SIZE 16
+struct UITextBoxComponent : public IUIComponent {
+	char buf[TEXT_BOX_SIZE];
+
+	glm::vec2 position;
+	glm::vec2 size;
+
+	glm::vec3 foregroundColor;
+	glm::vec3 backgroundColor;
+
+	std::function<void(UITextBoxComponent*)> callback;
+
+	bool isHover = false;
+	bool isActive = false;
+
+	bool isShift = false;
+
+	int location = 0;
+
+	virtual void init();
+	virtual void handleEvents(SDL_Event& e);
+	virtual void render(UIShader* shader);
+	virtual void update(float delta);
+	virtual void release();
+
+	virtual glm::vec2 getPosition();
+	virtual void setPosition(const glm::vec2& pos);
+
+	glm::vec2 getSize();
+	void setSize(const glm::vec2& size);
+
+	glm::vec3 getForegroundColor();
+	void setForegroundColor(const glm::vec3& foregroundColor);
+
+	glm::vec3 getBackgroundColor();
+	void setBackgroundColor(const glm::vec3& backgroundColor);
+
+	void setCallback(std::function<void(UITextBoxComponent*)> callback);
+
+	std::string getText();
+
 	virtual UIRect toRect();
 };
 
+struct UISelectButtonType {
+	std::string id;
+	uint32_t value;
+
+	UISelectButtonType() {}
+
+	UISelectButtonType(std::string id, uint32_t value) {
+		this->id = id;
+		this->value = value;
+	}
+};
+
+struct UISelectButtonComponent : public IUIComponent {
+
+	glm::vec2 position;
+	glm::vec2 size;
+
+	uint32_t index = 0;
+	std::vector<UISelectButtonType> types;
+
+	glm::vec3 backgroundColor;
+	glm::vec3 hoverColor;
+	glm::vec3 activeColor;
+	glm::vec3 foregroundColor;
+
+	bool isHover = false;
+	bool isActive = false;
+
+	float activeTimer = 0.0f;
+	float activeTimerMax = 0.2f;
+
+	std::function<void(UISelectButtonComponent*)> callback;
+
+	virtual void init();
+
+	virtual void handleEvents(SDL_Event& e);
+
+	virtual void render(UIShader* shader);
+
+	virtual void update(float delta);
+
+	virtual void release();
+
+	virtual glm::vec2 getPosition();
+
+	virtual void setPosition(const glm::vec2& pos);
+
+	glm::vec2 getSize();
+
+	void setSize(const glm::vec2& size);
+
+	glm::vec3 getForegroundColor();
+
+	void setForegroundColor(const glm::vec3& foregroundColor);
+
+	glm::vec3 getBackgroundColor();
+
+	void setBackgroundColor(const glm::vec3& backgroundColor);
+
+	glm::vec3 getActiveColor();
+
+	void setActiveColor(const glm::vec3& activeColor);
+
+	glm::vec3 getHoverColor();
+
+	void setHoverColor(const glm::vec3& hoverColor);
+
+	void setCallback(std::function<void(UISelectButtonComponent*)> callback);
+
+	void addValue(const UISelectButtonType& value);
+
+	std::string getCurrentID();
+
+	uint32_t getCurrentValue();
+	
+	virtual UIRect toRect();
+};
+
+struct UISliderComponent : public IUIComponent {
+
+	glm::vec2 position;
+	glm::vec2 size;
+
+	glm::vec3 foregroundColor;
+	glm::vec3 backgroundColor;
+	glm::vec3 sliderColor;
+
+	float min, max, value, p = 0.0f;
+
+	bool isHover = false;
+
+	virtual void init();
+	virtual void handleEvents(SDL_Event& e);
+	virtual void render(UIShader* shader);
+	virtual void update(float delta);
+	virtual void release();
+
+	virtual glm::vec2 getPosition();
+	virtual void setPosition(const glm::vec2& pos);
+
+	glm::vec3 getForegroundColor();
+	void setForegroundColor(const glm::vec3& foregroundColor);
+
+	glm::vec3 getBackgroundColor();
+	void setBackgroundColor(const glm::vec3& backgroundColor);
+
+	glm::vec3 getSliderColor();
+	void setSliderColor(const glm::vec3& sliderColor);
+
+	float getMin();
+	void setMin(float min);
+	
+	float getMax();
+	void setMax(float max);
+
+	float getValue();
+	void setValue(float value);
+
+	virtual UIRect toRect();
+
+	float _doValueChange(float p);
+
+};
+
+
+
 struct UIManager {
+	bool hasBackground = false;
+
+	glm::vec2 position;
+	glm::vec2 size;
+
+	glm::vec3 backgroundColor;
 
 	std::vector<IUIComponent*> components;
 
@@ -146,6 +370,20 @@ struct UIManager {
 	bool isShow();
 	void setShow(bool show);
 	void toggleShow();
+
+
+	void setHasBackground(bool hasBackground);
+	bool isHasBackground();
+
+	void setPosition(const glm::vec2& position);
+	glm::vec2 getPosition();
+
+	void setSize(const glm::vec2& size);
+	glm::vec2 getSize();
+
+	void setBackgroundColor(const glm::vec3& backgroundColor);
+	glm::vec3 getBackgroundColor();
+
 };
 
 

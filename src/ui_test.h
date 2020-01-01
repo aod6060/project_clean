@@ -9,8 +9,21 @@ struct UITestWindowCallback : public IWindowCallback {
 
 	UIManager manager;
 	UILabelComponent helloWorld;
+	// Button Test
 	UIButtonComponent testButton1;
 	UILabelComponent testLabel1;
+	// Check Box
+	UICheckBoxComponent testCheckBox1;
+	UILabelComponent testLabel2;
+
+	// TextBox
+	UITextBoxComponent testTexBox;
+
+	// SelectButtonComponent
+	UISelectButtonComponent testSelectButton;
+
+	// SliderComponent
+	UISliderComponent testSlider;
 
 	int counter = 0;
 
