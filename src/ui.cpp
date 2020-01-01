@@ -1182,26 +1182,26 @@ void UIManager::handleEvents(SDL_Event& e) {
 
 void UIManager::render(UIShader* shader) {
 
-
-	shader->bind();
-	shader->setProj(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
-	shader->setView(glm::mat4(1.0f));
-
-	// Render Background
-	if (this->hasBackground) {
-		shader->setModel(
-			glm::translate(glm::mat4(1.0f), glm::vec3(this->position, 0.0f)) *
-			glm::scale(glm::mat4(1.0f), glm::vec3(this->size, 0.0f))
-		);
-
-		shader->setColor(this->backgroundColor);
-
-		UISystem::quad.render(shader);
-	}
-
-	shader->unbind();
-
 	if (this->isShow()) {
+		shader->bind();
+		shader->setProj(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
+		shader->setView(glm::mat4(1.0f));
+
+		// Render Background
+		if (this->hasBackground) {
+			shader->setModel(
+				glm::translate(glm::mat4(1.0f), glm::vec3(this->position, 0.0f)) *
+				glm::scale(glm::mat4(1.0f), glm::vec3(this->size, 0.0f))
+			);
+
+			shader->setColor(this->backgroundColor);
+
+			UISystem::quad.render(shader);
+		}
+
+		shader->unbind();
+
+	
 		std::for_each(components.begin(), components.end(), [&](IUIComponent* comp) {
 			comp->render(shader);
 		});

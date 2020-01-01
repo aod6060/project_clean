@@ -34,6 +34,13 @@ private:
 
 	float yrot = 0.0f;
 
+	// UI Section
+	UIButtonComponent continueButton;
+	UIButtonComponent exitButton;
+	UIManager uiManager;
+
+	void _initUI();
+
 public:
 	virtual void init();
 	virtual void update(float delta);

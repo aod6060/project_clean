@@ -327,55 +327,7 @@ void main() {
     out_Color = vec4(color, 1.0);
 }
 
-1: What you want???
-2: I'm just some programmer...
-3: This is an example
-4: I'm a maverick.
-0: Hello, World
-1: What you want???
-2: I'm just some programmer...
-3: This is an example
-4: I'm a maverick.
-0: Hello, World
-1: What you want???
-H
-He
-Hel
-Hell
-Hello
-Hello,
-Hello, 
-Hello, w
-Hello, wo
-Hello, wor
-Hello, wo
-Hello, w
-Hello, 
-Hello, W
-Hello, Wo
-Hello, Wor
-Hello, Worl
-Hello, World
-Hello, World!
-Hello, World!!
-Hello, World!!!
-Hello, World!!!!
-Hello, World!!!
-2: I'm just some programmer...
-3: This is an example
-4: I'm a maverick.
-0: Hello, World
-Hello, World!!
-Hello, World!
-Hello, World
-Hello, Worl
-Hello, Wor
-Hello, Wo
-Hello, W
-Hello, 
-Hello,
-Hello
-Hell
-Hel
-He
-H
+tsize=16, osize=64
+tex: 15
+renderbuf: 1
+Success: Framebuffer created

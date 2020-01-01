@@ -81,19 +81,6 @@ void GameWindowCallback::init() {
 
 		ShaderManager::hubShader.setProjection(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
 		ShaderManager::hubShader.setView(glm::mat4(1.0f));
-		/*
-		ShaderManager::hubShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(128.0f, 128.0f, 0.0f)));
-
-		terrain.data.blendMapTex.bind();
-		hubGeom.render(&ShaderManager::hubShader);
-		terrain.data.blendMapTex.unbind();
-
-		ShaderManager::hubShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(129.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(128.0f, 128.0f, 0.0f)));
-
-		terrain.blendMap.bind();
-		hubGeom.render(&ShaderManager::hubShader);
-		terrain.blendMap.unbind();
-		*/
 
 		ShaderManager::hubShader.unbind();
 
@@ -101,6 +88,9 @@ void GameWindowCallback::init() {
 		FontRender::print(1.0f, 1.0f, "player position: [%f, %f, %f]", camera.pos.x, camera.pos.y, camera.pos.z);
 		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
 		FontRender::print(1.0f, 22.0f, "player rotation: [%f, %f]", camera.rot.x, camera.rot.y);
+
+
+		this->uiManager.render(&ShaderManager::uiShader);
 
 		RenderSystem::enable(GL_DEPTH_TEST);
 
@@ -120,8 +110,6 @@ void GameWindowCallback::init() {
 		1.0f,
 		1024.0f);
 
-	//terrain.setHeightMapFilePath("data/terrain/static_terrain_height_map.png");
-	//terrain.setBlendMap("data/terrain/static_terrain_rgb_map.png");
 	terrain.init();
 
 	terrain.setBlackChannel(&this->dirt1);
@@ -130,41 +118,51 @@ void GameWindowCallback::init() {
 	terrain.setBlueChannel(&this->dirt2);
 
 	waterGeom.init();
+
+	this->_initUI();
 }
 
 void GameWindowCallback::update(float delta) {
-	if (input_isIMFromConfDown("escape")) {
-		win_exit();
-	}
 
-	if (input_isIMFromConfDown("wire-frame-toggle")) {
-		this->isWire = !this->isWire;
-
-		if (this->isWire) {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	if (!uiManager.isShow()) {
+		if (input_isIMFromConfDown("escape")) {
+			uiManager.setShow(true);
+			input_setGrab(false);
 		}
-		else {
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		if (input_isIMFromConfDown("wire-frame-toggle")) {
+			this->isWire = !this->isWire;
+
+			if (this->isWire) {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+		}
+
+		yrot += 32.0f * delta;
+
+		if (yrot >= 360.0f) {
+			yrot -= 360.0f;
+		}
+
+		camera.update(delta);
+
+		// Water animation
+		this->waterAnim += delta * 0.001f;
+
+		if (this->waterAnim >= 1.0f) {
+			this->waterAnim -= 1.0f;
 		}
 	}
+	else {
+		if (input_isIMFromConfDown("escape")) {
+			uiManager.setShow(false);
+			input_setGrab(true);
+		}
 
-	if (input_isIMFromConfDown("toggle-input-mode")) {
-		input_toggleGrab();
-	}
-
-	yrot += 32.0f * delta;
-
-	if (yrot >= 360.0f) {
-		yrot -= 360.0f;
-	}
-
-	camera.update(delta);
-
-	// Water animation
-	this->waterAnim += delta * 0.001f;
-
-	if (this->waterAnim >= 1.0f) {
-		this->waterAnim -= 1.0f;
+		uiManager.update(delta);
 	}
 }
 
@@ -176,6 +174,12 @@ void GameWindowCallback::render() {
 }
 
 void GameWindowCallback::release() {
+	UISystem::removeManager(&this->uiManager);
+
+	uiManager.release();
+
+	this->uiManager.release();
+
 	waterGeom.release();
 	terrain.release();
 	multiMeshTest.release();
@@ -194,3 +198,46 @@ void GameWindowCallback::release() {
 	hubGeom.release();
 }
 
+void GameWindowCallback::_initUI() {
+	float x = conf_getWidth() * 0.4f;
+	float y = conf_getHeight() * 0.2f;
+
+	float width = conf_getWidth() * 0.2f;
+	float height = conf_getHeight() * 0.4f;
+
+	// continueButton
+	continueButton.setTitle("Continue");
+	continueButton.init();
+	continueButton.setPosition(glm::vec2(x + (width * 0.5f - continueButton.size.x * 0.5f), y + 32.0f));
+
+	continueButton.setButtonCallback([&](UIButtonComponent* comp) {
+		uiManager.setShow(false);
+		input_setGrab(true);
+	});
+	
+	// exitButton
+	exitButton.setTitle("Exit");
+	exitButton.init();
+	exitButton.setPosition(glm::vec2(x + (width * 0.5f - exitButton.size.x * 0.5f), y + 64.0f));
+
+	exitButton.setButtonCallback([&](UIButtonComponent* comp) {
+		win_exit();
+	});
+
+	// manager
+
+	this->uiManager.setHasBackground(true);
+	this->uiManager.setPosition(glm::vec2(x, y));
+	this->uiManager.setSize(glm::vec2(width, height));
+	this->uiManager.setBackgroundColor(glm::vec3(0.1f));
+	this->uiManager.setShow(false);
+
+	this->uiManager.addComponent(&continueButton);
+	this->uiManager.addComponent(&exitButton);
+
+	this->uiManager.init();
+
+	UISystem::addManager(&this->uiManager);
+	
+	input_setGrab(true);
+}
