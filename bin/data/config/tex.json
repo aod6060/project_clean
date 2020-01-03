@@ -1,0 +1,50 @@
+{
+    "type": "texture",
+    "version": "1.0",
+    "textures": [
+        {
+            "name": "angry",
+            "path": "data/textures/angry.png"
+        },
+        {
+            "name": "logos:logo1",
+            "path": "data/textures/logos/derf_games.png"
+        },
+        {
+            "name": "logos:logo2",
+            "path": "data/textures/logos/teh_island_engine_v_1_0_0.png"
+        },
+        {
+            "name": "menu:startmenu",
+            "path": "data/textures/menu/startmenu.png"
+        },
+        {
+            "name": "terrain:dirt1",
+            "path": "data/textures/terrain/dirt1.png"
+        },
+        {
+            "name": "terrain:dirt2",
+            "path": "data/textures/terrain/dirt2.png"
+        },
+        {
+            "name": "terrain:grass1",
+            "path": "data/textures/terrain/grass1.png"
+        },
+        {
+            "name": "terrain:grass2",
+            "path": "data/textures/terrain/grass2.png"
+        },
+        {
+            "name": "terrain:sand1",
+            "path": "data/textures/terrain/sand1.png"
+        },
+        {
+            "name": "water:water1",
+            "path": "data/textures/water/temp_water1.png"
+        },
+        {
+            "name": "terrain:blendMap",
+            "path": "data/terrain/static_terrain_rgb_map.png"
+        }
+    ]
+}

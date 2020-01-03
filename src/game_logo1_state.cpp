@@ -5,7 +5,7 @@ void Logo1State::init() {
 	this->maxTime = 3.0f;
 
 	// Init Textures
-	this->logo.loadTexture("data/textures/logos/derf_games.png");
+	//this->logo.loadTexture("data/textures/logos/derf_games.png");
 
 	// Render Pass
 	this->hubGeom.init();
@@ -41,9 +41,11 @@ void Logo1State::init() {
 			glm::scale(glm::mat4(1.0f), glm::vec3(logoWidth, logoHeight, 0.0f))
 		);
 
-		logo.bind();
+		//logo.bind();
+		TextureManager::getTex("logos:logo1")->bind();
 		this->hubGeom.render(&ShaderManager::hubShader);
-		logo.unbind();
+		TextureManager::getTex("logos:logo1")->unbind();
+		//logo.unbind();
 
 		ShaderManager::hubShader.unbind();
 
@@ -77,5 +79,4 @@ void Logo1State::render() {
 void Logo1State::release() {
 	this->renderPassManager.release();
 	hubGeom.release();
-	logo.release();
 }

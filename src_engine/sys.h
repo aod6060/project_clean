@@ -35,6 +35,7 @@
 #include "state.h"
 #include "input.h"
 #include "graphics.h"
+#include "texture_manager.h"
 #include "shader.h"
 #include "geometry.h"
 #include "render_pass.h"

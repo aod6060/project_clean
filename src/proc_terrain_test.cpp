@@ -42,33 +42,40 @@ void ProcTerrainTestWindowCallback::init() {
 
 	this->procTerrain.init("data/terrain/regular.json");
 
-	this->current = &procTerrain.elevationTex;
+	//this->current = &procTerrain.elevationTex;
+	this->current = TextureManager::getTex(TextureManager::TERRAIN_ELEVATION);
 
 }
 
 void ProcTerrainTestWindowCallback::update(float delta) {
 	if (input_isKeyDown(Keyboard::KB_1)) {
-		this->current = &procTerrain.elevationTex;
+		//this->current = &procTerrain.elevationTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_ELEVATION);
 	} 
 
 	if (input_isKeyDown(Keyboard::KB_2)) {
-		this->current = &procTerrain.maskTex;
+		//this->current = &procTerrain.maskTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_MASK);
 	}
 
 	if (input_isKeyDown(Keyboard::KB_3)) {
-		this->current = &procTerrain.maskedElevationTex;
+		//this->current = &procTerrain.maskedElevationTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_MASKED_ELEVATION);
 	}
 
 	if (input_isKeyDown(Keyboard::KB_4)) {
-		this->current = &procTerrain.moisterTex;
+		//this->current = &procTerrain.moisterTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_MOISTER);
 	}
 
 	if (input_isKeyDown(Keyboard::KB_5)) {
-		this->current = &procTerrain.blendMapTex;
+		//this->current = &procTerrain.blendMapTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP);
 	}
 
 	if (input_isKeyDown(Keyboard::KB_6)) {
-		this->current = &procTerrain.biomesMapTex;
+		//this->current = &procTerrain.biomesMapTex;
+		this->current = TextureManager::getTex(TextureManager::TERRAIN_BIOMES);
 	}
 }
 

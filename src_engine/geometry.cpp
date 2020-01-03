@@ -370,13 +370,14 @@ void StaticTerrainGeometry::init() {
 	SDL_FreeSurface(surf);
 
 
-	this->blendMap.loadTexture(this->blendMapPath);
+	//this->blendMap.loadTexture(this->blendMapPath);
 
 }
 
 void StaticTerrainGeometry::render(TerrainShader* shader) {
 
-	blendMap.bind();
+	//blendMap.bind();
+	blendMap->bind();
 	blackChannel->bind(GL_TEXTURE1);
 	redChannel->bind(GL_TEXTURE2);
 	greenChannel->bind(GL_TEXTURE3);
@@ -401,7 +402,8 @@ void StaticTerrainGeometry::render(TerrainShader* shader) {
 
 	shader->unbindAttr();
 
-	blendMap.unbind();
+	//blendMap.unbind();
+	blendMap->unbind();
 	blackChannel->unbind(GL_TEXTURE1);
 	redChannel->unbind(GL_TEXTURE2);
 	greenChannel->unbind(GL_TEXTURE3);
@@ -415,13 +417,16 @@ void StaticTerrainGeometry::release() {
 	greenChannel = nullptr;
 	blueChannel = nullptr;
 
-	this->blendMap.release();
+	//this->blendMap.release();
 	this->indinces.release();
 	this->normals.release();
 	this->texCoords.release();
 	this->vertices.release();
 }
 
+void StaticTerrainGeometry::setBlendMap(Texture2D* blendMap) {
+	this->blendMap = blendMap;
+}
 
 // HUB Geometry
 void QuadHUBGeometry::init() {

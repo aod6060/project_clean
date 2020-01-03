@@ -3,10 +3,10 @@
 
 void GameState::_initUI() {
 	float x = conf_getWidth() * 0.4f;
-	float y = conf_getHeight() * 0.2f;
+	float y = conf_getHeight() * 0.4f;
 
 	float width = conf_getWidth() * 0.2f;
-	float height = conf_getHeight() * 0.4f;
+	float height = conf_getHeight() * 0.3f;
 
 	// continueButton
 	continueButton.setTitle("Continue");
@@ -25,6 +25,7 @@ void GameState::_initUI() {
 
 	exitButton.setButtonCallback([&](UIButtonComponent* comp) {
 		this->callback->changeState("start-menu");
+		logger_output("pressed exit button");
 	});
 
 	// manager
@@ -46,17 +47,6 @@ void GameState::_initUI() {
 }
 
 void GameState::init() {
-	angry.loadTexture("data/textures/angry.png");
-
-	grass1.loadTexture("data/textures/terrain/grass1.png");
-	grass2.loadTexture("data/textures/terrain/grass2.png");
-	dirt1.loadTexture("data/textures/terrain/dirt1.png");
-	dirt2.loadTexture("data/textures/terrain/dirt2.png");
-	sand1.loadTexture("data/textures/terrain/sand1.png");
-
-
-	water.loadTexture("data/textures/water/temp_water1.png");
-
 	hubGeom.init();
 
 	this->mainRenderPass.setCallback([&]() {
@@ -85,15 +75,18 @@ void GameState::init() {
 		// Render Meshes
 		ShaderManager::sceneShader.bind();
 		ShaderManager::sceneShader.setCamera(&camera);
-		logger_output("Camera Pass\n");
+		//logger_output("Camera Pass\n");
 
-		angry.bind();
 		//angry.bind();
+		//angry.bind();
+		TextureManager::getTex("angry")->bind();
 		multiMeshTest.setModel(model);
-		logger_output("Model Pass\n");
+		//logger_output("Model Pass\n");
 
 		multiMeshTest.render(&ShaderManager::sceneShader);
-		angry.unbind();
+		TextureManager::getTex("angry")->unbind();
+
+		//angry.unbind();
 		//angry.unbind();
 		ShaderManager::sceneShader.unbind();
 
@@ -114,12 +107,14 @@ void GameState::init() {
 
 		ShaderManager::waterShader.setTimeDelta(this->waterAnim);
 
-		water.bind();
+		//water.bind();
+		TextureManager::getTex("water:water1")->bind();
 		waterGeom.render(&ShaderManager::waterShader);
-		water.unbind();
+		//water.unbind();
+		TextureManager::getTex("water:water1")->unbind();
 
 		ShaderManager::waterShader.unbind();
-		logger_output("Hello, World 4\n");
+		//logger_output("Hello, World 4\n");
 
 		RenderSystem::disable(GL_DEPTH_TEST);
 	});
@@ -136,11 +131,12 @@ void GameState::init() {
 
 		ShaderManager::hubShader.unbind();
 
+		/*
 		FontRender::setColor(glm::vec3(1.0f, 0.0f, 0.0f));
 		FontRender::print(1.0f, 1.0f, "player position: [%f, %f, %f]", camera.pos.x, camera.pos.y, camera.pos.z);
 		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
 		FontRender::print(1.0f, 22.0f, "player rotation: [%f, %f]", camera.rot.x, camera.rot.y);
-
+		*/
 
 		this->uiManager.render(&ShaderManager::uiShader);
 
@@ -164,10 +160,15 @@ void GameState::init() {
 
 	terrain.init();
 
-	terrain.setBlackChannel(&this->dirt1);
-	terrain.setRedChannel(&this->sand1);
-	terrain.setGreenChannel(&this->grass1);
-	terrain.setBlueChannel(&this->dirt2);
+	//terrain.setBlackChannel(&this->dirt1);
+	terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
+	//terrain.setRedChannel(&this->sand1);
+	terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
+	//terrain.setGreenChannel(&this->grass1);
+	terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
+	//terrain.setBlueChannel(&this->dirt2);
+	terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
+
 
 	waterGeom.init();
 
@@ -213,9 +214,9 @@ void GameState::update(float delta) {
 			uiManager.setShow(false);
 			input_setGrab(true);
 		}
-
-		uiManager.update(delta);
 	}
+
+	uiManager.update(delta);
 }
 
 void GameState::fixedUpdate() {
@@ -236,17 +237,6 @@ void GameState::release() {
 	waterGeom.release();
 	terrain.release();
 	multiMeshTest.release();
-	//testShader.release();
-
-	water.release();
-
-	sand1.release();
-	dirt2.release();
-	dirt1.release();
-	grass2.release();
-	grass1.release();
-
-	angry.release();
 
 	hubGeom.release();
 }

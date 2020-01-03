@@ -3,7 +3,7 @@
 #include <sys.h>
 
 struct Logo1State : public AbstractState {
-	Texture2D logo;
+	//Texture2D logo;
 
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
@@ -21,7 +21,7 @@ struct Logo1State : public AbstractState {
 };
 
 struct Logo2State : public AbstractState {
-	Texture2D logo;
+	//Texture2D logo;
 
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
@@ -39,7 +39,7 @@ struct Logo2State : public AbstractState {
 };
 
 struct StartMenuState : public AbstractState {
-	Texture2D startMenu;
+	//Texture2D startMenu;
 
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
@@ -82,15 +82,15 @@ struct GameState : public AbstractState {
 	float waterAnim = 0.0f;
 	WaterGeometry waterGeom;
 
-	Texture2D angry;
+	//Texture2D angry;
 	// Terrain Stuff
-	Texture2D grass1;
-	Texture2D grass2;
-	Texture2D dirt1;
-	Texture2D dirt2;
-	Texture2D sand1;
+	//Texture2D grass1;
+	//Texture2D grass2;
+	//Texture2D dirt1;
+	//Texture2D dirt2;
+	//Texture2D sand1;
 
-	Texture2D water;
+	//Texture2D water;
 
 	float yrot = 0.0f;
 

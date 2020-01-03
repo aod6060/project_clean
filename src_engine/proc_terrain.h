@@ -76,12 +76,14 @@ struct ProcTerrain {
 	std::vector<uint32_t> biome_pixels;
 
 	// Textures
+	/*
 	Texture2D elevationTex;
 	Texture2D maskTex;
 	Texture2D maskedElevationTex;
 	Texture2D moisterTex;
 	Texture2D blendMapTex;
 	Texture2D biomesMapTex;
+	*/
 
 	void loadConfig(std::string path);
 
@@ -109,8 +111,6 @@ struct ProcTerrainGeometry : public IGeometry<TerrainShader> {
 	VertexBuffer texCoords;
 	VertexBuffer normals;
 	IndexBuffer indinces;
-
-	Texture2D blendMap;
 
 	Texture2D* blackChannel;
 	Texture2D* redChannel;

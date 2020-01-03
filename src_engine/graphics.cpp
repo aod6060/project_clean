@@ -3,10 +3,12 @@
 
 // Global Inits
 void graphics_init() {
+	TextureManager::init();
 	ShaderManager::init();
 	PreProcessorManager::init();
 	FontRender::init();
 	UISystem::init();
+
 }
 
 void graphics_release() {
@@ -14,6 +16,7 @@ void graphics_release() {
 	FontRender::release();
 	PreProcessorManager::release();
 	ShaderManager::release();
+	TextureManager::release();
 }
 
 // Shaders
@@ -368,6 +371,28 @@ void Texture2D::init(
 		pixels);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
+
+	this->unbind();
+}
+
+void Texture2D::upload(uint32_t bytesPerPixel, void* pixel) {
+	this->bind();
+
+	glTexImage2D(
+		GL_TEXTURE_2D,
+		0,
+		(bytesPerPixel == 4) ? GL_RGBA : GL_RGB,
+		this->width,
+		this->height,
+		0,
+		(bytesPerPixel == 4) ? GL_RGBA : GL_RGB,
+		GL_UNSIGNED_BYTE,
+		pixel);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	//glGenerateMipmap(GL_TEXTURE_2D);
 
 	this->unbind();
 }

@@ -1306,3 +1306,7 @@ void UISystem::removeManager(UIManager* manager) {
 		managers.erase(managers.begin() + i);
 	}
 }
+
+int UISystem::sizeManager() {
+	return managers.size();
+}

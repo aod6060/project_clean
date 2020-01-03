@@ -396,4 +396,7 @@ struct UISystem {
 
 	static void addManager(UIManager* manager);
 	static void removeManager(UIManager* manager);
+
+	static int sizeManager();
+
 };

@@ -109,12 +109,23 @@ void ProcTerrain::init(std::string path) {
 }
 
 void ProcTerrain::release() {
-	elevationTex.release();
-	maskTex.release();
-	maskedElevationTex.release();
-	moisterTex.release();
-	blendMapTex.release();
-	biomesMapTex.release();
+	this->elevation_pixels.clear();
+	this->mask_pixels.clear();
+	this->mask_elevation_pixels.clear();
+	this->moister_pixels.clear();
+	this->blend_map_pixels.clear();
+	this->biome_pixels.clear();
+
+	this->elevation.clear();
+	this->mask.clear();
+	this->maskedElevation.clear();
+	this->moister.clear();
+	this->blend.clear();
+	this->biomes.clear();
+	this->terrainType.clear();
+
+	this->elevationWaves.clear();
+	this->moisterWaves.clear();
 }
 
 float ProcTerrain::toMask(float x, float y, float radius, ProcTerrainMaskType type) {
@@ -319,57 +330,20 @@ void ProcTerrain::generate() {
 void ProcTerrain::generateTextures() {
 	// Textures
 	// Elevation
-	this->elevationTex.init(
-		size,
-		size,
-		4,
-		elevation_pixels.data()
-	);
-
-	// Mask
-	this->maskTex.init(
-		size,
-		size,
-		4,
-		mask_pixels.data()
-	);
-
-	// Masked Elevation
-	this->maskedElevationTex.init(
-		size,
-		size,
-		4,
-		mask_elevation_pixels.data()
-	);
-
-	// Moister
-	this->moisterTex.init(
-		size,
-		size,
-		4,
-		moister_pixels.data()
-	);
-
-	// Blend Map
-	this->blendMapTex.init(
-		size,
-		size,
-		4,
-		blend_map_pixels.data()
-	);
-
-	// Biome
-	this->biomesMapTex.init(
-		this->size,
-		this->size,
-		4,
-		biome_pixels.data()
-	);
+	TextureManager::getTex(TextureManager::TERRAIN_ELEVATION)->upload(4, elevation_pixels.data());
+	TextureManager::getTex(TextureManager::TERRAIN_MASK)->upload(4, mask_pixels.data());
+	TextureManager::getTex(TextureManager::TERRAIN_MASKED_ELEVATION)->upload(4, this->mask_elevation_pixels.data());
+	TextureManager::getTex(TextureManager::TERRAIN_MOISTER)->upload(4, this->moister_pixels.data());
+	TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP)->upload(4, this->blend_map_pixels.data());
+	TextureManager::getTex(TextureManager::TERRAIN_BIOMES)->upload(4, this->biome_pixels.data());
 }
 
 // Geometry
 void ProcTerrainGeometry::init() {
 	//this->data.loadConfig("data/terrain/regular.json");
+	this->heights.clear();
+	this->v.clear();
+
 	this->data.init("data/terrain/regular.json");
 
 	this->width = this->data.size;
@@ -474,11 +448,13 @@ void ProcTerrainGeometry::init() {
 	texCoords.update();
 	this->normals.update();
 
-	blendMap.initEmpty(width, height);
+	//blendMap.initEmpty(width, height);
 
 	PreProcessorManager::Blur(
-		&data.blendMapTex,
-		&blendMap,
+		//&data.blendMapTex,
+		//&blendMap,
+		TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP),
+		TextureManager::getTex(TextureManager::TERRAIN_BLUR_BLEND_MAP),
 		1024.0f,
 		width,
 		height);
@@ -486,7 +462,8 @@ void ProcTerrainGeometry::init() {
 
 void ProcTerrainGeometry::render(TerrainShader* shader) {
 	//data.blendMapTex.bind();
-	blendMap.bind();
+	//blendMap.bind();
+	TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP)->bind();
 	blackChannel->bind(GL_TEXTURE1);
 	redChannel->bind(GL_TEXTURE2);
 	greenChannel->bind(GL_TEXTURE3);
@@ -513,7 +490,8 @@ void ProcTerrainGeometry::render(TerrainShader* shader) {
 	shader->unbindAttr();
 
 	//data.blendMapTex.unbind();
-	blendMap.unbind();
+	//blendMap.unbind();
+	TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP)->unbind();
 	blackChannel->unbind(GL_TEXTURE1);
 	redChannel->unbind(GL_TEXTURE2);
 	greenChannel->unbind(GL_TEXTURE3);
@@ -531,9 +509,13 @@ void ProcTerrainGeometry::release() {
 	this->texCoords.release();
 	this->vertices.release();
 
-	this->blendMap.release();
+	//this->blendMap.release();
 
 	this->data.release();
+
+	
+	this->heights.clear();
+	this->v.clear();
 }
 
 void ProcTerrainGeometry::setBlackChannel(Texture2D* channel) {

@@ -8,7 +8,7 @@ void StartMenuState::init() {
 	this->uiMaxTime = 1.0f;
 
 	// Init Textures
-	this->startMenu.loadTexture("data/textures/menu/startmenu.png");
+	//this->startMenu.loadTexture("data/textures/menu/startmenu.png");
 
 	// Render Pass
 	this->hubGeom.init();
@@ -32,9 +32,11 @@ void StartMenuState::init() {
 			glm::scale(glm::mat4(1.0f), glm::vec3(conf_getWidth(), conf_getHeight(), 0.0f))
 		);
 
-		startMenu.bind();
+		//startMenu.bind();
+		TextureManager::getTex("menu:startmenu")->bind();
 		this->hubGeom.render(&ShaderManager::hubShader);
-		startMenu.unbind();
+		TextureManager::getTex("menu:startmenu")->unbind();
+		//startMenu.unbind();
 
 		ShaderManager::hubShader.unbind();
 
@@ -83,10 +85,12 @@ void StartMenuState::render() {
 
 void StartMenuState::release() {
 	UISystem::removeManager(&this->manager);
+	this->manager.release();
+
 	this->renderPassManager.release();
 	manager.release();
 	hubGeom.release();
-	this->startMenu.release();
+	//this->startMenu.release();
 }
 
 void StartMenuState::_uiInit() {

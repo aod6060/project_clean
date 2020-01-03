@@ -134,6 +134,8 @@ struct Texture2D {
 
 	void initEmpty(uint32_t width, uint32_t height);
 
+	void upload(uint32_t bytesPerPixel, void* pixel);
+
 	void bind(GLenum tex = GL_TEXTURE0);
 
 	void unbind(GLenum tex = GL_TEXTURE0);

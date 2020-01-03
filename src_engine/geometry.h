@@ -91,7 +91,9 @@ struct StaticTerrainGeometry : public IGeometry<TerrainShader> {
 
 	std::string blendMapPath;
 
-	Texture2D blendMap;
+	//Texture2D blendMap;
+
+	Texture2D* blendMap;
 
 	Texture2D* blackChannel;
 	Texture2D* redChannel;
@@ -101,6 +103,8 @@ struct StaticTerrainGeometry : public IGeometry<TerrainShader> {
 	void setHeightMapFilePath(std::string path);
 
 	void setBlendMap(std::string path);
+
+	void setBlendMap(Texture2D* blendMap);
 
 	void setBlackChannel(Texture2D* channel);
 	void setRedChannel(Texture2D* channel);

@@ -5,7 +5,7 @@ void Logo2State::init() {
 	this->maxTime = 3.0f;
 
 	// Init Textures
-	this->logo.loadTexture("data/textures/logos/teh_island_engine_v_1_0_0.png");
+	//this->logo.loadTexture("data/textures/logos/teh_island_engine_v_1_0_0.png");
 
 	// Render Pass
 	this->hubGeom.init();
@@ -41,9 +41,11 @@ void Logo2State::init() {
 			glm::scale(glm::mat4(1.0f), glm::vec3(logoWidth, logoHeight, 0.0f))
 		);
 
-		logo.bind();
+		//logo.bind();
+		TextureManager::getTex("logos:logo2")->bind();
 		this->hubGeom.render(&ShaderManager::hubShader);
-		logo.unbind();
+		TextureManager::getTex("logos:logo2")->unbind();
+		//logo.unbind();
 
 		ShaderManager::hubShader.unbind();
 
@@ -79,5 +81,5 @@ void Logo2State::render() {
 void Logo2State::release() {
 	this->renderPassManager.release();
 	hubGeom.release();
-	logo.release();
+	//logo.release();
 }
