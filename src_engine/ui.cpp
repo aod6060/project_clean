@@ -99,6 +99,8 @@ UIRect UILabelComponent::toRect() {
 	return UIRect(this->position, size);
 }
 
+void UILabelComponent::onShowEvent(bool show) {}
+
 
 
 // UIButtonComponent
@@ -250,7 +252,13 @@ UIRect UIButtonComponent::toRect() {
 	return UIRect(this->position, this->size);
 }
 
-
+void UIButtonComponent::onShowEvent(bool show) {
+	if (!show) {
+		this->isActive = false;
+		this->isHover = false;
+		this->activeTimer = 0.0f;
+	}
+}
 
 // UICheckBoxComponent
 void UICheckBoxComponent::init() {
@@ -403,6 +411,7 @@ UIRect UICheckBoxComponent::toRect() {
 	return UIRect(this->position, this->size);
 }
 
+void UICheckBoxComponent::onShowEvent(bool show) {}
 
 // UITextBoxComponent
 void UITextBoxComponent::init() {
@@ -819,6 +828,7 @@ UIRect UITextBoxComponent::toRect() {
 	return UIRect(this->position, this->size);
 }
 
+void UITextBoxComponent::onShowEvent(bool show) {}
 
 // UISelect Button Component
 void UISelectButtonComponent::init() {
@@ -987,6 +997,7 @@ UIRect UISelectButtonComponent::toRect() {
 	return UIRect(this->position, this->size);
 }
 
+void UISelectButtonComponent::onShowEvent(bool show) {}
 
 // UISliderComponent
 void UISliderComponent::init() {
@@ -1151,6 +1162,7 @@ float UISliderComponent::_doValueChange(float p) {
 	return ((max - min) / 100.0f) * (p)+min;
 }
 
+void UISliderComponent::onShowEvent(bool show) {}
 
 
 // UIManager
@@ -1222,6 +1234,10 @@ bool UIManager::isShow() {
 
 void UIManager::setShow(bool show) {
 	this->show = show;
+
+	std::for_each(components.begin(), components.end(), [&](IUIComponent* comp) {
+		comp->onShowEvent(this->show);
+	});
 }
 
 void UIManager::toggleShow() {

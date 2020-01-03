@@ -35,6 +35,9 @@ struct IUIComponent {
 	virtual void setPosition(const glm::vec2& pos) = 0;
 
 	virtual UIRect toRect() = 0;
+
+	virtual void onShowEvent(bool show) = 0;
+
 };
 
 struct UILabelComponent : public IUIComponent {
@@ -58,6 +61,9 @@ struct UILabelComponent : public IUIComponent {
 	glm::vec3 getColor();
 
 	virtual UIRect toRect();
+
+	virtual void onShowEvent(bool show);
+
 };
 
 struct UIButtonComponent : public IUIComponent {
@@ -109,6 +115,9 @@ struct UIButtonComponent : public IUIComponent {
 	void setButtonCallback(std::function<void(UIButtonComponent*)> buttonCallback);
 
 	virtual UIRect toRect();
+
+	virtual void onShowEvent(bool show);
+
 
 };
 
@@ -170,6 +179,7 @@ struct UICheckBoxComponent : public IUIComponent {
 
 	virtual UIRect toRect();
 
+	virtual void onShowEvent(bool show);
 
 };
 
@@ -215,6 +225,9 @@ struct UITextBoxComponent : public IUIComponent {
 	std::string getText();
 
 	virtual UIRect toRect();
+
+	virtual void onShowEvent(bool show);
+
 };
 
 struct UISelectButtonType {
@@ -293,6 +306,9 @@ struct UISelectButtonComponent : public IUIComponent {
 	uint32_t getCurrentValue();
 	
 	virtual UIRect toRect();
+
+	virtual void onShowEvent(bool show);
+
 };
 
 struct UISliderComponent : public IUIComponent {
@@ -338,6 +354,8 @@ struct UISliderComponent : public IUIComponent {
 	virtual UIRect toRect();
 
 	float _doValueChange(float p);
+
+	virtual void onShowEvent(bool show);
 
 };
 
