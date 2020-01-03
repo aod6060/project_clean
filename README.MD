@@ -10,7 +10,7 @@ technology stack which is as follows...
 * SDL2 + extensions (SDL2_image and SDL2_ttf)
 * OpenGL 4.* (Graphics)
 * Bullet Physics 3 (Physics)
-* OpenAL 1.1 (AudioFX and Music)
+* FMOD (AudioFX and Music)
 * Assimp 5 (Asset Loading but I might cosider create a tool)
 * jsoncpp (config, maps, and other type of data the game needs)
 * lua (scripting)
