@@ -59,6 +59,9 @@ void SceneGeometry::MeshGeometry::release() {
 	texCoords.release();
 	vertices.release();
 
+	f.clear();
+	v.clear();
+
 	parent = nullptr;
 }
 
@@ -201,6 +204,7 @@ void SceneGeometry::release() {
 		geom.release();
 	});
 
+	this->geometry.clear();
 }
 
 

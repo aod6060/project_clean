@@ -313,3 +313,6 @@ bool input_isIMFromConfRelease(std::string name);
 bool input_isIMFromConfDown(std::string name);
 bool input_isIMFromConfPress(std::string name);
 bool input_isIMFromConfUp(std::string name);
+
+bool input_checkUpdate();
+bool input_checkMotionUpdate();

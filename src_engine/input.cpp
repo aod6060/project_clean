@@ -11,6 +11,9 @@ static int g_my = 0;
 static int g_mouseWheelX = 0;
 static int g_mouseWheelY = 0;
 
+static bool g_updateCheck = false;
+static bool g_motionUpdateCheck = false;
+
 void input_init() {
 	for (uint32_t i = 0; i < KB_SIZE; i++) {
 		keys[i] = IS_RELEASE;
@@ -70,18 +73,22 @@ void input_init() {
 			_doKeyboardDown(e.key);
 			break;
 		case SDL_KEYUP:
+			g_updateCheck = true;
 			_doKeyboardUp(e.key);
 			break;
 		case SDL_MOUSEBUTTONDOWN:
 			_doMouseDown(e.button);
 			break;
 		case SDL_MOUSEBUTTONUP:
+			g_updateCheck = true;
 			_doMouseUp(e.button);
 			break;
 		case SDL_MOUSEMOTION:
+			g_motionUpdateCheck = true;
 			_doMouseMotion(e.motion);
 			break;
 		case SDL_MOUSEWHEEL:
+			g_updateCheck = true;
 			_doMouseWheel(e.wheel);
 			break;
 		}
@@ -117,6 +124,9 @@ void input_update() {
 
 	g_mouseWheelX = 0;
 	g_mouseWheelY = 0;
+
+	g_updateCheck = false;
+	g_motionUpdateCheck = false;
 }
 
 bool input_isKeyRelease(const Keyboard& key) {
@@ -169,6 +179,7 @@ void input_toggleGrab() {
 }
 
 void input_getMouseWheelCoord(int& x, int& y) {
+	g_updateCheck = true;
 	x = g_mouseWheelX;
 	y = g_mouseWheelY;
 }
@@ -242,4 +253,12 @@ bool input_isIMFromConfPress(std::string name) {
 
 bool input_isIMFromConfUp(std::string name) {
 	return input_isInputMappingUp(conf_getInputMapping(name));
+}
+
+bool input_checkUpdate() {
+	return g_updateCheck;
+}
+
+bool input_checkMotionUpdate() {
+	return g_motionUpdateCheck;
 }

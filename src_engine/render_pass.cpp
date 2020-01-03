@@ -19,3 +19,7 @@ void RenderPassManager::render() {
 		pass->render();
 	});
 }
+
+void RenderPassManager::release() {
+	passes.clear();
+}

@@ -14,4 +14,6 @@ struct RenderPassManager {
 	void addRenderPass(RenderPass* pass);
 
 	void render();
+
+	void release();
 };

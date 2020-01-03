@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
 		}
 	}
 	else {
-		GameWindowCallback windowCB;
+		GameStateWindowCallback windowCB;
 
 		conf_init("config/config.json");
 

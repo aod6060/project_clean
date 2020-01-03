@@ -87,6 +87,13 @@ void ProcTerrain::init(std::string path) {
 	this->terrainType.resize(size2);
 
 	// Create Pixels
+	this->elevation_pixels.clear();
+	this->mask_pixels.clear();
+	this->mask_elevation_pixels.clear();
+	this->moister_pixels.clear();
+	this->blend_map_pixels.clear();
+	this->biome_pixels.clear();
+	
 	this->elevation_pixels.resize(size2);
 	this->mask_pixels.resize(size2);
 	this->mask_elevation_pixels.resize(size2);

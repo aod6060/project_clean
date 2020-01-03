@@ -65,7 +65,7 @@
         }
     ],
     "logger": {
-        "type": "file"
+        "type": "both"
     },
     "graphics": {
         "fov": 60.0
