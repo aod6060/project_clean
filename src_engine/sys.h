@@ -44,3 +44,4 @@
 #include "ui.h"
 #include "camera.h"
 #include "proc_terrain.h"
+#include "physics.h"
