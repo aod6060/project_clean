@@ -58,6 +58,8 @@ struct ProcTerrain {
 	float grassLevel = 0.35f;
 	float forestLevel = 0.5f;
 
+	float heightScale = 64.0f;
+
 	// Actual Values
 	std::vector<float> elevation;
 	std::vector<float> mask;
@@ -76,14 +78,6 @@ struct ProcTerrain {
 	std::vector<uint32_t> biome_pixels;
 
 	// Textures
-	/*
-	Texture2D elevationTex;
-	Texture2D maskTex;
-	Texture2D maskedElevationTex;
-	Texture2D moisterTex;
-	Texture2D blendMapTex;
-	Texture2D biomesMapTex;
-	*/
 
 	void loadConfig(std::string path);
 
@@ -100,7 +94,7 @@ struct ProcTerrain {
 
 struct ProcTerrainGeometry : public IGeometry<TerrainShader> {
 	ProcTerrain data;
-	float heightScale = 64.0f;
+	//float heightScale = 64.0f;
 	int width = 0;
 	int height = 0;
 
@@ -127,7 +121,4 @@ struct ProcTerrainGeometry : public IGeometry<TerrainShader> {
 	void setRedChannel(Texture2D* channel);
 	void setGreenChannel(Texture2D* channel);
 	void setBlueChannel(Texture2D* channel);
-
-	void setHeightScale(float scale);
-
 };

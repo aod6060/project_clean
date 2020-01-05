@@ -57,5 +57,6 @@
         "beach": 0.20,
         "grass": 0.30,
         "forest": 0.50
-    }
+    },
+    "height-scale": 48.0
 }

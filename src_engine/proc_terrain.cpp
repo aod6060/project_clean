@@ -53,6 +53,9 @@ void ProcTerrain::loadConfig(std::string path) {
 		this->beachLevel = levels["beach"].asFloat();
 		this->grassLevel = levels["grass"].asFloat();
 		this->forestLevel = levels["forest"].asFloat();
+
+		// height-scale
+		this->heightScale = root["height-scale"].asFloat();
 	}
 
 	in.close();
@@ -359,7 +362,7 @@ void ProcTerrainGeometry::init() {
 
 	for (int y = 0; y < this->height; y++) {
 		for (int x = 0; x < this->width; x++) {
-			float height = this->data.maskedElevation[y * this->width + x] * this->heightScale;
+			float height = this->data.maskedElevation[y * this->width + x] * this->data.heightScale;
 			this->heights[y * this->width + x] = height;
 			v[y * this->width + x] = glm::vec3(x - halfWidth, height, y - halfHeight);
 		}
@@ -532,8 +535,4 @@ void ProcTerrainGeometry::setGreenChannel(Texture2D* channel) {
 
 void ProcTerrainGeometry::setBlueChannel(Texture2D* channel) {
 	this->blueChannel = channel;
-}
-
-void ProcTerrainGeometry::setHeightScale(float scale) {
-	this->heightScale = scale;
 }

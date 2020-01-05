@@ -1,13 +1,6 @@
 #pragma once
 
 
-
-struct PhysicsObject {
-	btRigidBody* body;
-	int group;
-	int mask;
-};
-
 struct PhysicsManager {
 	btBroadphaseInterface* broadphase = nullptr;
 	btCollisionDispatcher* disp = nullptr;
@@ -21,5 +14,19 @@ struct PhysicsManager {
 
 	btDiscreteDynamicsWorld* getWorld();
 
+	void stepSimulation();
 
+	btBoxShape* createBoxShape(const btVector3& halfExtends);
+
+	btSphereShape* createSphereShape(const btScalar& radius);
+
+	btStaticPlaneShape* createStaticPlaneShape(const btVector3& planeNormal, const btScalar planeConstant);
+
+	btCapsuleShape* createCapsuleShape(const btScalar& radius, const btScalar& height);
+
+	btHeightfieldTerrainShape* createHeightfiledCollisionShape(ProcTerrain& procTerrain);
+
+	btRigidBody* createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape);
+
+	void removeRigidBody(btRigidBody* body);
 };

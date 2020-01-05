@@ -97,7 +97,7 @@ void GameState::init() {
 		ShaderManager::waterShader.setCamera(&camera);
 
 
-		float y = this->terrain.data.beachLevel * this->terrain.heightScale;
+		float y = this->terrain.data.beachLevel * this->terrain.data.heightScale;
 		ShaderManager::waterShader.setModel(
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, y, 0.0f)) *
 			glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))

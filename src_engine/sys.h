@@ -1,6 +1,7 @@
 #pragma once
 
 
+#define FF60 1.0f / 60.0f
 
 // Standard Libraries
 #include <cstdio>
@@ -26,7 +27,7 @@
 #include <GL/glew.h>
 #include <json/json.h>
 #include <btBulletDynamicsCommon.h>
-
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
 // My Stuff
 #include "logger.h"
