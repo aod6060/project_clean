@@ -65,7 +65,26 @@ struct StartMenuState : public AbstractState {
 	virtual void release();
 };
 
+struct GameState;
+
+struct LevelManager {
+	PhysicsManager* phyManager = nullptr;
+	GameState* state;
+
+	ProcTerrainGeometry terrain;
+	btHeightfieldTerrainShape* shape;
+	btRigidBody* body = nullptr;
+
+	void init(GameState* state);
+
+	void render();
+
+	void release();
+};
+
 struct GameState : public AbstractState {
+	PhysicsManager phyManager;
+
 	Camera camera;
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
@@ -76,21 +95,12 @@ struct GameState : public AbstractState {
 	bool isWire = false;
 
 	SceneGeometry multiMeshTest;
-	//StaticTerrainGeometry terrain;
-	ProcTerrainGeometry terrain;
+	//ProcTerrainGeometry terrain;
+
+	LevelManager levelManager;
 
 	float waterAnim = 0.0f;
 	WaterGeometry waterGeom;
-
-	//Texture2D angry;
-	// Terrain Stuff
-	//Texture2D grass1;
-	//Texture2D grass2;
-	//Texture2D dirt1;
-	//Texture2D dirt2;
-	//Texture2D sand1;
-
-	//Texture2D water;
 
 	float yrot = 0.0f;
 

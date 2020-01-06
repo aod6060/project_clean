@@ -60,9 +60,33 @@ btHeightfieldTerrainShape* PhysicsManager::createHeightfiledCollisionShape(ProcT
 }
 
 btRigidBody* PhysicsManager::createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape) {
-	return nullptr;
+	bool isDynamic = (mass != 0.f);
+
+	btVector3 localInertia(0, 0, 0);
+
+	if (isDynamic) {
+		shape->calculateLocalInertia(mass, localInertia);
+	}
+
+	btDefaultMotionState* ms = new btDefaultMotionState(
+		startTransform
+	);
+
+	btRigidBody::btRigidBodyConstructionInfo info(mass, ms, shape, localInertia);
+
+	btRigidBody* body = new btRigidBody(info);
+
+	body->setUserIndex(-1);
+
+	this->getWorld()->addRigidBody(body);
+
+	return body;
 }
 
 void PhysicsManager::removeRigidBody(btRigidBody* body) {
 	// Do nothing for now
+	this->getWorld()->removeRigidBody(body);
+	btMotionState* ms = body->getMotionState();
+	delete body;
+	delete ms;
 }

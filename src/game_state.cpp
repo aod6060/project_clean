@@ -47,6 +47,8 @@ void GameState::_initUI() {
 }
 
 void GameState::init() {
+	this->phyManager.init();
+
 	hubGeom.init();
 
 	this->mainRenderPass.setCallback([&]() {
@@ -61,18 +63,23 @@ void GameState::init() {
 		//MainRenderPass* pass = context->getPass<MainRenderPass>();
 
 		// Terrain Rendering
+		/*
 		ShaderManager::terrainShader.bind();
 		ShaderManager::terrainShader.setCamera(&camera);
 		ShaderManager::terrainShader.setTexScale(32.0f);
 
 		ShaderManager::terrainShader.setModel(model);
-		terrain.render(&ShaderManager::terrainShader);
+		//terrain.render(&ShaderManager::terrainShader);
 
 		ShaderManager::terrainShader.unbind();
+		*/
+
+		levelManager.render();
 
 		//logger_output("Hello, World 2\n");
 
 		// Render Meshes
+		/*
 		ShaderManager::sceneShader.bind();
 		ShaderManager::sceneShader.setCamera(&camera);
 		//logger_output("Camera Pass\n");
@@ -89,6 +96,7 @@ void GameState::init() {
 		//angry.unbind();
 		//angry.unbind();
 		ShaderManager::sceneShader.unbind();
+		*/
 
 		//logger_output("Hello, World 3\n");
 
@@ -97,7 +105,7 @@ void GameState::init() {
 		ShaderManager::waterShader.setCamera(&camera);
 
 
-		float y = this->terrain.data.beachLevel * this->terrain.data.heightScale;
+		float y = levelManager.terrain.data.beachLevel * levelManager.terrain.data.heightScale;
 		ShaderManager::waterShader.setModel(
 			glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, y, 0.0f)) *
 			glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))
@@ -147,8 +155,8 @@ void GameState::init() {
 	renderPassManager.addRenderPass(&this->mainRenderPass);
 	renderPassManager.addRenderPass(&this->hubRenderPass);
 
-	multiMeshTest.setFilePath("data/meshes/multi_mesh_test.json");
-	multiMeshTest.init();
+	//multiMeshTest.setFilePath("data/meshes/multi_mesh_test.json");
+	//multiMeshTest.init();
 
 	camera.init(
 		glm::vec3(0.0f),
@@ -158,16 +166,17 @@ void GameState::init() {
 		1.0f,
 		1024.0f);
 
-	terrain.init();
+	//terrain.init();
 
 	//terrain.setBlackChannel(&this->dirt1);
-	terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
+	//terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
 	//terrain.setRedChannel(&this->sand1);
-	terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
+	//terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
 	//terrain.setGreenChannel(&this->grass1);
-	terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
+	//terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
 	//terrain.setBlueChannel(&this->dirt2);
-	terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
+	//terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
+	levelManager.init(this);
 
 
 	waterGeom.init();
@@ -220,7 +229,7 @@ void GameState::update(float delta) {
 }
 
 void GameState::fixedUpdate() {
-
+	phyManager.stepSimulation();
 }
 
 void GameState::render() {
@@ -235,8 +244,72 @@ void GameState::release() {
 	this->renderPassManager.release();
 
 	waterGeom.release();
-	terrain.release();
-	multiMeshTest.release();
+	//terrain.release();
+	levelManager.release();
+	//multiMeshTest.release();
 
 	hubGeom.release();
+
+	phyManager.release();
+}
+
+
+
+
+// Level Manager
+void LevelManager::init(GameState* state) {
+	this->state = state;
+
+	this->phyManager = &this->state->phyManager;
+	
+
+	terrain.init();
+
+	//terrain.setBlackChannel(&this->dirt1);
+	terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
+	//terrain.setRedChannel(&this->sand1);
+	terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
+	//terrain.setGreenChannel(&this->grass1);
+	terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
+	//terrain.setBlueChannel(&this->dirt2);
+	terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
+
+	this->shape = this->phyManager->createHeightfiledCollisionShape(
+		terrain.data
+	);
+
+	float offset = terrain.data.heightScale * 0.5f;
+	btVector3 v(0.0f, 0.0f, 0.0f);
+
+	this->body = this->phyManager->createRigidBody(0, btTransform(btQuaternion(0, 0, 0, 1), v), this->shape);
+
+}
+
+void LevelManager::render() {
+
+	glm::mat4 model;
+
+	float m[16];
+
+	this->body->getWorldTransform().getOpenGLMatrix(m);
+
+	model = glm::make_mat4(m);
+
+	ShaderManager::terrainShader.bind();
+	ShaderManager::terrainShader.setCamera(&this->state->camera);
+	ShaderManager::terrainShader.setTexScale(32.0f);
+
+	ShaderManager::terrainShader.setModel(model);
+	terrain.render(&ShaderManager::terrainShader);
+
+	ShaderManager::terrainShader.unbind();
+
+}
+
+void LevelManager::release() {
+	phyManager->removeRigidBody(this->body);
+	delete shape;
+	terrain.release();
+	phyManager = nullptr;
+	state = nullptr;
 }
