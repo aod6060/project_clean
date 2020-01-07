@@ -50,17 +50,17 @@ btHeightfieldTerrainShape* PhysicsManager::createHeightfiledCollisionShape(ProcT
 	return new btHeightfieldTerrainShape(
 		procTerrain.size,
 		procTerrain.size,
-		procTerrain.maskedElevation.data(),
+		procTerrain.maskedElevationScaled.data(),
 		procTerrain.heightScale,
 		0.0f,
-		1.0f,
+		procTerrain.heightScale,
 		1,
 		PHY_FLOAT,
 		false);
 }
 
 btRigidBody* PhysicsManager::createRigidBody(float mass, const btTransform& startTransform, btCollisionShape* shape) {
-	bool isDynamic = (mass != 0.f);
+	bool isDynamic = (mass > 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 

@@ -45,6 +45,10 @@
         {
             "name": "terrain:blendMap",
             "path": "data/terrain/static_terrain_rgb_map.png"
+        },
+        {
+            "name": "obj:crappy-crate",
+            "path": "data/textures/objects/crate/crappy_crate.png"
         }
     ]
 }

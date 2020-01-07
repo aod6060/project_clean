@@ -64,6 +64,8 @@ struct ProcTerrain {
 	std::vector<float> elevation;
 	std::vector<float> mask;
 	std::vector<float> maskedElevation;
+	std::vector<float> maskedElevationScaled;
+
 	std::vector<glm::vec2> moister;
 	std::vector<glm::vec3> blend;
 	std::vector<glm::vec3> biomes;
@@ -89,6 +91,10 @@ struct ProcTerrain {
 
 	void generate();
 	void generateTextures();
+
+	void genHeights(std::vector<float>& heights);
+
+	float getY(int x, int z);
 
 };
 

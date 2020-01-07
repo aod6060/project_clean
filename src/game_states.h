@@ -82,6 +82,24 @@ struct LevelManager {
 	void release();
 };
 
+struct CratesManager {
+	PhysicsManager* phyManager = nullptr;
+	GameState* state = nullptr;
+
+	SceneGeometry crappyCrate;
+
+	btCollisionShape* shape = nullptr;
+
+	std::vector<btRigidBody*> bodies;
+
+	void init(GameState* state);
+
+	void render();
+
+	void release();
+
+};
+
 struct GameState : public AbstractState {
 	PhysicsManager phyManager;
 
@@ -94,10 +112,11 @@ struct GameState : public AbstractState {
 
 	bool isWire = false;
 
-	SceneGeometry multiMeshTest;
+	//SceneGeometry multiMeshTest;
 	//ProcTerrainGeometry terrain;
 
 	LevelManager levelManager;
+	CratesManager cratesManager;
 
 	float waterAnim = 0.0f;
 	WaterGeometry waterGeom;

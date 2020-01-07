@@ -59,46 +59,10 @@ void GameState::init() {
 		RenderSystem::viewport(0, 0, conf_getWidth(), conf_getHeight());
 		RenderSystem::clearColor(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
 		RenderSystem::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//MainRenderPass* pass = context->getPass<MainRenderPass>();
-
 		// Terrain Rendering
-		/*
-		ShaderManager::terrainShader.bind();
-		ShaderManager::terrainShader.setCamera(&camera);
-		ShaderManager::terrainShader.setTexScale(32.0f);
-
-		ShaderManager::terrainShader.setModel(model);
-		//terrain.render(&ShaderManager::terrainShader);
-
-		ShaderManager::terrainShader.unbind();
-		*/
-
 		levelManager.render();
 
-		//logger_output("Hello, World 2\n");
-
-		// Render Meshes
-		/*
-		ShaderManager::sceneShader.bind();
-		ShaderManager::sceneShader.setCamera(&camera);
-		//logger_output("Camera Pass\n");
-
-		//angry.bind();
-		//angry.bind();
-		TextureManager::getTex("angry")->bind();
-		multiMeshTest.setModel(model);
-		//logger_output("Model Pass\n");
-
-		multiMeshTest.render(&ShaderManager::sceneShader);
-		TextureManager::getTex("angry")->unbind();
-
-		//angry.unbind();
-		//angry.unbind();
-		ShaderManager::sceneShader.unbind();
-		*/
-
-		//logger_output("Hello, World 3\n");
+		cratesManager.render();
 
 		// Render Water
 		ShaderManager::waterShader.bind();
@@ -139,13 +103,6 @@ void GameState::init() {
 
 		ShaderManager::hubShader.unbind();
 
-		/*
-		FontRender::setColor(glm::vec3(1.0f, 0.0f, 0.0f));
-		FontRender::print(1.0f, 1.0f, "player position: [%f, %f, %f]", camera.pos.x, camera.pos.y, camera.pos.z);
-		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
-		FontRender::print(1.0f, 22.0f, "player rotation: [%f, %f]", camera.rot.x, camera.rot.y);
-		*/
-
 		this->uiManager.render(&ShaderManager::uiShader);
 
 		RenderSystem::enable(GL_DEPTH_TEST);
@@ -155,31 +112,18 @@ void GameState::init() {
 	renderPassManager.addRenderPass(&this->mainRenderPass);
 	renderPassManager.addRenderPass(&this->hubRenderPass);
 
-	//multiMeshTest.setFilePath("data/meshes/multi_mesh_test.json");
-	//multiMeshTest.init();
+	levelManager.init(this);
+	cratesManager.init(this);
+
+	waterGeom.init();
 
 	camera.init(
-		glm::vec3(0.0f),
+		glm::vec3(0.0f, this->levelManager.terrain.data.getY(0, 0) + 2.0f, 0.0f),
 		glm::vec2(0.0f),
 		conf_getFOV(),
 		(float)conf_getWidth() / (float)conf_getHeight(),
 		1.0f,
 		1024.0f);
-
-	//terrain.init();
-
-	//terrain.setBlackChannel(&this->dirt1);
-	//terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
-	//terrain.setRedChannel(&this->sand1);
-	//terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
-	//terrain.setGreenChannel(&this->grass1);
-	//terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
-	//terrain.setBlueChannel(&this->dirt2);
-	//terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
-	levelManager.init(this);
-
-
-	waterGeom.init();
 
 	this->_initUI();
 }
@@ -245,6 +189,7 @@ void GameState::release() {
 
 	waterGeom.release();
 	//terrain.release();
+	cratesManager.release();
 	levelManager.release();
 	//multiMeshTest.release();
 
@@ -279,7 +224,7 @@ void LevelManager::init(GameState* state) {
 	);
 
 	float offset = terrain.data.heightScale * 0.5f;
-	btVector3 v(0.0f, 0.0f, 0.0f);
+	btVector3 v(0.0f, offset, 0.0f);
 
 	this->body = this->phyManager->createRigidBody(0, btTransform(btQuaternion(0, 0, 0, 1), v), this->shape);
 
@@ -297,9 +242,9 @@ void LevelManager::render() {
 
 	ShaderManager::terrainShader.bind();
 	ShaderManager::terrainShader.setCamera(&this->state->camera);
-	ShaderManager::terrainShader.setTexScale(32.0f);
+	ShaderManager::terrainShader.setTexScale(128.0f);
 
-	ShaderManager::terrainShader.setModel(model);
+	ShaderManager::terrainShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 	terrain.render(&ShaderManager::terrainShader);
 
 	ShaderManager::terrainShader.unbind();
@@ -312,4 +257,77 @@ void LevelManager::release() {
 	terrain.release();
 	phyManager = nullptr;
 	state = nullptr;
+}
+
+
+#define NUM_CRATES 128
+
+// CreateManager 
+void CratesManager::init(GameState* state) {
+	this->state = state;
+	this->phyManager = &this->state->phyManager;
+
+	this->crappyCrate.setFilePath("data/meshes/objects/crate/crappy_crate.json");
+	this->crappyCrate.init();
+
+
+	this->shape = this->phyManager->createBoxShape(btVector3(1, 1, 1));
+
+	for (int i = 0; i < NUM_CRATES; i++) {
+		float x = (rand() % 512) - 256.0f;
+		float z = (rand() % 512) - 256.0f;
+		float y = (rand() % 64) + state->levelManager.terrain.data.heightScale + 20;
+
+		btVector3 v(x, y, z);
+
+		btQuaternion q(0, 0, 0, 1);
+
+		btTransform start(q, v);
+
+		btRigidBody* body = this->phyManager->createRigidBody(1.0f, start, this->shape);
+
+		this->bodies.push_back(body);
+	}
+}
+
+void CratesManager::render() {
+	ShaderManager::sceneShader.bind();
+
+
+	ShaderManager::sceneShader.setCamera(&this->state->camera);
+
+	TextureManager::getTex("obj:crappy-crate")->bind();
+	for (int i = 0; i < NUM_CRATES; i++) {
+		float m[16];
+
+		bodies[i]->getCenterOfMassTransform().getOpenGLMatrix(m);
+
+		glm::mat4 model = glm::make_mat4(m);
+
+		
+		//ShaderManager::sceneShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3( 0.0f, 0.0f, 0.0f)));
+
+
+		this->crappyCrate.setModel(model);
+		this->crappyCrate.render(&ShaderManager::sceneShader);
+
+	}
+	TextureManager::getTex("obj:crappy-crate")->unbind();
+
+	ShaderManager::sceneShader.unbind();
+}
+
+void CratesManager::release() {
+
+	for (int i = 0; i < NUM_CRATES; i++) {
+		this->phyManager->removeRigidBody(this->bodies[i]);
+	}
+
+	this->bodies.clear();
+
+	delete this->shape;
+
+	this->crappyCrate.release();
+	this->phyManager = nullptr;
+	this->state = nullptr;
 }

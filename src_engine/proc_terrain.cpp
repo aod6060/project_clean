@@ -109,6 +109,11 @@ void ProcTerrain::init(std::string path) {
 	// Textures
 	// Elevation
 	this->generateTextures();
+
+
+
+	this->genHeights(this->maskedElevationScaled);
+
 }
 
 void ProcTerrain::release() {
@@ -339,6 +344,24 @@ void ProcTerrain::generateTextures() {
 	TextureManager::getTex(TextureManager::TERRAIN_MOISTER)->upload(4, this->moister_pixels.data());
 	TextureManager::getTex(TextureManager::TERRAIN_BLEND_MAP)->upload(4, this->blend_map_pixels.data());
 	TextureManager::getTex(TextureManager::TERRAIN_BIOMES)->upload(4, this->biome_pixels.data());
+}
+
+
+void ProcTerrain::genHeights(std::vector<float>& heights) {
+
+	heights.resize(this->size * this->size);
+
+	for (int i = 0; i < maskedElevation.size(); i++) {
+		heights[i] = this->maskedElevation[i] * this->heightScale;
+	}
+}
+
+float ProcTerrain::getY(int x, int z) {
+	float y = 0.0f;
+	x += this->size * 0.5f;
+	z += this->size * 0.5f;
+	y = (maskedElevationScaled[z * size + x]);
+	return y;
 }
 
 // Geometry
