@@ -333,3 +333,8 @@ tex: 7
 renderbuf: 1
 Success: Framebuffer created
 pressed exit button0
+tsize=16, osize=64
+tex: 7
+renderbuf: 1
+Success: Framebuffer created
+pressed exit button0
