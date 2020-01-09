@@ -102,8 +102,12 @@ struct CratesManager {
 
 struct GameState : public AbstractState {
 	PhysicsManager phyManager;
+	btCollisionShape* shape;
+	btRigidBody* body;
 
-	Camera camera;
+	//Camera camera;
+	PhysicsCamera camera;
+
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
 

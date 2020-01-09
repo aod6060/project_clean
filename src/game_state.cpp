@@ -75,7 +75,7 @@ void GameState::init() {
 			glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))
 		);
 
-		ShaderManager::waterShader.setTexScale(32.0f);
+		ShaderManager::waterShader.setTexScale(64.0f);
 
 		ShaderManager::waterShader.setTimeDelta(this->waterAnim);
 
@@ -117,13 +117,26 @@ void GameState::init() {
 
 	waterGeom.init();
 
+	camera.setPhysicsManager(&this->phyManager);
+	camera.setJumpSpeed(10.0f);
+
+	float x = (rand() % 512) - 256.0f;
+	float z = (rand() % 512) - 256.0f;
+
 	camera.init(
-		glm::vec3(0.0f, this->levelManager.terrain.data.getY(0, 0) + 2.0f, 0.0f),
+		glm::vec3(x, this->levelManager.terrain.data.getY(x, z) + 2.0f, z),
 		glm::vec2(0.0f),
 		conf_getFOV(),
 		(float)conf_getWidth() / (float)conf_getHeight(),
 		1.0f,
-		1024.0f);
+		1024.0f,
+		64.0f,
+		512.0f);
+
+	float y = levelManager.terrain.data.beachLevel * levelManager.terrain.data.heightScale - 2.0;
+
+	this->shape = phyManager.createStaticPlaneShape(btVector3(0, 1, 0), 0.0f);
+	this->body = phyManager.createRigidBody(0.0f, btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, y, 0)), shape);
 
 	this->_initUI();
 }
@@ -134,23 +147,6 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(true);
 			input_setGrab(false);
-		}
-
-		if (input_isIMFromConfDown("wire-frame-toggle")) {
-			this->isWire = !this->isWire;
-
-			if (this->isWire) {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			}
-			else {
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			}
-		}
-
-		yrot += 32.0f * delta;
-
-		if (yrot >= 360.0f) {
-			yrot -= 360.0f;
 		}
 
 		camera.update(delta);
@@ -173,7 +169,10 @@ void GameState::update(float delta) {
 }
 
 void GameState::fixedUpdate() {
-	phyManager.stepSimulation();
+	if (!uiManager.isShow()) {
+		phyManager.stepSimulation();
+		camera.fixedUpdate();
+	}
 }
 
 void GameState::render() {
@@ -182,8 +181,10 @@ void GameState::render() {
 
 void GameState::release() {
 	UISystem::removeManager(&this->uiManager);
-
 	uiManager.release();
+
+	phyManager.removeRigidBody(this->body);
+	delete this->shape;
 
 	this->renderPassManager.release();
 
@@ -195,6 +196,7 @@ void GameState::release() {
 
 	hubGeom.release();
 
+	camera.release();
 	phyManager.release();
 }
 

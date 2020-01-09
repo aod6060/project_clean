@@ -30,3 +30,34 @@ struct PhysicsManager {
 
 	void removeRigidBody(btRigidBody* body);
 };
+
+struct PhysicsCamera : public Camera {
+	PhysicsManager* phyManager;
+
+	btRigidBody* body = nullptr;
+	btCollisionShape* shape = nullptr;
+
+	float jumpSpeed = 32.0f;
+
+	void setJumpSpeed(float jumpSpeed);
+
+	void setPhysicsManager(PhysicsManager* man);
+
+	virtual void init(
+		glm::vec3 pos,
+		glm::vec2 rot,
+		float fov,
+		float aspect,
+		float znear,
+		float zfar,
+		float rotSpeed = 64.0f,
+		float walkingSpeed = 32.0f);
+
+	virtual void update(float delta);
+
+	void fixedUpdate();
+
+	virtual glm::mat4 getView();
+
+	void release();
+};

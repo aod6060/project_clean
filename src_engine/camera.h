@@ -12,7 +12,7 @@ struct Camera {
 	float rotSpeed = 64.0f;
 	float walkingSpeed = 32.0f;
 
-	void init(
+	virtual void init(
 		glm::vec3 pos,
 		glm::vec2 rot,
 		float fov,
@@ -22,10 +22,10 @@ struct Camera {
 		float rotSpeed = 64.0f,
 		float walkingSpeed = 32.0f);
 
-	void update(float delta);
+	virtual void update(float delta);
 
-	glm::mat4 getProjection();
+	virtual glm::mat4 getProjection();
 
-	glm::mat4 getView();
+	virtual glm::mat4 getView();
 
 };

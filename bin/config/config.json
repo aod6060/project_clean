@@ -54,6 +54,11 @@
             "input": "KB_LSHIFT"
         },
         {
+            "name": "move-jump",
+            "is-mouse-button": false,
+            "input": "KB_SPACE"
+        },
+        {
             "name": "wire-frame-toggle",
             "is-mouse-button": false,
             "input": "KB_F1"
