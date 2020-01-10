@@ -16,6 +16,7 @@ void GameState::_initUI() {
 	continueButton.setButtonCallback([&](UIButtonComponent* comp) {
 		uiManager.setShow(false);
 		input_setGrab(true);
+		SoundManager::playerMusicChannel();
 	});
 
 	// exitButton
@@ -139,6 +140,8 @@ void GameState::init() {
 	this->body = phyManager.createRigidBody(0.0f, btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, y, 0)), shape);
 
 	this->_initUI();
+
+	SoundManager::playMusic("song1");
 }
 
 void GameState::update(float delta) {
@@ -147,6 +150,7 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(true);
 			input_setGrab(false);
+			SoundManager::pauseMusicChannel();
 		}
 
 		camera.update(delta);
@@ -162,6 +166,7 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(false);
 			input_setGrab(true);
+			SoundManager::playerMusicChannel();
 		}
 	}
 
@@ -180,6 +185,8 @@ void GameState::render() {
 }
 
 void GameState::release() {
+	SoundManager::stopMusicChannel();
+
 	UISystem::removeManager(&this->uiManager);
 	uiManager.release();
 

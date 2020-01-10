@@ -1,0 +1,28 @@
+{
+    "type": "sound",
+    "version": "1.0",
+    "sfx": [
+        {
+            "name": "crate",
+            "path": "data/sound/sfx/crates.mp3"
+        },
+        {
+            "name": "walking",
+            "path": "data/sound/sfx/crappy_walking_sfx.mp3"
+        },
+        {
+            "name": "running",
+            "path": "data/sound/sfx/crappy_running_sfx.mp3"
+        },
+        {
+            "name": "ocean",
+            "path": "data/sound/sfx/ocean_ambient_sfx.mp3"
+        }
+    ],
+    "music": [
+        {
+            "name": "song1",
+            "path": "data/sound/music/crappy_song1.mp3"
+        }
+    ]
+}

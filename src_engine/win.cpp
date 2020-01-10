@@ -52,6 +52,7 @@ void win_init(IWindowCallback* appCB) {
 	logger_init();
 	input_init();
 	graphics_init();
+	SoundManager::init();
 
 	if (g_appCB) {
 		g_appCB->init();
@@ -98,6 +99,7 @@ void win_update() {
 			g_fixedTime = 0.0f;
 		}
 
+		SoundManager::update();
 		input_update();
 
 		SDL_GL_SwapWindow(g_window);
@@ -112,6 +114,8 @@ void win_release() {
 	g_appCB = nullptr;
 
 	g_eventCBs.clear();
+
+	SoundManager::release();
 
 	graphics_release();
 

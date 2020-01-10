@@ -28,6 +28,7 @@
 #include <json/json.h>
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <fmod/fmod.hpp>
 
 // My Stuff
 #include "logger.h"
@@ -46,3 +47,4 @@
 #include "camera.h"
 #include "proc_terrain.h"
 #include "physics.h"
+#include "sound.h"
