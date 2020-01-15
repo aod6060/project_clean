@@ -1,5 +1,26 @@
 #include "sys.h"
 
+
+struct WaitExecute {
+	float time = 0.0f;
+	float max = 0.5f;
+
+	WaitExecute() { time = max; }
+
+	void call(float delta, std::function<void()> func) {
+		if (time >= max) {
+			reset();
+			func();
+		}
+		else {
+			time += delta;
+		}
+	}
+
+	void reset() {
+		time = 0.0f;
+	}
+};
 // Physics Manager
 void PhysicsManager::init() {
 	this->collisionConf = new btDefaultCollisionConfiguration();
@@ -93,6 +114,9 @@ void PhysicsManager::removeRigidBody(btRigidBody* body) {
 
 
 
+WaitExecute runningExecute;
+WaitExecute walkingExecute;
+WaitExecute jumpExecute;
 
 // PhysicsCamera
 void PhysicsCamera::init(
@@ -124,10 +148,21 @@ void PhysicsCamera::init(
 
 	this->rotSpeed = rotSpeed;
 	this->walkingSpeed = walkingSpeed;
+	
+	runningExecute.time = runningExecute.max = SoundManager::getSound("running")->getTimeInSeconds();
+	walkingExecute.time = walkingExecute.max = SoundManager::getSound("walking")->getTimeInSeconds();
+	jumpExecute.time = jumpExecute.max = SoundManager::getSound("jumping")->getTimeInSeconds();
+
 }
+
 
 void PhysicsCamera::update(float delta) {
 	if (input_getGrab()) {
+
+		this->pos.x = body->getCenterOfMassPosition().x();
+		this->pos.y = body->getCenterOfMassPosition().y();
+		this->pos.z = body->getCenterOfMassPosition().z();
+
 		int x, y;
 
 		input_getMousePos(x, y);
@@ -157,6 +192,8 @@ void PhysicsCamera::update(float delta) {
 
 		if (input_isIMFromConfPress("move-run")) {
 			sp *= 3.0f;
+
+			this->isRunning = true;
 		}
 
 		btVector3 vel = body->getLinearVelocity();
@@ -166,6 +203,10 @@ void PhysicsCamera::update(float delta) {
 
 		if (input_isIMFromConfDown("move-jump")) {
 			vel[1] = jumpSpeed;
+			jumpExecute.call(delta, [&]() {
+				SoundManager::getSound("jumping")->play();
+				jumpExecute.time = jumpExecute.max;
+			});
 		}
 
 		if (input_isIMFromConfPress("move-forward")) {
@@ -173,6 +214,7 @@ void PhysicsCamera::update(float delta) {
 			//pos.z -= sp * glm::cos(yrad) * delta;
 			vel[0] += sp * btSin(yrad) * FF60;
 			vel[2] -= sp * btCos(yrad) * FF60;
+			isMoving = true;
 		}
 
 		if (input_isIMFromConfPress("move-backward")) {
@@ -180,6 +222,7 @@ void PhysicsCamera::update(float delta) {
 			//pos.z += sp * glm::cos(yrad) * delta;
 			vel[0] -= sp * btSin(yrad) * FF60;
 			vel[2] += sp * btCos(yrad) * FF60;
+			isMoving = true;
 		}
 
 		if (input_isIMFromConfPress("strafe-left")) {
@@ -187,6 +230,7 @@ void PhysicsCamera::update(float delta) {
 			//pos.z -= sp * glm::sin(yrad) * delta;
 			vel[0] -= sp * btCos(yrad) * FF60;
 			vel[2] -= sp * btSin(yrad) * FF60;
+			isMoving = true;
 		}
 
 		if (input_isIMFromConfPress("strafe-right")) {
@@ -194,11 +238,36 @@ void PhysicsCamera::update(float delta) {
 			//pos.z += sp * glm::sin(yrad) * delta;
 			vel[0] += sp * btCos(yrad) * FF60;
 			vel[2] += sp * btSin(yrad) * FF60;
+			isMoving = true;
 		}
 
 		body->setLinearVelocity(vel);
+
+
+		if (this->isMoving) {
+			if (this->isRunning) {
+				
+				runningExecute.call(delta, [&]() {
+					SoundManager::getSound("running")->play();
+				});
+			}
+			else {
+				walkingExecute.call(delta, [&]() {
+					SoundManager::getSound("walking")->play();
+				});
+				
+			}
+		}
+		else {
+			runningExecute.reset();
+			walkingExecute.reset();
+		}
+
+		this->isMoving = false;
+		this->isRunning = false;
 	}
 }
+
 
 void PhysicsCamera::fixedUpdate() {}
 

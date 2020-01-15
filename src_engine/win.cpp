@@ -99,7 +99,8 @@ void win_update() {
 			g_fixedTime = 0.0f;
 		}
 
-		SoundManager::update();
+		SoundManager::update(g_delta);
+
 		input_update();
 
 		SDL_GL_SwapWindow(g_window);

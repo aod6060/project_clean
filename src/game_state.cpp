@@ -3,10 +3,10 @@
 
 void GameState::_initUI() {
 	float x = conf_getWidth() * 0.4f;
-	float y = conf_getHeight() * 0.4f;
+	float y = conf_getHeight() * 0.2f;
 
 	float width = conf_getWidth() * 0.2f;
-	float height = conf_getHeight() * 0.3f;
+	float height = conf_getHeight() * 0.5f;
 
 	// continueButton
 	continueButton.setTitle("Continue");
@@ -16,13 +16,65 @@ void GameState::_initUI() {
 	continueButton.setButtonCallback([&](UIButtonComponent* comp) {
 		uiManager.setShow(false);
 		input_setGrab(true);
-		SoundManager::playerMusicChannel();
+		//SoundManager::playerMusicChannel();
 	});
+
+	/*
+		Sound Controls
+	*/
+	// Master Label
+	masterSliderLabel.init();
+	masterSliderLabel.setTitle("Master");
+	masterSliderLabel.setPosition(glm::vec2(x + (width * 0.5f - FontRender::getSize("Master").x * 0.5), y + 64.0f));
+	
+	// Master Slider Control
+	masterSlider.init();
+	masterSlider.setMin(0.0f);
+	masterSlider.setMax(1.0f);
+	masterSlider.setValue(SoundManager::masterVolumn);
+	masterSlider.setPosition(glm::vec2(x + (width * 0.5f - masterSlider.size.x * 0.5f), y + 96.0f));
+
+	// Music Label
+	musicSliderLabel.init();
+	musicSliderLabel.setTitle("Music");
+	musicSliderLabel.setPosition(glm::vec2(x + (width * 0.5f - FontRender::getSize("music").x * 0.5), y + 128.0f));
+
+	// Music Slider Control
+	musicSlider.init();
+	musicSlider.setMin(0.0f);
+	musicSlider.setMax(1.0f);
+	musicSlider.setValue(SoundManager::musicVolumn);
+	musicSlider.setPosition(glm::vec2(x + (width * 0.5f - musicSlider.size.x * 0.5f), y + 160.0f));
+
+	// Ambient Label
+	ambientSliderLabel.init();
+	ambientSliderLabel.setTitle("Ambient");
+	ambientSliderLabel.setPosition(glm::vec2(x + (width * 0.5f - FontRender::getSize("Ambient").x * 0.5), y + 192.0f));
+
+	// Ambient Slider Control
+	ambientSlider.init();
+	ambientSlider.setMin(0.0f);
+	ambientSlider.setMax(1.0f);
+	ambientSlider.setValue(SoundManager::ambientVolumn);
+	ambientSlider.setPosition(glm::vec2(x + (width * 0.5f - ambientSlider.size.x * 0.5f), y + 224.0f));
+
+	// SoundFX Label
+	soundfxSliderLabel.init();
+	soundfxSliderLabel.setTitle("SoundFX");
+	soundfxSliderLabel.setPosition(glm::vec2(x + (width * 0.5f - FontRender::getSize("SoundFX").x * 0.5), y + 256.0f));
+
+	// SoundFX Slider Control
+	soundfxSlider.init();
+	soundfxSlider.setMin(0.0f);
+	soundfxSlider.setMax(1.0f);
+	soundfxSlider.setValue(SoundManager::ambientVolumn);
+	soundfxSlider.setPosition(glm::vec2(x + (width * 0.5f - soundfxSlider.size.x * 0.5f), y + 288.0f));
+
 
 	// exitButton
 	exitButton.setTitle("Exit");
 	exitButton.init();
-	exitButton.setPosition(glm::vec2(x + (width * 0.5f - exitButton.size.x * 0.5f), y + 64.0f));
+	exitButton.setPosition(glm::vec2(x + (width * 0.5f - exitButton.size.x * 0.5f), y + 320.0f));
 
 	exitButton.setButtonCallback([&](UIButtonComponent* comp) {
 		this->callback->changeState("start-menu");
@@ -38,6 +90,14 @@ void GameState::_initUI() {
 	this->uiManager.setShow(false);
 
 	this->uiManager.addComponent(&continueButton);
+	this->uiManager.addComponent(&masterSliderLabel);
+	this->uiManager.addComponent(&masterSlider);
+	this->uiManager.addComponent(&musicSliderLabel);
+	this->uiManager.addComponent(&musicSlider);
+	this->uiManager.addComponent(&ambientSliderLabel);
+	this->uiManager.addComponent(&ambientSlider);
+	this->uiManager.addComponent(&soundfxSliderLabel);
+	this->uiManager.addComponent(&soundfxSlider);
 	this->uiManager.addComponent(&exitButton);
 
 	this->uiManager.init();
@@ -118,6 +178,7 @@ void GameState::init() {
 
 	waterGeom.init();
 
+	
 	camera.setPhysicsManager(&this->phyManager);
 	camera.setJumpSpeed(10.0f);
 
@@ -134,6 +195,10 @@ void GameState::init() {
 		64.0f,
 		512.0f);
 
+	this->cameraData.id = PhysicObjectType::POT_PLAYER;
+
+	camera.body->setUserPointer(&this->cameraData);
+
 	float y = levelManager.terrain.data.beachLevel * levelManager.terrain.data.heightScale - 2.0;
 
 	this->shape = phyManager.createStaticPlaneShape(btVector3(0, 1, 0), 0.0f);
@@ -141,7 +206,12 @@ void GameState::init() {
 
 	this->_initUI();
 
-	SoundManager::playMusic("song1");
+	//SoundManager::playMusic("song1");
+	//SoundManager::setMusicVolumn(0.0f);
+	//SoundManager::setListener(&this->camera);
+	
+	SoundManager::getSound("song1")->play();
+	SoundManager::getSound("ocean-ambients")->play();
 }
 
 void GameState::update(float delta) {
@@ -150,7 +220,7 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(true);
 			input_setGrab(false);
-			SoundManager::pauseMusicChannel();
+			//SoundManager::pauseMusicChannel();
 		}
 
 		camera.update(delta);
@@ -166,8 +236,13 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(false);
 			input_setGrab(true);
-			SoundManager::playerMusicChannel();
+			//SoundManager::playerMusicChannel();
 		}
+
+		SoundManager::masterVolumn = masterSlider.getValue();
+		SoundManager::musicVolumn = musicSlider.getValue();
+		SoundManager::ambientVolumn = ambientSlider.getValue();
+		SoundManager::soundfxVolumn = soundfxSlider.getValue();
 	}
 
 	uiManager.update(delta);
@@ -177,6 +252,37 @@ void GameState::fixedUpdate() {
 	if (!uiManager.isShow()) {
 		phyManager.stepSimulation();
 		camera.fixedUpdate();
+
+		cratesManager.fixedUpdate();
+
+		// Check for collisions
+		/*
+		int num = this->phyManager.disp->getNumManifolds();
+
+		for (int i = 0; i < num; i++) {
+			btPersistentManifold* man = this->phyManager.getWorld()->getDispatcher()->getManifoldByIndexInternal(i);
+
+			// Handle Crate Sound
+			if (man->getBody0()->getUserPointer() != nullptr) {
+				PhysicsData* pd = (PhysicsData*)man->getBody0()->getUserPointer();
+
+				if (pd != nullptr) {
+					if (pd->id == PhysicObjectType::POT_CRATE) {
+						//btVector3 pos = man->getBody0()->get
+						btRigidBody* body = (btRigidBody*)man->getBody0();
+
+						if (body->isActive()) {
+							btVector3 pos = body->getCenterOfMassPosition();
+
+							glm::vec3 p = glm::vec3(pos.x(), pos.y(), pos.z());
+
+							SoundManager::playSoundFX("crate", p);
+						}
+					}
+				}
+			}
+		}
+		*/
 	}
 }
 
@@ -185,7 +291,10 @@ void GameState::render() {
 }
 
 void GameState::release() {
-	SoundManager::stopMusicChannel();
+	//SoundManager::stopMusicChannel();
+
+	SoundManager::getSound("ocean-ambients")->stop();
+	SoundManager::getSound("song1")->stop();
 
 	UISystem::removeManager(&this->uiManager);
 	uiManager.release();
@@ -203,6 +312,8 @@ void GameState::release() {
 
 	hubGeom.release();
 
+	//SoundManager::releaseListener();
+	camera.body->setUserPointer(nullptr);
 	camera.release();
 	phyManager.release();
 }
@@ -237,6 +348,11 @@ void LevelManager::init(GameState* state) {
 
 	this->body = this->phyManager->createRigidBody(0, btTransform(btQuaternion(0, 0, 0, 1), v), this->shape);
 
+	this->data.id = PhysicObjectType::POT_TERRAIN;
+
+	this->body->setUserPointer(&data);
+
+	//this->body->setUserPointer(&PhysicObjectType::POT_TERRAIN);
 }
 
 void LevelManager::render() {
@@ -261,6 +377,7 @@ void LevelManager::render() {
 }
 
 void LevelManager::release() {
+	this->body->setUserPointer(nullptr);
 	phyManager->removeRigidBody(this->body);
 	delete shape;
 	terrain.release();
@@ -271,6 +388,16 @@ void LevelManager::release() {
 
 #define NUM_CRATES 128
 
+bool callbackFunc(
+	btManifoldPoint& cp, 
+	const btCollisionObject* obj1, 
+	const btCollisionObject* obj2,
+	int index0,
+	int index1) {
+
+
+	return false;
+}
 // CreateManager 
 void CratesManager::init(GameState* state) {
 	this->state = state;
@@ -281,6 +408,8 @@ void CratesManager::init(GameState* state) {
 
 
 	this->shape = this->phyManager->createBoxShape(btVector3(1, 1, 1));
+
+	this->data.id = PhysicObjectType::POT_CRATE;
 
 	for (int i = 0; i < NUM_CRATES; i++) {
 		float x = (rand() % 512) - 256.0f;
@@ -294,8 +423,18 @@ void CratesManager::init(GameState* state) {
 		btTransform start(q, v);
 
 		btRigidBody* body = this->phyManager->createRigidBody(1.0f, start, this->shape);
-
+		
+		body->setUserPointer(&this->data);
+		//body->setCollisionFlags(body->getCollisionFlags() | btCollisionObject::CF_HAS_COLLISION_SOUND_TRIGGER);
+		
 		this->bodies.push_back(body);
+	}
+}
+
+void CratesManager::fixedUpdate() {
+
+	for (int i = 0; i < bodies.size(); i++) {
+		
 	}
 }
 
@@ -329,6 +468,7 @@ void CratesManager::render() {
 void CratesManager::release() {
 
 	for (int i = 0; i < NUM_CRATES; i++) {
+		this->bodies[i]->setUserPointer(nullptr);
 		this->phyManager->removeRigidBody(this->bodies[i]);
 	}
 

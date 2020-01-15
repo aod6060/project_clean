@@ -1,27 +1,47 @@
 {
     "type": "sound",
-    "version": "1.0",
-    "sfx": [
-        {
-            "name": "crate",
-            "path": "data/sound/sfx/crates.mp3"
-        },
+    "version": "1.1",
+    "channel-pool-max": 128,
+    "default-volumn": {
+        "master": 1.0,
+        "music": 0.1,
+        "ambient": 0.1,
+        "sound-fx": 0.1
+    },
+    "files": [
         {
             "name": "walking",
+            "category": "sound-fx",
+            "looping": false,
+            "channel-pool": 1,
             "path": "data/sound/sfx/crappy_walking_sfx.mp3"
         },
         {
             "name": "running",
+            "category": "sound-fx",
+            "looping": false,
+            "channel-pool": 1,
             "path": "data/sound/sfx/crappy_running_sfx.mp3"
         },
         {
-            "name": "ocean",
+            "name": "jumping",
+            "category": "sound-fx",
+            "looping": false,
+            "channel-pool": 1,
+            "path": "data/sound/sfx/jumping.mp3"
+        },
+        {
+            "name": "ocean-ambients",
+            "category": "ambient",
+            "looping": true,
+            "channel-pool": 1,
             "path": "data/sound/sfx/ocean_ambient_sfx.mp3"
-        }
-    ],
-    "music": [
+        },
         {
             "name": "song1",
+            "category": "music",
+            "looping": true,
+            "channel-pool": 1,
             "path": "data/sound/music/crappy_song1.mp3"
         }
     ]

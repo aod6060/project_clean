@@ -1,5 +1,9 @@
 #pragma once
 
+struct PhysicsData {
+	int id;
+	void* data;
+};
 
 struct PhysicsManager {
 	btBroadphaseInterface* broadphase = nullptr;
@@ -36,6 +40,9 @@ struct PhysicsCamera : public Camera {
 
 	btRigidBody* body = nullptr;
 	btCollisionShape* shape = nullptr;
+
+	bool isRunning = false;
+	bool isMoving = false;
 
 	float jumpSpeed = 32.0f;
 

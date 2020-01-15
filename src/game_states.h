@@ -48,6 +48,7 @@ struct StartMenuState : public AbstractState {
 
 	UIManager manager;
 	UIButtonComponent startButton;
+
 	UIButtonComponent exitButton;
 
 	float time;
@@ -65,6 +66,13 @@ struct StartMenuState : public AbstractState {
 	virtual void release();
 };
 
+
+enum PhysicObjectType {
+	POT_TERRAIN = 0,
+	POT_CRATE,
+	POT_PLAYER
+};
+
 struct GameState;
 
 struct LevelManager {
@@ -74,6 +82,7 @@ struct LevelManager {
 	ProcTerrainGeometry terrain;
 	btHeightfieldTerrainShape* shape;
 	btRigidBody* body = nullptr;
+	PhysicsData data;
 
 	void init(GameState* state);
 
@@ -89,12 +98,16 @@ struct CratesManager {
 	SceneGeometry crappyCrate;
 
 	btCollisionShape* shape = nullptr;
+	PhysicsData data;
 
 	std::vector<btRigidBody*> bodies;
+	//std::vector<PhysicsData> physicsData;
 
 	void init(GameState* state);
 
 	void render();
+
+	void fixedUpdate();
 
 	void release();
 
@@ -107,6 +120,7 @@ struct GameState : public AbstractState {
 
 	//Camera camera;
 	PhysicsCamera camera;
+	PhysicsData cameraData;
 
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
@@ -128,7 +142,29 @@ struct GameState : public AbstractState {
 	float yrot = 0.0f;
 
 	// UI Section
+	// Continue Button
 	UIButtonComponent continueButton;
+
+	/*
+	Sound Options
+	*/
+	// Master Sound Control
+	UILabelComponent masterSliderLabel;
+	UISliderComponent masterSlider;
+
+	// Music
+	UILabelComponent musicSliderLabel;
+	UISliderComponent musicSlider;
+
+	// Ambient
+	UILabelComponent ambientSliderLabel;
+	UISliderComponent ambientSlider;
+
+	// Sound FX
+	UILabelComponent soundfxSliderLabel;
+	UISliderComponent soundfxSlider;
+
+	// Exit Button
 	UIButtonComponent exitButton;
 	UIManager uiManager;
 

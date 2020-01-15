@@ -1162,7 +1162,9 @@ float UISliderComponent::_doValueChange(float p) {
 	return ((max - min) / 100.0f) * (p)+min;
 }
 
-void UISliderComponent::onShowEvent(bool show) {}
+void UISliderComponent::onShowEvent(bool show) {
+	this->isHover = false;
+}
 
 
 // UIManager
