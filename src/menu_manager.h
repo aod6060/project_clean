@@ -13,8 +13,6 @@ struct IMenu {
 	virtual bool isShow() = 0;
 };
 
-
-
 struct StartMenu : public IMenu {
 	UIManager manager;
 	UIButtonComponent classModeButton;

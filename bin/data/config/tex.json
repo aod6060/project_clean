@@ -49,6 +49,10 @@
         {
             "name": "obj:crappy-crate",
             "path": "data/textures/objects/crate/crappy_crate.png"
+        },
+        {
+            "name": "obj:temp_player",
+            "path": "data/textures/objects/temp_player/temp_player_albedo.png"
         }
     ]
 }

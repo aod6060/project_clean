@@ -44,6 +44,8 @@ void win_init(IWindowCallback* appCB) {
 		);
 	}
 
+	//SDL_GL_SetSwapInterval(1);
+
 	g_context = SDL_GL_CreateContext(g_window);
 
 	TTF_Init();

@@ -60,6 +60,21 @@ struct StartMenuState : public AbstractState {
 
 struct GameState;
 
+struct GameCamera : public Camera {
+	glm::vec3 zoom;
+
+	void init(
+		glm::vec3 pos,
+		glm::vec2 rot,
+		glm::vec3 zoom
+	);
+
+	virtual void update(float delta);
+
+	virtual glm::mat4 getView();
+
+};
+
 struct LevelManager {
 	// Physics Manager
 	PhysicsManager* phyManager = nullptr;
@@ -83,6 +98,25 @@ struct LevelManager {
 
 };
 
+
+struct PlayerManager {
+	PhysicsManager* phyManager = nullptr;
+	GameState* state = nullptr;
+
+	SceneGeometry mesh;
+
+	glm::vec3 position;
+	float yrot;
+
+	
+	void init(GameState* state);
+
+	void update(float delta);
+	void fixedUpdate();
+	void render();
+	void release();
+};
+
 struct GameState : public AbstractState {
 	RenderPassManager renderPassMan;
 	RenderPass mainRenderPass;
@@ -90,10 +124,11 @@ struct GameState : public AbstractState {
 
 	PhysicsManager phyManager;
 
-	Camera testCamera;
+	//Camera testCamera;
+	GameCamera camera;
 
 	LevelManager levelManager;
-
+	PlayerManager playerManager;
 
 	virtual void init();
 	virtual void update(float delta);

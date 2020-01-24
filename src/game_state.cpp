@@ -1,6 +1,33 @@
 #include "game_states.h"
 #include "menu_manager.h"
 
+// Game Camera
+void GameCamera::init(
+	glm::vec3 pos,
+	glm::vec2 rot,
+	glm::vec3 zoom
+) {
+	this->zoom = zoom;
+	Camera::init(
+		pos,
+		rot,
+		conf_getFOV(),
+		(float)conf_getWidth() / (float)conf_getHeight(),
+		1.0f,
+		1024.0f);
+}
+
+void GameCamera::update(float delta) {}
+
+glm::mat4 GameCamera::getView() {
+	return
+		glm::translate(glm::mat4(1.0f), -this->zoom) *
+		glm::rotate(glm::mat4(1.0f), glm::radians(rot.x), glm::vec3(1.0f, 0.0f, 0.0f)) *
+		glm::rotate(glm::mat4(1.0f), glm::radians(rot.y), glm::vec3(0.0f, 1.0f, 0.0f)) *
+		glm::translate(glm::mat4(1.0f), -this->pos);
+}
+
+
 // Level Manager
 void LevelManager::init(GameState* state) {
 	this->state = state;
@@ -41,7 +68,7 @@ void LevelManager::render() {
 
 	// Terrain
 	ShaderManager::terrainShader.bind();
-	ShaderManager::terrainShader.setCamera(&this->state->testCamera);
+	ShaderManager::terrainShader.setCamera(&this->state->camera);
 	ShaderManager::terrainShader.setTexScale(128.0f);
 	ShaderManager::terrainShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)));
 	terrain.render(&ShaderManager::terrainShader);
@@ -49,7 +76,7 @@ void LevelManager::render() {
 
 	// Water
 	ShaderManager::waterShader.bind();
-	ShaderManager::waterShader.setCamera(&this->state->testCamera);
+	ShaderManager::waterShader.setCamera(&this->state->camera);
 
 	float y = terrain.data.beachLevel * terrain.data.heightScale;
 	ShaderManager::waterShader.setModel(
@@ -86,7 +113,150 @@ void LevelManager::release() {
 	state = nullptr;
 }
 
+// Player Manager
+void PlayerManager::init(GameState* state) {
+	this->state = state;
+	this->phyManager = &this->state->phyManager;
 
+	this->mesh.setFilePath("data/meshes/objects/temp_player/temp_player.json");
+	this->mesh.init();
+
+	float x = (rand() % 512) - 256.0f;
+	float z = (rand() % 512) - 256.0f;
+
+	this->position = glm::vec3(
+		x,
+		state->levelManager.terrain.data.getY(x, z),
+		z
+	);
+
+	yrot = (float)(rand() % 360);
+
+}
+
+void PlayerManager::update(float delta) {
+	// Do Nothing for now...
+	if (input_getGrab()) {
+		int x, y;
+		input_getMousePos(x, y);
+
+		glm::vec2 rot = state->camera.rot;
+		float rotSpeed = 128;
+
+		float threshold = 0.0006f;
+
+		float d = ((delta > threshold) ? delta : threshold);
+
+		rot.x += rotSpeed * y * d;
+		rot.y += rotSpeed * x * d;
+
+		if (rot.y <= -360.0f) {
+			rot.y += 360.0f;
+		}
+
+		if (rot.y >= 360.0f) {
+			rot.y -= 360.0f;
+		}
+
+		if (rot.x < 0.0f) {
+			rot.x = 0.0f;
+		}
+
+		if (rot.x > 90.0f) {
+			rot.x = 90.0f;
+		}
+
+
+		float zoom = state->camera.zoom.z;
+
+		int cx, cy;
+
+		input_getMouseWheelCoord(cx, cy);
+
+		zoom += -(cy * 256.0f * d);
+
+		if (zoom < 4) {
+			zoom = 4;
+		}
+
+		if (zoom > 32) {
+			zoom = 32;
+		}
+
+		state->camera.zoom.z = zoom;
+		state->camera.pos = this->position;
+		state->camera.rot = rot;
+
+		float yrad = glm::radians(rot.y);
+
+		float speed = state->camera.walkingSpeed;
+
+		if (input_isIMFromConfPress("move-run")) {
+			speed *= 2.0f;
+		}
+
+		if (input_isIMFromConfPress("move-forward")) {
+			this->yrot = -rot.y;
+
+			position.x += sin(yrad) * speed * d;
+			position.z -= cos(yrad) * speed * d;
+		}
+
+		if (input_isIMFromConfPress("move-backward")) {
+			this->yrot = -rot.y;
+
+			position.x -= sin(yrad) * speed * d;
+			position.z += cos(yrad) * speed * d;
+		}
+
+		if (input_isIMFromConfPress("strafe-left")) {
+			this->yrot = -rot.y;
+
+			position.x -= cos(yrad) * speed * d;
+			position.z -= sin(yrad) * speed * d;
+		}
+
+		if (input_isIMFromConfPress("strafe-right")) {
+			this->yrot = -rot.y;
+
+			position.x += cos(yrad) * speed * d;
+			position.z += sin(yrad) * speed * d;
+		}
+	}
+}
+
+void PlayerManager::fixedUpdate() {
+	// Do Nothing for now...
+
+	if (input_getGrab()) {
+	}
+
+}
+
+void PlayerManager::render() {
+
+	ShaderManager::sceneShader.bind();
+
+	ShaderManager::sceneShader.setCamera(&this->state->camera);
+
+	mesh.setModel(
+		glm::translate(glm::mat4(1.0f), this->position) *
+		glm::rotate(glm::mat4(1.0f), glm::radians(this->yrot), glm::vec3(0, 1, 0))
+	);
+
+	TextureManager::getTex("obj:temp_player")->bind();
+	mesh.render(&ShaderManager::sceneShader);
+	TextureManager::getTex("obj:temp_player")->unbind();
+
+	ShaderManager::sceneShader.unbind();
+
+}
+
+void PlayerManager::release() {
+	this->mesh.release();
+	this->phyManager = nullptr;
+	this->state = nullptr;
+}
 
 // Game State
 void GameState::init() {
@@ -103,6 +273,8 @@ void GameState::init() {
 
 		// Terrain Rendering
 		levelManager.render();
+
+		playerManager.render();
 
 		RenderSystem::disable(GL_DEPTH_TEST);
 	});
@@ -125,28 +297,17 @@ void GameState::init() {
 
 	// Initialize Managers
 	levelManager.init(this);
+	playerManager.init(this);
 
 	MenuManager::gameContextMenu.setCallback([&](UIButtonComponent* comp) {
 		MenuManager::gameContextMenu.setShow(false);
 		input_setGrab(true);
 	});
 
-	float x = (rand() % 512) - 256.0f;
-	float z = (rand() % 512) - 256.0f;
-
-
-	this->testCamera.init(
-		glm::vec3(
-			x, 
-			levelManager.terrain.data.getY(x, z) + 2.0f, 
-			z),
-		glm::vec2(0.0f, 0.0f),
-		conf_getFOV(),
-		(float)conf_getWidth() / (float)conf_getHeight(),
-		1.0f,
-		1024.0f,
-		64.0f,
-		512.0f
+	camera.init(
+		playerManager.position,
+		glm::vec2(0.0f),
+		glm::vec3(0.0f, 1.0f, 8.0f)
 	);
 
 	input_setGrab(true);
@@ -160,9 +321,11 @@ void GameState::update(float delta) {
 		}
 
 		// Update Stuff
-		testCamera.update(delta);
+		camera.update(delta);
 
 		levelManager.update(delta);
+
+		playerManager.update(delta);
 
 	}
 	else {
@@ -179,6 +342,8 @@ void GameState::update(float delta) {
 void GameState::fixedUpdate() {
 	if (!MenuManager::isShow()) {
 		phyManager.stepSimulation();
+
+		playerManager.fixedUpdate();
 	}
 }
 
@@ -187,6 +352,7 @@ void GameState::render() {
 }
 
 void GameState::release() {
+	playerManager.release();
 	levelManager.release();
 	renderPassMan.release();
 	phyManager.release();
