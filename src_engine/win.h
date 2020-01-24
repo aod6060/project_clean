@@ -18,3 +18,10 @@ void win_update();
 void win_release();
 
 void win_exit();
+
+IWindowCallback* win_getCallback();
+
+template<typename T>
+T* win_getCallbackTemp() {
+	return (T*)win_getCallback();
+}

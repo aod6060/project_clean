@@ -39,25 +39,16 @@ struct Logo2State : public AbstractState {
 };
 
 struct StartMenuState : public AbstractState {
-	//Texture2D startMenu;
-
 	RenderPassManager renderPassManager;
 	RenderPass mainRenderPass;
 
 	QuadHUBGeometry hubGeom;
-
-	UIManager manager;
-	UIButtonComponent startButton;
-
-	UIButtonComponent exitButton;
 
 	float time;
 	float maxTime;
 
 	float uiTime;
 	float uiMaxTime;
-
-	void _uiInit();
 
 	virtual void init();
 	virtual void update(float delta);
@@ -67,6 +58,54 @@ struct StartMenuState : public AbstractState {
 };
 
 
+struct GameState;
+
+struct LevelManager {
+	// Physics Manager
+	PhysicsManager* phyManager = nullptr;
+	GameState* state = nullptr;
+
+	// Terrain
+	ProcTerrainGeometry terrain;
+	btHeightfieldTerrainShape* terrainShape;
+	btRigidBody* terrainBody;
+
+	// Water
+	float waterAnim = 0.0f;
+	WaterGeometry waterGeom;
+	btCollisionShape* waterShape;
+	btRigidBody* waterBody;
+
+	void init(GameState* state);
+	void render();
+	void update(float delta);
+	void release();
+
+};
+
+struct GameState : public AbstractState {
+	RenderPassManager renderPassMan;
+	RenderPass mainRenderPass;
+	RenderPass hubRenderPass;
+
+	PhysicsManager phyManager;
+
+	Camera testCamera;
+
+	LevelManager levelManager;
+
+
+	virtual void init();
+	virtual void update(float delta);
+	virtual void fixedUpdate();
+	virtual void render();
+	virtual void release();
+};
+
+
+struct ClassModeGameState : public GameState {};
+
+/*
 enum PhysicObjectType {
 	POT_TERRAIN = 0,
 	POT_CRATE,
@@ -112,7 +151,9 @@ struct CratesManager {
 	void release();
 
 };
+*/
 
+/*
 struct GameState : public AbstractState {
 	PhysicsManager phyManager;
 	btCollisionShape* shape;
@@ -145,9 +186,6 @@ struct GameState : public AbstractState {
 	// Continue Button
 	UIButtonComponent continueButton;
 
-	/*
-	Sound Options
-	*/
 	// Master Sound Control
 	UILabelComponent masterSliderLabel;
 	UISliderComponent masterSlider;
@@ -176,3 +214,4 @@ struct GameState : public AbstractState {
 	virtual void render();
 	virtual void release();
 };
+*/

@@ -1,6 +1,198 @@
 #include "game_states.h"
+#include "menu_manager.h"
+
+// Level Manager
+void LevelManager::init(GameState* state) {
+	this->state = state;
+	this->phyManager = &this->state->phyManager;
+
+	terrain.init();
+
+	terrain.setBlackChannel(TextureManager::getTex("terrain:dirt1"));
+	terrain.setRedChannel(TextureManager::getTex("terrain:sand1"));
+	terrain.setGreenChannel(TextureManager::getTex("terrain:grass1"));
+	terrain.setBlueChannel(TextureManager::getTex("terrain:dirt2"));
+
+	this->terrainShape = this->phyManager->createHeightfiledCollisionShape(
+		terrain.data
+	);
+
+	float offset = terrain.data.heightScale * 0.5f;
+	btVector3 v(0.0f, offset, 0.0f);
+
+	this->terrainBody = this->phyManager->createRigidBody(0, btTransform(btQuaternion(0, 0, 0, 1), v), this->terrainShape);
+
+	this->waterGeom.init();
+
+	float y = terrain.data.beachLevel * terrain.data.heightScale - 2.0f;
+
+	this->waterShape = phyManager->createStaticPlaneShape(btVector3(0, 1, 0), 0.0f);
+	this->waterBody = phyManager->createRigidBody(0.0f, btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, y, 0)), waterShape);
+}
+
+void LevelManager::render() {
+	glm::mat4 model;
+
+	float m[16];
+
+	this->terrainBody->getWorldTransform().getOpenGLMatrix(m);
+
+	model = glm::make_mat4(m);
+
+	// Terrain
+	ShaderManager::terrainShader.bind();
+	ShaderManager::terrainShader.setCamera(&this->state->testCamera);
+	ShaderManager::terrainShader.setTexScale(128.0f);
+	ShaderManager::terrainShader.setModel(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f)));
+	terrain.render(&ShaderManager::terrainShader);
+	ShaderManager::terrainShader.unbind();
+
+	// Water
+	ShaderManager::waterShader.bind();
+	ShaderManager::waterShader.setCamera(&this->state->testCamera);
+
+	float y = terrain.data.beachLevel * terrain.data.heightScale;
+	ShaderManager::waterShader.setModel(
+		glm::translate(glm::mat4(1.0f), glm::vec3(0, y, 0)) *
+		glm::scale(glm::mat4(1.0f), glm::vec3(1024.0f, 0.0f, 1024.0f))
+	);
+	ShaderManager::waterShader.setTexScale(64.0f);
+	ShaderManager::waterShader.setTimeDelta(this->waterAnim);
+
+	TextureManager::getTex("water:water1")->bind();
+	waterGeom.render(&ShaderManager::waterShader);
+	TextureManager::getTex("water:water1")->unbind();
+
+	ShaderManager::waterShader.unbind();
+}
+
+void LevelManager::update(float delta) {
+
+	this->waterAnim += delta * 0.001f;
+
+	if (this->waterAnim >= 1.0f) {
+		this->waterAnim -= 1.0f;
+	}
+}
+
+void LevelManager::release() {
+	phyManager->removeRigidBody(this->waterBody);
+	delete waterShape;
+	waterGeom.release();
+	phyManager->removeRigidBody(this->terrainBody);
+	delete terrainShape;
+	terrain.release();
+	phyManager = nullptr;
+	state = nullptr;
+}
 
 
+
+// Game State
+void GameState::init() {
+	this->phyManager.init();
+
+	this->mainRenderPass.setCallback([&]() {
+		glm::vec3 cc = glm::vec3(135.0f, 206.0f, 235.0f) / 255.0f;
+
+		RenderSystem::enable(GL_DEPTH_TEST);
+		RenderSystem::viewport(0, 0, conf_getWidth(), conf_getHeight());
+		RenderSystem::clearColor(cc.r, cc.g, cc.b, 1.0f);
+		RenderSystem::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		// Terrain Rendering
+		levelManager.render();
+
+		RenderSystem::disable(GL_DEPTH_TEST);
+	});
+
+	this->hubRenderPass.setCallback([&]() {
+		RenderSystem::disable(GL_DEPTH_TEST);
+		//MenuManager::render();
+		ShaderManager::hubShader.bind();
+
+		ShaderManager::hubShader.setProjection(glm::ortho(0.0f, (float)conf_getWidth(), (float)conf_getHeight(), 0.0f));
+		ShaderManager::hubShader.setView(glm::mat4(1.0f));
+
+		ShaderManager::hubShader.unbind();
+
+		MenuManager::gameContextMenu.render();
+	});
+
+	this->renderPassMan.addRenderPass(&this->mainRenderPass);
+	this->renderPassMan.addRenderPass(&this->hubRenderPass);
+
+	// Initialize Managers
+	levelManager.init(this);
+
+	MenuManager::gameContextMenu.setCallback([&](UIButtonComponent* comp) {
+		MenuManager::gameContextMenu.setShow(false);
+		input_setGrab(true);
+	});
+
+	float x = (rand() % 512) - 256.0f;
+	float z = (rand() % 512) - 256.0f;
+
+
+	this->testCamera.init(
+		glm::vec3(
+			x, 
+			levelManager.terrain.data.getY(x, z) + 2.0f, 
+			z),
+		glm::vec2(0.0f, 0.0f),
+		conf_getFOV(),
+		(float)conf_getWidth() / (float)conf_getHeight(),
+		1.0f,
+		1024.0f,
+		64.0f,
+		512.0f
+	);
+
+	input_setGrab(true);
+}
+
+void GameState::update(float delta) {
+	if (!MenuManager::isShow()) {
+		if (input_isIMFromConfDown("escape")) {
+			MenuManager::gameContextMenu.setShow(true);
+			input_setGrab(false);
+		}
+
+		// Update Stuff
+		testCamera.update(delta);
+
+		levelManager.update(delta);
+
+	}
+	else {
+		if (input_isIMFromConfDown("escape")) {
+			MenuManager::gameContextMenu.setShow(false);
+			input_setGrab(true);
+		}
+	}
+
+	//MenuManager::update(delta);
+	MenuManager::gameContextMenu.update(delta);
+}
+
+void GameState::fixedUpdate() {
+	if (!MenuManager::isShow()) {
+		phyManager.stepSimulation();
+	}
+}
+
+void GameState::render() {
+	this->renderPassMan.render();
+}
+
+void GameState::release() {
+	levelManager.release();
+	renderPassMan.release();
+	phyManager.release();
+}
+
+/*
 void GameState::_initUI() {
 	float x = conf_getWidth() * 0.4f;
 	float y = conf_getHeight() * 0.2f;
@@ -19,9 +211,6 @@ void GameState::_initUI() {
 		//SoundManager::playerMusicChannel();
 	});
 
-	/*
-		Sound Controls
-	*/
 	// Master Label
 	masterSliderLabel.init();
 	masterSliderLabel.setTitle("Master");
@@ -220,7 +409,6 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(true);
 			input_setGrab(false);
-			//SoundManager::pauseMusicChannel();
 		}
 
 		camera.update(delta);
@@ -236,7 +424,6 @@ void GameState::update(float delta) {
 		if (input_isIMFromConfDown("escape")) {
 			uiManager.setShow(false);
 			input_setGrab(true);
-			//SoundManager::playerMusicChannel();
 		}
 
 		SoundManager::masterVolumn = masterSlider.getValue();
@@ -254,35 +441,6 @@ void GameState::fixedUpdate() {
 		camera.fixedUpdate();
 
 		cratesManager.fixedUpdate();
-
-		// Check for collisions
-		/*
-		int num = this->phyManager.disp->getNumManifolds();
-
-		for (int i = 0; i < num; i++) {
-			btPersistentManifold* man = this->phyManager.getWorld()->getDispatcher()->getManifoldByIndexInternal(i);
-
-			// Handle Crate Sound
-			if (man->getBody0()->getUserPointer() != nullptr) {
-				PhysicsData* pd = (PhysicsData*)man->getBody0()->getUserPointer();
-
-				if (pd != nullptr) {
-					if (pd->id == PhysicObjectType::POT_CRATE) {
-						//btVector3 pos = man->getBody0()->get
-						btRigidBody* body = (btRigidBody*)man->getBody0();
-
-						if (body->isActive()) {
-							btVector3 pos = body->getCenterOfMassPosition();
-
-							glm::vec3 p = glm::vec3(pos.x(), pos.y(), pos.z());
-
-							SoundManager::playSoundFX("crate", p);
-						}
-					}
-				}
-			}
-		}
-		*/
 	}
 }
 
@@ -480,3 +638,5 @@ void CratesManager::release() {
 	this->phyManager = nullptr;
 	this->state = nullptr;
 }
+
+*/

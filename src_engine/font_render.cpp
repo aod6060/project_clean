@@ -61,7 +61,7 @@ void FontRender::print(float x, float y, const char* format, ...) {
 	}
 
 
-
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texID);
 
 	glTexImage2D(
@@ -78,6 +78,7 @@ void FontRender::print(float x, float y, const char* format, ...) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	float width = surf->w;
@@ -106,8 +107,10 @@ void FontRender::print(float x, float y, const char* format, ...) {
 		FontRender::color
 	);
 
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, texID);
 	quad.render(&ShaderManager::fontRenderShader);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	ShaderManager::fontRenderShader.unbind();

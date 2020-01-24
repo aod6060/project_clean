@@ -136,3 +136,7 @@ void win_register_event(std::function<void(SDL_Event&)> eventCB) {
 void win_exit() {
 	g_isRunning = false;
 }
+
+IWindowCallback* win_getCallback() {
+	return g_appCB;
+}

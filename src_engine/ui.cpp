@@ -149,14 +149,18 @@ void UIButtonComponent::render(UIShader* shader) {
 	shader->unbind();
 
 	// Render Title
+	
 	FontRender::setColor(this->foregroundColor);
 	std::string temp = this->title;
 	if (temp.length() == 0) {
 		temp = " ";
 	}
 	FontRender::print(position.x, position.y, temp.c_str());
-
-
+	
+	/*
+	FontRender::setColor(this->foregroundColor);
+	FontRender::print(position.x, position.y, "Fuck");
+	*/
 }
 
 void UIButtonComponent::update(float delta) {
@@ -254,9 +258,11 @@ UIRect UIButtonComponent::toRect() {
 
 void UIButtonComponent::onShowEvent(bool show) {
 	if (!show) {
+		/*
 		this->isActive = false;
 		this->isHover = false;
 		this->activeTimer = 0.0f;
+		*/
 	}
 }
 
@@ -1248,6 +1254,7 @@ void UIManager::toggleShow() {
 
 void UIManager::init() {
 	// Don't know what to do with this one...
+	setShow(false);
 }
 
 void UIManager::release() {

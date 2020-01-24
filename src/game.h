@@ -5,11 +5,15 @@
 #include "game_states.h"
 
 
-struct GameStateWindowCallback : public StateWindowCallback {
+struct GameWindowCallback : public StateWindowCallback {
 	Logo1State logo1State;
 	Logo2State logo2State;
 	StartMenuState startMenuState;
-	GameState gameState;
+	//GameState gameState;
+	ClassModeGameState classModeGameState;
 
 	virtual void init();
+
+	virtual void release();
+
 };

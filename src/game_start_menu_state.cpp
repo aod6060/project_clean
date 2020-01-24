@@ -1,4 +1,5 @@
 #include "game_states.h"
+#include "menu_manager.h"
 
 void StartMenuState::init() {
 	this->time = 0.0f;
@@ -6,9 +7,6 @@ void StartMenuState::init() {
 
 	this->uiTime = 0.0f;
 	this->uiMaxTime = 1.0f;
-
-	// Init Textures
-	//this->startMenu.loadTexture("data/textures/menu/startmenu.png");
 
 	// Render Pass
 	this->hubGeom.init();
@@ -38,14 +36,12 @@ void StartMenuState::init() {
 		TextureManager::getTex("menu:startmenu")->unbind();
 		//startMenu.unbind();
 
-		ShaderManager::hubShader.unbind();
+		MenuManager::startMenu.render();
 
-		manager.render(&ShaderManager::uiShader);
+		ShaderManager::hubShader.unbind();
 	});
 
 	this->renderPassManager.addRenderPass(&this->mainRenderPass);
-
-	this->_uiInit();
 }
 
 void StartMenuState::update(float delta) {
@@ -65,14 +61,15 @@ void StartMenuState::update(float delta) {
 		logger_output("%d\n", input_checkUpdate());
 	}
 
-	if (this->uiTime >= this->uiMaxTime && !this->manager.isShow()) {
-		this->manager.setShow(true);
+	if (this->uiTime >= this->uiMaxTime && !MenuManager::startMenu.isShow()) {
+		//this->manager.setShow(true);
+		MenuManager::startMenu.setShow(true);
 	}
 	else {
 		this->uiTime += delta;
 	}
 
-	this->manager.update(delta);
+	MenuManager::startMenu.update(delta);
 }
 
 void StartMenuState::fixedUpdate() {
@@ -84,60 +81,7 @@ void StartMenuState::render() {
 }
 
 void StartMenuState::release() {
-	UISystem::removeManager(&this->manager);
-	this->manager.release();
-
 	this->renderPassManager.release();
-	manager.release();
 	hubGeom.release();
 	//this->startMenu.release();
-}
-
-void StartMenuState::_uiInit() {
-	float x = conf_getWidth() * 0.4f;
-	float y = conf_getHeight() * 0.6f;
-
-	float width = conf_getWidth() * 0.2f;
-	float height = conf_getHeight() * 0.3f;
-
-	// Start Button
-	startButton.setTitle("Start");
-	startButton.init();
-	startButton.setPosition(glm::vec2(
-		x + (width * 0.5f - startButton.size.x * 0.5f),
-		y + 32.0f
-	));
-
-	startButton.setButtonCallback([&](UIButtonComponent* comp) {
-		this->callback->changeState("game");
-	});
-
-
-
-	// Exit Button
-	exitButton.setTitle("Exit");
-	exitButton.init();
-	exitButton.setPosition(glm::vec2(
-		x + (width * 0.5f - exitButton.size.x * 0.5f),
-		y + 64.0f
-	));
-
-	exitButton.setButtonCallback([&](UIButtonComponent* comp) {
-		win_exit();
-	});
-
-
-	// UI Manager
-	this->manager.setHasBackground(true);
-	manager.setPosition(glm::vec2(x, y));
-	manager.setSize(glm::vec2(width, height));
-	manager.setBackgroundColor(glm::vec3(0.1f));
-	manager.setShow(false);
-
-	manager.addComponent(&startButton);
-	manager.addComponent(&exitButton);
-
-	manager.init();
-
-	UISystem::addManager(&this->manager);
 }
