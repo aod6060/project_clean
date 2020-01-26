@@ -35,6 +35,10 @@ void PhysicsManager::init() {
 	world->setGravity(btVector3(0, -10, 0));
 }
 
+void PhysicsManager::update(float delta, int subpasses) {
+	this->getWorld()->stepSimulation(delta, subpasses);
+}
+
 void PhysicsManager::release() {
 	delete this->world;
 	delete this->solver;
@@ -48,7 +52,7 @@ btDiscreteDynamicsWorld* PhysicsManager::getWorld() {
 }
 
 void PhysicsManager::stepSimulation() {
-	this->getWorld()->stepSimulation(FF60);
+	this->getWorld()->stepSimulation(FF60, 10);
 }
 
 btBoxShape* PhysicsManager::createBoxShape(const btVector3& halfExtends) {

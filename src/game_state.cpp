@@ -124,13 +124,32 @@ void PlayerManager::init(GameState* state) {
 	float x = (rand() % 512) - 256.0f;
 	float z = (rand() % 512) - 256.0f;
 
+	/*
 	this->position = glm::vec3(
 		x,
 		state->levelManager.terrain.data.getY(x, z),
 		z
 	);
+	*/
 
+	this->shape = this->phyManager->createCapsuleShape(1.0f, 2.0f);
+	
+	btVector3 pos = btVector3(
+		x,
+		state->levelManager.terrain.data.getY(x, z) + 2.0f,
+		z);
+
+	this->body = this->phyManager->createRigidBody(
+		1.0f,
+		btTransform(btQuaternion(0, 0, 0, 1), pos),
+		this->shape);
+
+	this->body->setSleepingThresholds(0, 0);
+	this->body->setAngularFactor(0);
+	
 	yrot = (float)(rand() % 360);
+
+	this->speed = 1024.0f;
 
 }
 
@@ -184,53 +203,125 @@ void PlayerManager::update(float delta) {
 		}
 
 		state->camera.zoom.z = zoom;
-		state->camera.pos = this->position;
+		glm::vec3 p = this->getPos();
+		p.y -= 2.0f;
+		state->camera.pos = p;
 		state->camera.rot = rot;
+
+		/*
+		if (input_isIMFromConfDown("move-jump")) {
+			this->moveJump = true;
+		}
+
+		this->moveRunning = input_isIMFromConfPress("move-run");
+		this->moveForward = input_isIMFromConfPress("move-forward");
+		this->moveBackward = input_isIMFromConfPress("move-backward");
+		this->strafeLeft = input_isIMFromConfPress("strafe-left");
+		this->strafeRight = input_isIMFromConfPress("strafe-right");
+
+		if (this->moveForward || this->moveBackward || this->strafeLeft || this->strafeRight) {
+			this->yrot = rot.y;
+		}
+
+		*/
 
 		float yrad = glm::radians(rot.y);
 
-		float speed = state->camera.walkingSpeed;
+		float speed = this->speed;
+
+
+		btVector3 vel = body->getLinearVelocity();
+
+		vel[0] = 0;
+		vel[2] = 0;
+
+		if (input_isIMFromConfDown("move-jump")) {
+			vel[1] = 10.0f;
+		}
 
 		if (input_isIMFromConfPress("move-run")) {
 			speed *= 2.0f;
 		}
 
+		float modif = 16.0f;
 		if (input_isIMFromConfPress("move-forward")) {
-			this->yrot = -rot.y;
-
-			position.x += sin(yrad) * speed * d;
-			position.z -= cos(yrad) * speed * d;
+			this->yrot = rot.y;
+			vel[0] += btSin(yrad) * speed * d * modif;
+			vel[2] -= btCos(yrad) * speed * d * modif;
 		}
 
 		if (input_isIMFromConfPress("move-backward")) {
-			this->yrot = -rot.y;
-
-			position.x -= sin(yrad) * speed * d;
-			position.z += cos(yrad) * speed * d;
+			this->yrot = rot.y;
+			vel[0] -= btSin(yrad) * speed * d * modif;
+			vel[2] += btCos(yrad) * speed * d * modif;
 		}
 
 		if (input_isIMFromConfPress("strafe-left")) {
-			this->yrot = -rot.y;
-
-			position.x -= cos(yrad) * speed * d;
-			position.z -= sin(yrad) * speed * d;
+			this->yrot = rot.y;
+			vel[0] -= btCos(yrad) * speed * d * modif;
+			vel[2] -= btSin(yrad) * speed * d * modif;
 		}
 
 		if (input_isIMFromConfPress("strafe-right")) {
-			this->yrot = -rot.y;
-
-			position.x += cos(yrad) * speed * d;
-			position.z += sin(yrad) * speed * d;
+			this->yrot = rot.y;
+			vel[0] += btCos(yrad) * speed * d * modif;
+			vel[2] += btSin(yrad) * speed * d * modif;
 		}
+
+		body->setLinearVelocity(vel);
+		
 	}
 }
 
 void PlayerManager::fixedUpdate() {
 	// Do Nothing for now...
 
+	/*
 	if (input_getGrab()) {
-	}
+		float yrad = glm::radians(this->yrot);
 
+		float speed = this->speed;
+
+
+		btVector3 vel = body->getLinearVelocity();
+
+		vel[0] = 0;
+		vel[2] = 0;
+
+		if (this->moveJump) {
+			vel[1] = 10.0f;
+			this->moveJump = false;
+		}
+
+		if (this->moveRunning) {
+			speed *= 4.0f;
+		}
+
+		if (this->moveForward) {
+			vel[0] += btSin(yrad) * speed;
+			vel[2] -= btCos(yrad) * speed;
+		}
+
+		if (this->moveBackward) {
+			vel[0] -= btSin(yrad) * speed;
+			vel[2] += btCos(yrad) * speed;
+		}
+
+		if (this->strafeLeft) {
+			vel[0] -= btCos(yrad) * speed;
+			vel[2] -= btSin(yrad) * speed;
+		}
+
+		if (this->strafeRight) {
+			vel[0] += btCos(yrad) * speed;
+			vel[2] += btSin(yrad) * speed;
+		}
+
+		body->setLinearVelocity(vel);
+
+		this->position = this->getPos();
+	}
+	*/
 }
 
 void PlayerManager::render() {
@@ -239,9 +330,21 @@ void PlayerManager::render() {
 
 	ShaderManager::sceneShader.setCamera(&this->state->camera);
 
+	//float m[16];
+
+	glm::vec3 p = this->getPos();
+
+	p.y -= 2.0f;
+
+	/*
+	glm::vec3 p = glm::vec3(
+		this->position.x,
+		this->position.y - 2.0f,
+		this->position.z);
+	*/
 	mesh.setModel(
-		glm::translate(glm::mat4(1.0f), this->position) *
-		glm::rotate(glm::mat4(1.0f), glm::radians(this->yrot), glm::vec3(0, 1, 0))
+		glm::translate(glm::mat4(1.0f), p) *
+		glm::rotate(glm::mat4(1.0f), glm::radians(-this->yrot), glm::vec3(0, 1, 0))
 	);
 
 	TextureManager::getTex("obj:temp_player")->bind();
@@ -253,9 +356,20 @@ void PlayerManager::render() {
 }
 
 void PlayerManager::release() {
+	this->phyManager->removeRigidBody(this->body);
+	delete this->shape;
 	this->mesh.release();
 	this->phyManager = nullptr;
 	this->state = nullptr;
+}
+
+glm::vec3 PlayerManager::getPos() {
+	btVector3 v = body->getCenterOfMassPosition();
+	return glm::vec3(
+		v.x(),
+		v.y(),
+		v.z()
+	);
 }
 
 // Game State
@@ -305,7 +419,7 @@ void GameState::init() {
 	});
 
 	camera.init(
-		playerManager.position,
+		playerManager.getPos(),
 		glm::vec2(0.0f),
 		glm::vec3(0.0f, 1.0f, 8.0f)
 	);
@@ -321,6 +435,8 @@ void GameState::update(float delta) {
 		}
 
 		// Update Stuff
+		phyManager.update(delta, 10);
+
 		camera.update(delta);
 
 		levelManager.update(delta);
@@ -341,7 +457,7 @@ void GameState::update(float delta) {
 
 void GameState::fixedUpdate() {
 	if (!MenuManager::isShow()) {
-		phyManager.stepSimulation();
+		//phyManager.stepSimulation();
 
 		playerManager.fixedUpdate();
 	}

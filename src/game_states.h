@@ -98,23 +98,39 @@ struct LevelManager {
 
 };
 
-
 struct PlayerManager {
 	PhysicsManager* phyManager = nullptr;
 	GameState* state = nullptr;
 
 	SceneGeometry mesh;
 
-	glm::vec3 position;
+	//glm::vec3 position;
 	float yrot;
 
-	
+	float speed = 512.0f;
+
+	btCollisionShape* shape = nullptr;
+	btRigidBody* body = nullptr;
+
+	glm::vec3 position;
+
+	bool moveJump = false;
+
+	bool moveRunning = false;
+	bool moveForward = false;
+	bool moveBackward = false;
+	bool strafeLeft = false;
+	bool strafeRight = false;
+
 	void init(GameState* state);
 
 	void update(float delta);
 	void fixedUpdate();
 	void render();
 	void release();
+
+	glm::vec3 getPos();
+
 };
 
 struct GameState : public AbstractState {

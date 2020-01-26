@@ -14,6 +14,8 @@ struct PhysicsManager {
 
 	void init();
 
+	void update(float delta, int subpasses);
+
 	void release();
 
 	btDiscreteDynamicsWorld* getWorld();
