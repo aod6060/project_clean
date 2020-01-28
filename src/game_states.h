@@ -133,6 +133,56 @@ struct PlayerManager {
 
 };
 
+enum CollectableType {
+	CT_NORM_STICK = 0,
+	CT_NORM_TRASHBAG,
+	CT_NORM_TV,
+	CT_NORM_FRIGORATOR,
+	CT_SILVER_STICK,
+	CT_SILVER_TRASHBAG,
+	CT_SILVER_TV,
+	CT_SILVER_FRIGORATOR,
+	CT_GOLD_STICK,
+	CT_GOLD_TRASHBAG,
+	CT_GOLD_TV,
+	CT_GOLD_FRIGORATOR,
+	CT_SUPRISE_CRATE,
+	CT_MAX_SIZE
+};
+
+struct CollectableObject {
+	CollectableType type;
+	btRigidBody* body;
+};
+
+struct CollectableManager {
+	GameState* state;
+	PhysicsManager* phyManager;
+
+	SceneGeometry collectableMesh;
+	btCollisionShape* shape;
+
+	std::vector<std::string> textures;
+	std::vector<std::function<int()>> callbacks;
+	
+	// Table of values...
+	std::vector<CollectableType> table;
+
+	std::vector<CollectableObject> colObjs;
+
+	void init(GameState* state);
+
+	void render();
+
+	void release();
+
+	void buildTable();
+
+	CollectableType getTypeFromTable();
+
+
+};
+
 struct GameState : public AbstractState {
 	RenderPassManager renderPassMan;
 	RenderPass mainRenderPass;
@@ -145,6 +195,7 @@ struct GameState : public AbstractState {
 
 	LevelManager levelManager;
 	PlayerManager playerManager;
+	CollectableManager collectableManager;
 
 	virtual void init();
 	virtual void update(float delta);
@@ -155,114 +206,3 @@ struct GameState : public AbstractState {
 
 
 struct ClassModeGameState : public GameState {};
-
-/*
-enum PhysicObjectType {
-	POT_TERRAIN = 0,
-	POT_CRATE,
-	POT_PLAYER
-};
-
-struct GameState;
-
-struct LevelManager {
-	PhysicsManager* phyManager = nullptr;
-	GameState* state;
-
-	ProcTerrainGeometry terrain;
-	btHeightfieldTerrainShape* shape;
-	btRigidBody* body = nullptr;
-	PhysicsData data;
-
-	void init(GameState* state);
-
-	void render();
-
-	void release();
-};
-
-struct CratesManager {
-	PhysicsManager* phyManager = nullptr;
-	GameState* state = nullptr;
-
-	SceneGeometry crappyCrate;
-
-	btCollisionShape* shape = nullptr;
-	PhysicsData data;
-
-	std::vector<btRigidBody*> bodies;
-	//std::vector<PhysicsData> physicsData;
-
-	void init(GameState* state);
-
-	void render();
-
-	void fixedUpdate();
-
-	void release();
-
-};
-*/
-
-/*
-struct GameState : public AbstractState {
-	PhysicsManager phyManager;
-	btCollisionShape* shape;
-	btRigidBody* body;
-
-	//Camera camera;
-	PhysicsCamera camera;
-	PhysicsData cameraData;
-
-	RenderPassManager renderPassManager;
-	RenderPass mainRenderPass;
-
-	QuadHUBGeometry hubGeom;
-	RenderPass hubRenderPass;
-
-	bool isWire = false;
-
-	//SceneGeometry multiMeshTest;
-	//ProcTerrainGeometry terrain;
-
-	LevelManager levelManager;
-	CratesManager cratesManager;
-
-	float waterAnim = 0.0f;
-	WaterGeometry waterGeom;
-
-	float yrot = 0.0f;
-
-	// UI Section
-	// Continue Button
-	UIButtonComponent continueButton;
-
-	// Master Sound Control
-	UILabelComponent masterSliderLabel;
-	UISliderComponent masterSlider;
-
-	// Music
-	UILabelComponent musicSliderLabel;
-	UISliderComponent musicSlider;
-
-	// Ambient
-	UILabelComponent ambientSliderLabel;
-	UISliderComponent ambientSlider;
-
-	// Sound FX
-	UILabelComponent soundfxSliderLabel;
-	UISliderComponent soundfxSlider;
-
-	// Exit Button
-	UIButtonComponent exitButton;
-	UIManager uiManager;
-
-	void _initUI();
-
-	virtual void init();
-	virtual void update(float delta);
-	virtual void fixedUpdate();
-	virtual void render();
-	virtual void release();
-};
-*/

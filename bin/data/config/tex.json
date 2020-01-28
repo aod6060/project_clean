@@ -53,6 +53,58 @@
         {
             "name": "obj:temp_player",
             "path": "data/textures/objects/temp_player/temp_player_albedo.png"
+        },
+        {
+            "name": "col:norm_stick",
+            "path": "data/textures/collectables/norm_stick.png"
+        },
+        {
+            "name": "col:norm_trashbag",
+            "path": "data/textures/collectables/norm_trashbag.png"
+        },
+        {
+            "name": "col:norm_tv",
+            "path": "data/textures/collectables/norm_tv.png"
+        },
+        {
+            "name": "col:norm_frigorator",
+            "path": "data/textures/collectables/norm_frigorator.png"
+        },
+        {
+            "name": "col:silver_stick",
+            "path": "data/textures/collectables/silver_stick.png"
+        },
+        {
+            "name": "col:silver_trashbag",
+            "path": "data/textures/collectables/silver_trashbag.png"
+        },
+        {
+            "name": "col:silver_tv",
+            "path": "data/textures/collectables/silver_tv.png"
+        },
+        {
+            "name": "col:silver_frigorator",
+            "path": "data/textures/collectables/silver_frigorator.png"
+        },
+        {
+            "name": "col:gold_stick",
+            "path": "data/textures/collectables/gold_stick.png"
+        },
+        {
+            "name": "col:gold_trashbag",
+            "path": "data/textures/collectables/gold_trashbag.png"
+        },
+        {
+            "name": "col:gold_tv",
+            "path": "data/textures/collectables/gold_tv.png"
+        },
+        {
+            "name": "col:gold_frigorator",
+            "path": "data/textures/collectables/gold_frigorator.png"
+        },
+        {
+            "name": "col:suprise_crate",
+            "path": "data/textures/collectables/suprise_crate.png"
         }
     ]
 }

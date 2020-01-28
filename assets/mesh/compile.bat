@@ -10,4 +10,5 @@ echo %comp%
 %comp% temp_floor.blend ../../bin/data/meshes/temp_floor
 %comp% multi_mesh_test.blend ../../bin/data/meshes/multi_mesh_test
 %comp% crappy_crate.blend ../../bin/data/meshes/objects/crate/crappy_crate
+%comp% collectable.blend ../../bin/data/meshes/collectable
 %comp% temp_player.blend ../../bin/data/meshes/objects/temp_player/temp_player
