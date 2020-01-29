@@ -60,6 +60,14 @@ struct StartMenuState : public AbstractState {
 
 struct GameState;
 
+enum PhysicsType {
+	PT_PLAYER,
+	PT_COLLECTABLE,
+	PT_TERRAIN,
+	PT_WATER,
+	PT_MAX_SIZE
+};
+
 struct GameCamera : public Camera {
 	glm::vec3 zoom;
 
@@ -84,12 +92,14 @@ struct LevelManager {
 	ProcTerrainGeometry terrain;
 	btHeightfieldTerrainShape* terrainShape;
 	btRigidBody* terrainBody;
+	PhysicsData terrainData;
 
 	// Water
 	float waterAnim = 0.0f;
 	WaterGeometry waterGeom;
 	btCollisionShape* waterShape;
 	btRigidBody* waterBody;
+	PhysicsData waterData;
 
 	void init(GameState* state);
 	void render();
@@ -101,6 +111,7 @@ struct LevelManager {
 struct PlayerManager {
 	PhysicsManager* phyManager = nullptr;
 	GameState* state = nullptr;
+	PhysicsData data;
 
 	SceneGeometry mesh;
 
@@ -150,9 +161,16 @@ enum CollectableType {
 	CT_MAX_SIZE
 };
 
+struct CollectableManager;
+
 struct CollectableObject {
+	CollectableManager* manager;
 	CollectableType type;
 	btRigidBody* body;
+	PhysicsData data;
+	bool playerCollide = false;
+	float time = 0.0f;
+	float maxTime = 1.0f;
 };
 
 struct CollectableManager {
@@ -165,6 +183,8 @@ struct CollectableManager {
 	std::vector<std::string> textures;
 	std::vector<std::function<int()>> callbacks;
 	
+	int score = 0;
+
 	// Table of values...
 	std::vector<CollectableType> table;
 
@@ -173,6 +193,8 @@ struct CollectableManager {
 	void init(GameState* state);
 
 	void render();
+
+	void update(float delta);
 
 	void release();
 

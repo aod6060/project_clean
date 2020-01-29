@@ -332,14 +332,12 @@ tsize=16, osize=64
 tex: 7
 renderbuf: 1
 Success: Framebuffer created
-0
-tsize=16, osize=64
-tex: 7
-renderbuf: 1
-Success: Framebuffer created
-0
-tsize=16, osize=64
-tex: 7
-renderbuf: 1
-Success: Framebuffer created
+Score: 0
+Score: -4096
+Score: -8192
+Score: -4096
+Score: -8192
+Score: -12288
+Score: -16384
+Score: -20480
 0

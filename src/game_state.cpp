@@ -50,6 +50,8 @@ void LevelManager::init(GameState* state) {
 	btVector3 v(0.0f, offset, 0.0f);
 
 	this->terrainBody = this->phyManager->createRigidBody(0, btTransform(btQuaternion(0, 0, 0, 1), v), this->terrainShape);
+	this->terrainData.id = PT_TERRAIN;
+	this->terrainBody->setUserPointer(&this->terrainData);
 
 	this->waterGeom.init();
 
@@ -57,6 +59,9 @@ void LevelManager::init(GameState* state) {
 
 	this->waterShape = phyManager->createStaticPlaneShape(btVector3(0, 1, 0), 0.0f);
 	this->waterBody = phyManager->createRigidBody(0.0f, btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, y, 0)), waterShape);
+	this->waterData.id = PT_WATER;
+	this->waterBody->setUserPointer(&this->waterData);
+	
 }
 
 void LevelManager::render() {
@@ -105,9 +110,11 @@ void LevelManager::update(float delta) {
 }
 
 void LevelManager::release() {
+	waterBody->setUserPointer(nullptr);
 	phyManager->removeRigidBody(this->waterBody);
 	delete waterShape;
 	waterGeom.release();
+	this->terrainBody->setUserPointer(nullptr);
 	phyManager->removeRigidBody(this->terrainBody);
 	delete terrainShape;
 	terrain.release();
@@ -142,6 +149,10 @@ void PlayerManager::init(GameState* state) {
 	this->body->setSleepingThresholds(0, 0);
 	this->body->setAngularFactor(0);
 	
+	data.id = PT_PLAYER;
+	
+	this->body->setUserPointer(&data);
+
 	yrot = (float)(rand() % 360);
 
 	this->speed = 1024.0f;
@@ -285,6 +296,7 @@ void PlayerManager::render() {
 }
 
 void PlayerManager::release() {
+
 	this->phyManager->removeRigidBody(this->body);
 	delete this->shape;
 	this->mesh.release();
@@ -309,7 +321,7 @@ void add_v(std::vector<CollectableType>& c, CollectableType type, uint32_t max) 
 	}
 }
 
-#define NUM_COLLECTABLES 128
+#define NUM_COLLECTABLES 64
 
 void CollectableManager::init(GameState* state) {
 	this->state = state;
@@ -378,9 +390,18 @@ void CollectableManager::init(GameState* state) {
 
 		colObj.type = type;
 		colObj.body = phyManager->createRigidBody(1.0f, t, this->shape);
+		colObj.manager = this;
 
 		this->colObjs.push_back(colObj);
 	}
+
+	for (int i = 0; i < this->colObjs.size(); i++) {
+		colObjs[i].data.data = &colObjs[i];
+		colObjs[i].data.id = PT_COLLECTABLE;
+		colObjs[i].body->setUserPointer(&colObjs[i].data);
+	}
+
+	logger_output("Score: %d\n", this->score);
 }
 
 void CollectableManager::render() {
@@ -406,8 +427,165 @@ void CollectableManager::render() {
 	ShaderManager::sceneShader.unbind();
 }
 
+void CollectableManager::update(float delta) {
+	// Update Timer for colObjects
+	for (int i = 0; i < this->colObjs.size(); i++) {
+		if (colObjs[i].playerCollide) {
+			if (colObjs[i].time <= 0.0f) {
+				colObjs[i].playerCollide = false;
+				colObjs[i].time = 0.0f;
+			}
+			else {
+				colObjs[i].time -= delta;
+			}
+		}
+	}
+
+	// Check for collisions
+	int numManifolds = phyManager->getWorld()->getDispatcher()->getNumManifolds();
+
+	float explosion = 64.0f;
+
+	for (int i = 0; i < numManifolds; i++) {
+		btPersistentManifold* contactManifold = phyManager->getWorld()->getDispatcher()->getManifoldByIndexInternal(i);
+
+		btRigidBody* body0 = (btRigidBody*)(contactManifold->getBody0());
+		btRigidBody* body1 = (btRigidBody*)(contactManifold->getBody1());
+
+		if (body0 != nullptr && body1 != nullptr) {
+			PhysicsData* data0 = (PhysicsData*)body0->getUserPointer();
+			PhysicsData* data1 = (PhysicsData*)body1->getUserPointer();
+
+			if (data0 != nullptr && data1 != nullptr) {
+
+				if (data0->id == PT_PLAYER) {
+					if (data1->id == PT_COLLECTABLE) {
+						
+						CollectableObject* obj = (CollectableObject*)(data1->data);
+
+						if (!obj->playerCollide) {
+							CollectableType type = obj->type;
+
+							float x = (rand() % 512) - 256.0f;
+							float z = (rand() % 512) - 256.0f;
+
+							float y = state->levelManager.terrain.data.heightScale + 32.0f + (rand() % 64);
+
+							int score = this->callbacks[type]();
+
+							this->score += score;
+
+							if (type == CT_SUPRISE_CRATE) {
+								if(score < 0) {
+									/*
+									// Send player flying upwards lol
+									btVector3 v = body0->getLinearVelocity();
+
+									v[1] = explosion;
+
+									body0->setLinearVelocity(v);
+									*/
+
+									btVector3 pos0 = body0->getCenterOfMassPosition();
+									btVector3 pos1 = body1->getCenterOfMassPosition();
+
+
+									btVector3 p = pos0 - pos1;
+
+									p = p.normalize();
+
+									body0->setLinearVelocity(p * explosion);
+								}
+							}
+							logger_output("Score: %d\n", this->score);
+
+							btVector3 v = btVector3(x, y, z);
+							btQuaternion q = btQuaternion(0, 0, 0, 1);
+
+							btTransform tran = btTransform(q, v);
+
+							type = this->getTypeFromTable();
+
+							obj->body->setCenterOfMassTransform(tran);
+							obj->body->activate(true);
+							obj->type = type;
+
+							obj->playerCollide = true;
+							obj->time = obj->maxTime;
+
+						}
+					}
+				}
+
+				if (data1->id == PT_PLAYER) {
+					// Player it safe
+					if (data0->id == PT_COLLECTABLE) {
+						CollectableObject* obj = (CollectableObject*)(data0->data);
+
+						if (!obj->playerCollide) {
+							CollectableType type = obj->type;
+
+							float x = (rand() % 512) - 256.0f;
+							float z = (rand() % 512) - 256.0f;
+
+							float y = state->levelManager.terrain.data.heightScale + 32.0f + (rand() % 64);
+							
+							int score = this->callbacks[type]();
+							
+							this->score += score;
+
+							if (type == CT_SUPRISE_CRATE) {
+								if (score < 0) {
+									// Send player flying upwards lol
+									/*
+									btVector3 v = body1->getLinearVelocity();
+
+									v[1] = explosion;
+
+									body1->setLinearVelocity(v);
+									*/
+
+									btVector3 pos0 = body1->getCenterOfMassPosition();
+									btVector3 pos1 = body0->getCenterOfMassPosition();
+
+
+									btVector3 p = pos0 - pos1;
+
+									p = p.normalize();
+
+									body1->setLinearVelocity(p * explosion);
+
+								}
+							}
+
+							logger_output("Score: %d\n", this->score);
+
+							btVector3 v = btVector3(x, y, z);
+							btQuaternion q = btQuaternion(0, 0, 0, 1);
+
+							btTransform tran = btTransform(q, v);
+
+							type = this->getTypeFromTable();
+
+							obj->body->setCenterOfMassTransform(tran);
+							obj->body->activate(true);
+							obj->type = type;
+
+							obj->playerCollide = true;
+							obj->time = obj->maxTime;
+						}
+					}
+				}
+			}
+		}
+
+	}
+}
+
 void CollectableManager::release() {
 	for (int i = 0; i < this->colObjs.size(); i++) {
+		colObjs[i].data.data = nullptr;
+		colObjs[i].body->setUserPointer(nullptr);
 		this->phyManager->removeRigidBody(colObjs[i].body);
 	}
 	colObjs.clear();
@@ -461,7 +639,8 @@ void CollectableManager::buildTable() {
 }
 
 CollectableType CollectableManager::getTypeFromTable() {
-	return this->table[rand() % this->table.size()];
+	//return this->table[rand() % this->table.size()];
+	return CT_SUPRISE_CRATE;
 }
 
 // Game State
@@ -497,6 +676,9 @@ void GameState::init() {
 
 		ShaderManager::hubShader.unbind();
 
+		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
+		FontRender::print(0.0f, 0.0f, "Score: %d", collectableManager.score);
+		
 		MenuManager::gameContextMenu.render();
 	});
 
@@ -538,6 +720,7 @@ void GameState::update(float delta) {
 
 		playerManager.update(delta);
 
+		collectableManager.update(delta);
 	}
 	else {
 		if (input_isIMFromConfDown("escape")) {
@@ -545,17 +728,10 @@ void GameState::update(float delta) {
 			input_setGrab(true);
 		}
 	}
-
-	//MenuManager::update(delta);
 	MenuManager::gameContextMenu.update(delta);
 }
 
 void GameState::fixedUpdate() {
-	if (!MenuManager::isShow()) {
-		//phyManager.stepSimulation();
-
-		playerManager.fixedUpdate();
-	}
 }
 
 void GameState::render() {
