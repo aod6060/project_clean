@@ -197,6 +197,20 @@ struct CollectableManager {
 
 };
 
+struct ScoreBoard {
+	int player1Score = 0;
+
+	void init();
+
+	void render();
+
+	void release();
+
+	void addPlayer1Score(int score);
+
+
+};
+
 struct GameState : public AbstractState {
 	RenderPassManager renderPassMan;
 	RenderPass mainRenderPass;

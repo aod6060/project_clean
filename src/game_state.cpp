@@ -643,6 +643,26 @@ CollectableType CollectableManager::getTypeFromTable() {
 	//return CT_SUPRISE_CRATE;
 }
 
+void ScoreBoard::init() {
+	this->player1Score = 0;
+}
+
+void ScoreBoard::render() {
+	// Player 1 Score
+	FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
+	FontRender::print(0.0f, 0.0f, "Player 1: %d", this->player1Score);
+}
+
+void ScoreBoard::release() {
+	this->player1Score = 0;
+}
+
+void ScoreBoard::addPlayer1Score(int score) {
+	this->player1Score += score;
+}
+
+
+
 // Game State
 void GameState::init() {
 	this->phyManager.init();
