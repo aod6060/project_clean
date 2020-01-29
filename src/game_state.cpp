@@ -639,8 +639,8 @@ void CollectableManager::buildTable() {
 }
 
 CollectableType CollectableManager::getTypeFromTable() {
-	//return this->table[rand() % this->table.size()];
-	return CT_SUPRISE_CRATE;
+	return this->table[rand() % this->table.size()];
+	//return CT_SUPRISE_CRATE;
 }
 
 // Game State

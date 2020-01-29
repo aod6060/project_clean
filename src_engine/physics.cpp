@@ -26,12 +26,26 @@ void PhysicsManager::init() {
 	this->collisionConf = new btDefaultCollisionConfiguration();
 	this->disp = new btCollisionDispatcher(this->collisionConf);
 	this->broadphase = new btDbvtBroadphase();
-	this->solver = new btSequentialImpulseConstraintSolver();
-	this->world = new btDiscreteDynamicsWorld(
+	//this->solver = new btSequentialImpulseConstraintSolver();
+	this->solver = new btSequentialImpulseConstraintSolverMt();
+	this->solverPool = new btConstraintSolverPoolMt(4);
+
+	/*
+	this->world = new btDiscreteDynamicsWorldMt(
 		disp,
 		broadphase,
 		solver,
 		collisionConf);
+	*/
+
+
+	this->world = new btDiscreteDynamicsWorldMt(
+		disp,
+		broadphase,
+		this->solverPool,
+		this->solver,
+		this->collisionConf);
+
 	world->setGravity(btVector3(0, -10, 0));
 }
 
@@ -42,6 +56,7 @@ void PhysicsManager::update(float delta, int subpasses) {
 void PhysicsManager::release() {
 	delete this->world;
 	delete this->solver;
+	delete this->solverPool;
 	delete this->broadphase;
 	delete this->disp;
 	delete this->collisionConf;

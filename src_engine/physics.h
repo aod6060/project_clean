@@ -1,5 +1,8 @@
 #pragma once
 
+#include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolverMt.h>
+#include <BulletDynamics/Dynamics/btDiscreteDynamicsWorldMt.h>
+
 struct PhysicsData {
 	int id;
 	void* data;
@@ -9,8 +12,11 @@ struct PhysicsManager {
 	btBroadphaseInterface* broadphase = nullptr;
 	btCollisionDispatcher* disp = nullptr;
 	btConstraintSolver* solver = nullptr;
+	btConstraintSolverPoolMt* solverPool = nullptr;
+
 	btDefaultCollisionConfiguration* collisionConf = nullptr;
-	btDiscreteDynamicsWorld* world = nullptr;
+	//btDiscreteDynamicsWorld* world = nullptr;
+	btDiscreteDynamicsWorldMt* world = nullptr;
 
 	void init();
 

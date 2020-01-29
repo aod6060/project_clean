@@ -125,14 +125,6 @@ struct PlayerManager {
 
 	glm::vec3 position;
 
-	bool moveJump = false;
-
-	bool moveRunning = false;
-	bool moveForward = false;
-	bool moveBackward = false;
-	bool strafeLeft = false;
-	bool strafeRight = false;
-
 	void init(GameState* state);
 
 	void update(float delta);
