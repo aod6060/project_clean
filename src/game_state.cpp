@@ -401,7 +401,7 @@ void CollectableManager::init(GameState* state) {
 		colObjs[i].body->setUserPointer(&colObjs[i].data);
 	}
 
-	logger_output("Score: %d\n", this->score);
+	//logger_output("Score: %d\n", this->score);
 }
 
 void CollectableManager::render() {
@@ -473,7 +473,8 @@ void CollectableManager::update(float delta) {
 
 							int score = this->callbacks[type]();
 
-							this->score += score;
+							//this->score += score;
+							state->scoreBoard.addPlayer1Score(score);
 
 							if (type == CT_SUPRISE_CRATE) {
 								if(score < 0) {
@@ -497,7 +498,7 @@ void CollectableManager::update(float delta) {
 									body0->setLinearVelocity(p * explosion);
 								}
 							}
-							logger_output("Score: %d\n", this->score);
+							//logger_output("Score: %d\n", this->score);
 
 							btVector3 v = btVector3(x, y, z);
 							btQuaternion q = btQuaternion(0, 0, 0, 1);
@@ -531,8 +532,9 @@ void CollectableManager::update(float delta) {
 							float y = state->levelManager.terrain.data.heightScale + 32.0f + (rand() % 64);
 							
 							int score = this->callbacks[type]();
-							
-							this->score += score;
+							state->scoreBoard.addPlayer1Score(score);
+
+							//this->score += score;
 
 							if (type == CT_SUPRISE_CRATE) {
 								if (score < 0) {
@@ -558,7 +560,7 @@ void CollectableManager::update(float delta) {
 								}
 							}
 
-							logger_output("Score: %d\n", this->score);
+							//logger_output("Score: %d\n", this->score);
 
 							btVector3 v = btVector3(x, y, z);
 							btQuaternion q = btQuaternion(0, 0, 0, 1);
@@ -643,7 +645,8 @@ CollectableType CollectableManager::getTypeFromTable() {
 	//return CT_SUPRISE_CRATE;
 }
 
-void ScoreBoard::init() {
+void ScoreBoard::init(GameState* state) {
+	this->state = state;
 	this->player1Score = 0;
 }
 
@@ -696,9 +699,10 @@ void GameState::init() {
 
 		ShaderManager::hubShader.unbind();
 
-		FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
-		FontRender::print(0.0f, 0.0f, "Score: %d", collectableManager.score);
-		
+		//FontRender::setColor(glm::vec3(0.0f, 0.0f, 1.0f));
+		//FontRender::print(0.0f, 0.0f, "Score: %d", collectableManager.score);
+		scoreBoard.render();
+
 		MenuManager::gameContextMenu.render();
 	});
 
@@ -709,6 +713,7 @@ void GameState::init() {
 	levelManager.init(this);
 	playerManager.init(this);
 	collectableManager.init(this);
+	scoreBoard.init(this);
 
 	MenuManager::gameContextMenu.setCallback([&](UIButtonComponent* comp) {
 		MenuManager::gameContextMenu.setShow(false);
@@ -759,6 +764,7 @@ void GameState::render() {
 }
 
 void GameState::release() {
+	scoreBoard.release();
 	collectableManager.release();
 	playerManager.release();
 	levelManager.release();

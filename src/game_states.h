@@ -175,7 +175,7 @@ struct CollectableManager {
 	std::vector<std::string> textures;
 	std::vector<std::function<int()>> callbacks;
 	
-	int score = 0;
+	//int score = 0;
 
 	// Table of values...
 	std::vector<CollectableType> table;
@@ -198,9 +198,11 @@ struct CollectableManager {
 };
 
 struct ScoreBoard {
+	GameState* state;
+
 	int player1Score = 0;
 
-	void init();
+	void init(GameState* state);
 
 	void render();
 
@@ -224,6 +226,7 @@ struct GameState : public AbstractState {
 	LevelManager levelManager;
 	PlayerManager playerManager;
 	CollectableManager collectableManager;
+	ScoreBoard scoreBoard;
 
 	virtual void init();
 	virtual void update(float delta);
