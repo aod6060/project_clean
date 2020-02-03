@@ -150,7 +150,8 @@ void PlayerManager::init(GameState* state) {
 	this->body->setAngularFactor(0);
 	
 	data.id = PT_PLAYER;
-	
+	data.data = this;
+
 	this->body->setUserPointer(&data);
 
 	yrot = (float)(rand() % 360);
@@ -313,6 +314,10 @@ glm::vec3 PlayerManager::getPos() {
 	);
 }
 
+void PlayerManager::handleScore(int score) {
+	this->state->scoreBoard.addPlayer1Score(score);
+}
+
 // collectable manager
 
 void add_v(std::vector<CollectableType>& c, CollectableType type, uint32_t max) {
@@ -320,8 +325,6 @@ void add_v(std::vector<CollectableType>& c, CollectableType type, uint32_t max) 
 		c.push_back(type);
 	}
 }
-
-#define NUM_COLLECTABLES 64
 
 void CollectableManager::init(GameState* state) {
 	this->state = state;
@@ -371,7 +374,7 @@ void CollectableManager::init(GameState* state) {
 	this->callbacks.push_back([&]() {return (rand() % 2 == 0) ? 4096 : -4096; });
 
 	// Create All Objects
-	for (int i = 0; i < NUM_COLLECTABLES; i++) {
+	for (int i = 0; i < COL_MAX_SIZE; i++) {
 
 		float x = (rand() % 512) - 256.0f;
 		float z = (rand() % 512) - 256.0f;
@@ -474,7 +477,10 @@ void CollectableManager::update(float delta) {
 							int score = this->callbacks[type]();
 
 							//this->score += score;
-							state->scoreBoard.addPlayer1Score(score);
+							//state->scoreBoard.addPlayer1Score(score);
+							IScore* hs = (IScore*)data0->data;
+
+							hs->handleScore(score);
 
 							if (type == CT_SUPRISE_CRATE) {
 								if(score < 0) {
@@ -532,9 +538,13 @@ void CollectableManager::update(float delta) {
 							float y = state->levelManager.terrain.data.heightScale + 32.0f + (rand() % 64);
 							
 							int score = this->callbacks[type]();
-							state->scoreBoard.addPlayer1Score(score);
+
+
+							//state->scoreBoard.addPlayer1Score(score);
 
 							//this->score += score;
+							IScore* hs = (IScore*)data1->data;
+							hs->handleScore(score);
 
 							if (type == CT_SUPRISE_CRATE) {
 								if (score < 0) {

@@ -10,7 +10,8 @@ struct GameWindowCallback : public StateWindowCallback {
 	Logo2State logo2State;
 	StartMenuState startMenuState;
 	//GameState gameState;
-	ClassModeGameState classModeGameState;
+	//ClassModeGameState classModeGameState;
+	GameState gameState;
 
 	virtual void init();
 

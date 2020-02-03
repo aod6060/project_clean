@@ -68,6 +68,10 @@ enum PhysicsType {
 	PT_MAX_SIZE
 };
 
+struct IScore {
+	virtual void handleScore(int score) = 0;
+};
+
 struct GameCamera : public Camera {
 	glm::vec3 zoom;
 
@@ -108,7 +112,7 @@ struct LevelManager {
 
 };
 
-struct PlayerManager {
+struct PlayerManager : public IScore {
 	PhysicsManager* phyManager = nullptr;
 	GameState* state = nullptr;
 	PhysicsData data;
@@ -134,7 +138,10 @@ struct PlayerManager {
 
 	glm::vec3 getPos();
 
+	virtual void handleScore(int score);
 };
+
+#define COL_MAX_SIZE 64
 
 enum CollectableType {
 	CT_NORM_STICK = 0,
@@ -197,6 +204,60 @@ struct CollectableManager {
 
 };
 
+#define PU_MAX_SIZE 8
+
+enum PowerupType {
+	PUT_SCORE_2X = 0,
+	PUT_SCORE_4X,
+	PUT_SCORE_8X,
+	PUT_SCORE_16X,
+	PUT_SCORE_32X,
+	PUT_JUMP_HEIGHT_2X,
+	PUT_JUMP_HEIGHT_4X,
+	PUT_TELEPORT_TO_RARE,
+	PUT_ALL_COLLECTABLES_TO_PLAYER,
+	PUT_MAX_SIZE
+};
+
+struct PowerupManager;
+
+struct PowerupObject {
+	PowerupManager* manager;
+	PowerupType type;
+	btRigidBody* body;
+	PhysicsData data;
+	bool playerCollide = false;
+	float time = 0.0f;
+	float maxTime = 1.0f;
+};
+
+struct PowerupManager {
+	GameState* state;
+	PhysicsManager* phyManager;
+
+	SceneGeometry scene;
+	btCollisionShape* shape;
+
+	std::vector<std::string> textures;
+	std::vector<std::function<void()>> callbacks;
+
+	std::vector<PowerupType> table;
+	std::vector<PowerupObject> objects;
+
+	void init(GameState* state);
+
+	void update(float delta);
+
+	void render();
+
+	void release();
+
+	void buildTable();
+
+	PowerupType getTypeFromTable();
+
+};
+
 struct ScoreBoard {
 	GameState* state;
 
@@ -226,6 +287,8 @@ struct GameState : public AbstractState {
 	LevelManager levelManager;
 	PlayerManager playerManager;
 	CollectableManager collectableManager;
+	PowerupManager powerupManager;
+
 	ScoreBoard scoreBoard;
 
 	virtual void init();
@@ -236,4 +299,4 @@ struct GameState : public AbstractState {
 };
 
 
-struct ClassModeGameState : public GameState {};
+//struct ClassModeGameState : public GameState {};

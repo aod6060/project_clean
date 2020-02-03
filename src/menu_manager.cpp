@@ -20,7 +20,7 @@ void StartMenu::init() {
 	);
 
 	this->classModeButton.setButtonCallback([&](UIButtonComponent* comp) {
-		win_getCallbackTemp<GameWindowCallback>()->changeState("classic-mode");
+		win_getCallbackTemp<GameWindowCallback>()->changeState("game-state");
 		this->setShow(false);
 	});
 

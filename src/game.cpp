@@ -10,13 +10,14 @@ void GameWindowCallback::init() {
 	this->logo2State.setStateWindowCallback(this);
 	this->startMenuState.setStateWindowCallback(this);
 	//this->gameState.setStateWindowCallback(this);
-	this->classModeGameState.setStateWindowCallback(this);
+	//this->classModeGameState.setStateWindowCallback(this);
+	this->gameState.setStateWindowCallback(this);
 
 	this->addState("logo1", &this->logo1State);
 	this->addState("logo2", &this->logo2State);
 	this->addState("start-menu", &this->startMenuState);
 	//this->addState("game", &this->gameState);
-	this->addState("classic-mode", &this->classModeGameState);
+	this->addState("game-state", &this->gameState);
 
 	this->setDefaultState("logo1");
 
